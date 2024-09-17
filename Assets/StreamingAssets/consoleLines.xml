@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gamelines>
+    <patrol>
+    	<line text="In the distance, an enemy patrol"/>
+    	<line text="You spy a patrol!"/>
+    	<line text="An enemy patrol, just in time for more target practice!"/>
+    </patrol>
+    <ambush>
+    	<line text="It's an ambush!"/>
+    	<line text="Suddenly they're all around you!"/>
+    	<line text="Warm those guns! You're surrounded!"/>
+    </ambush>
+</gamelines>
