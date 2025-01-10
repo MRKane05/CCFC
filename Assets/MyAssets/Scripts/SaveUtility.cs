@@ -50,6 +50,7 @@ public class SaveUtility : MonoBehaviour {
 		writer.AutoFlush = true;
 		writer.Write(SaveData);
 		writer.Close();
+		Debug.Log("Map Saved: " + path + "/" + FileName);
 	}
 
 	public bool CheckSaveFile(string FileName)

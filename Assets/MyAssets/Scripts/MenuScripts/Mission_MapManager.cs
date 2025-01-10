@@ -143,32 +143,56 @@ public class Mission_MapManager : MonoBehaviour {
         }
     }
 
+	public void GenerateFreshMap()
+	{
+		StartCoroutine(mapGenerate());
+	}
+
+	IEnumerator mapGenerate() {
+
+		//We need to scram our map before generating a new one
+		while (transform.childCount > 0)
+        {
+			foreach(Transform thisTrans in transform)
+            {
+				Destroy(thisTrans.gameObject);
+            }
+			yield return null;
+        }
+		Debug.Log("Generating Map");
+		mapArray.Clear();
+		mapArray = new List<mapArrayEntry>();
+		conflictTiles.Clear();
+		conflictTiles = new List<conflictTile>();
+		populateMap();
+		runMapTints(false);  //Necessary to figure out what's no-mans land
+							 //Add a few conflict tiles
+		addNewConflictTile(enemyTeam, 3, 2);
+		//addNewConflictTile(enemyTeam, 4, 4);
+		addNewConflictTile(enemyTeam, 2, 1);
+		addNewConflictTile(friendlyTeam, 2, 2);
+
+		//We could do with adding a smattering of Key areas for the enemy team, somehow...
+		addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
+		addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
+		addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
+		addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.BASE);
+		addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.BASE);
+		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
+		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
+		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
+		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
+
+		bMapLoaded = true;
+	}
+
 	// Use this for initialization
 	void Start () {
 		Instance = this;
 		alternateStep = new Vector3(-mapWidth/2F, 0, -mapHeight/2F); //used to offset our hex areas
-		if (!SaveUtility.Instance.CheckSaveFile("mapTileState.json") || true)
+		if (!SaveUtility.Instance.CheckSaveFile("mapTileState.json"))
 		{ //we need to make a new map
-			populateMap();
-			runMapTints(false);  //Necessary to figure out what's no-mans land
-							//Add a few conflict tiles
-			addNewConflictTile(enemyTeam, 3, 2);
-			//addNewConflictTile(enemyTeam, 4, 4);
-			addNewConflictTile(enemyTeam, 2, 1);
-			addNewConflictTile(friendlyTeam, 2, 2);
-
-			//We could do with adding a smattering of Key areas for the enemy team, somehow...
-			addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
-			addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
-			addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.STRATEGIC);
-			addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.BASE);
-			addKeyLocation(enemyTeam, keyLocation.enKeyLocationType.BASE);
-			addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
-			addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
-			addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
-			addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
-
-			bMapLoaded = true;
+			GenerateFreshMap();
 		} else
         {
 			loadMapState();
@@ -603,21 +627,9 @@ public class Mission_MapManager : MonoBehaviour {
 
 				//we'll either be loading the map detail or setting it up automatically
 				mapSelection.setTileLabel("" + ent);
-				//sort out our sides (basic assignment for the moment)
-				/*
-				if (y<Mathf.FloorToInt(mapHeight/4f)) { //this can be our "base ours"
-					mapSelection.setTeam(friendlyTeam); //Unsure if we still use this?
-					newMapEntry.mapScript.setTeam(friendlyTeam);
-					mapSelection.setTint(Color.Lerp (Color.white, Color.green, 0.33f), false, false);
-					newMapEntry.tileTeam = friendlyTeam;
-				} else {    //The enemy tiles aren't getting a number assigned correctly (the tiles are remaining at -1)
-					mapSelection.setTeam(enemyTeam);	//Unsure if we still use this
-					newMapEntry.mapScript.setTeam(enemyTeam);
-					mapSelection.setTint(Color.Lerp (Color.white, Color.red, 0.33f), false, false);
-					newMapEntry.tileTeam = enemyTeam;
-				}
-				*/
+
 				newMapEntry.tileEnt = ent;
+				newMapEntry.tileTeam = enemyTeam;
 				mapArray.Add(newMapEntry);
 
 				ent++; //cycle this up one
@@ -637,7 +649,7 @@ public class Mission_MapManager : MonoBehaviour {
 			//mapSelection.setTeam(friendlyTeam); //Unsure if we still use this?
 			//newMapEntry.mapScript.setTeam(friendlyTeam);
 			mapArray[i].mapScript.setTint(Color.Lerp(Color.white, bPlayerOwned ? Color.green : Color.red, 0.33f), false, false);
-			mapArray[i].tileTeam = friendlyTeam;
+			mapArray[i].tileTeam = bPlayerOwned ? friendlyTeam : enemyTeam;
 		}
 	}
 
@@ -696,7 +708,15 @@ public class Mission_MapManager : MonoBehaviour {
 			}
 			newMapEntry.tileEnt = ent;
 			mapArray.Add(newMapEntry);
+		}
 
+		foreach (conflictTile thisConflict in thisSaveForm.conflictTiles)
+        {
+			conflictTile newConflictTile = new conflictTile(thisConflict.tileNumber, thisConflict.turnsRemaining, thisConflict.tilesGained, thisConflict.conflictTeam);
+			conflictTiles.Add(newConflictTile);
+
+			//Seeing as this is called after the map is resolved we need to set our tile tints here
+			mapArray[thisConflict.tileNumber].mapScript.setConflictMarker(teamColors[thisConflict.conflictTeam], thisConflict.turnsRemaining.ToString(), true);
 		}
 	}
 

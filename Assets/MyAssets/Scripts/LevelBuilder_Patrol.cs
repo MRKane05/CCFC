@@ -15,7 +15,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 	GameObject[] enemyNodes;
 	
 	void Start() {
-		//setupLevel();
+		setupLevel();
 	}
 
 	//will need some sort of difficulty measure passed through to this...
