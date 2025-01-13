@@ -36,10 +36,13 @@ public class AttachedGun : MonoBehaviour {
 
 	//public int targetLayer = 1<<9;
 	public int targetLayer = 9; //only hit things on this layer.
-	// Use this for initialization
+								// Use this for initialization
+
+	AudioSource ourAudio;
 
 	ParticleEmitter ourHitEffect;
 	void Start () {
+		ourAudio = gameObject.GetComponent<AudioSource>();
 		ourHitEffect = gameObject.GetComponentInChildren<ParticleEmitter>();
 		//Flip target layer to bitmask
 		targetLayer = 1<<targetLayer;
@@ -89,33 +92,9 @@ public class AttachedGun : MonoBehaviour {
 
 		//make a bang!
 		if (firingSound) {
-			GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1f);
-			GetComponent<AudioSource>().Play();
+			ourAudio.pitch = Random.Range(0.6f, 1f);
+			ourAudio.PlayOneShot(firingSound);
 		}
-
-		//doTargetTrace(1, null);
-		//could probably do a player-based ray-check faster here than an actual ray-check and also
-		//allow for some more "fudge factor" with the player fighter (you know more proximity variance)
-		//Get our shot vector and factor in the accuracy of the shot.
-		/*
-		Vector3 shotVector = (transform.forward + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread))).normalized;
-		
-		//Try doing a fire raycast as we're slightly shifting the system approach.
-		RaycastHit hit;
-		//Physics.Raycast(Ray, distance, LayerMask);
-		Debug.DrawLine(transform.position, transform.position+shotVector*shotDistance);
-		Ray ourRay = new Ray(transform.position, shotVector);
-		
-		//Sort this out so that we can only hit things on this layer
-		//This is all very well until we're working with an AI...
-		if (Physics.Raycast(ourRay, out hit, shotDistance, targetLayer)) {
-			//Debug.Log ("Hit: " + hit.collider.gameObject.name);
-			//So now we need to find the AircraftController attached to this object.
-			AircraftController thisAircraftMP = hit.collider.gameObject.transform.parent.gameObject.GetComponent<AircraftController>() as AircraftController;
-			thisAircraftMP.takeDamage(damage, "NORMAL", transform.parent.parent.gameObject); //return our parent, but this is a messy process...
-			
-		}
-		*/	
 
 		float closestHit = float.MaxValue;
 		Actor closestActor = null;
@@ -155,6 +134,8 @@ public class AttachedGun : MonoBehaviour {
 		}
 
 		//Make the fire graphic
+		//We could do with making this into an array that gets read from and bullets recycled - I thought this was already in the game but apparently it's not...
+		/*
 		latestBullet = Instantiate(bulletPrefab, transform.position+transform.forward.normalized*forwardStep, transform.rotation) as GameObject;
 		latestBulletMP = latestBullet.GetComponent<Bullet>();
 		//latestBulletMP.Movement = transform.forward*BulletSpeed;
@@ -165,6 +146,7 @@ public class AttachedGun : MonoBehaviour {
 		
 		
 		Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose
+		*/
 		ReFireTime = Time.time+RefireRate;
 	
 	}

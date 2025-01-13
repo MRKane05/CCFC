@@ -37,10 +37,10 @@ public class SaveUtility : MonoBehaviour {
 		if (!Directory.Exists(path))	//Ensure we are able to save
 		{
 			Directory.CreateDirectory(path);
-			DebugLog.Instance.AddDebugMessage("Creating path for save: " + path);
+			Debug.Log("Creating path for save: " + path);
 		} else
         {
-			DebugLog.Instance.AddDebugMessage("Found path for save: " + path);
+			Debug.Log("Found path for save: " + path);
 		}
 	}
 
@@ -58,9 +58,7 @@ public class SaveUtility : MonoBehaviour {
 		//Check and see if we've got a saved map state
 		if (!System.IO.File.Exists(path + "/" + FileName))
 		{
-			Debug.Log("Save File Not Found");
-			DebugLog.Instance.AddDebugMessage("Save File Not Found: " + path + "/" + FileName);
-			Debug.Log(path + "/" + FileName);
+			Debug.Log("Save File Not Found: " + path + "/" + FileName);
 			return false;
 		}
 		return true;
@@ -71,7 +69,7 @@ public class SaveUtility : MonoBehaviour {
 		if (CheckSaveFile(Filename))
 		{
 			//Debug.Log("DataPath: " + Application.persistentDataPath + "/VHScores.json");
-			DebugLog.Instance.AddDebugMessage("Save File Read Path: " + path + "/" + Filename);
+			Debug.Log("Save File Read Path: " + path + "/" + Filename);
 			string fileData = File.ReadAllText(path + "/" + Filename);
 			return fileData;
 		}

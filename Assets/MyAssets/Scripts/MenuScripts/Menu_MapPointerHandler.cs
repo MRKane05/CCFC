@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class Menu_MapPointerHandler : MonoBehaviour {
 	private static Menu_MapPointerHandler instance;
@@ -13,6 +14,8 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 	Vector3 PointerRelativePosition;
 	float CursorMoveSpeed = 300f;
 	float PointerAlpha = 1f;
+
+	public TextMeshProUGUI TileDescriptionText;
 
 	[HideInInspector] public GameObject HoveredTile;
 
@@ -79,15 +82,49 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 		if (Physics.Raycast(rayVector, out hit, 20f))
 		{
 			//Debug.Log(hit.collider.gameObject.name);
-			HoveredTile = hit.collider.gameObject;	//So that our buttons can figure out which one is being hovered over
-			if (Input.GetButtonDown("Cross")|| Input.GetKeyDown(KeyCode.Return))
-            {
-				//See about selecting a tile :)
-				Mission_MapSection SelectedTile = HoveredTile.GetComponent<Mission_MapSection>();
-				if (SelectedTile)
+			HoveredTile = hit.collider.gameObject;  //So that our buttons can figure out which one is being hovered over
+			Mission_MapSection SelectedTile = HoveredTile.GetComponent<Mission_MapSection>();	//PROBLEM: Seems pointless to run this every tick, but I don't think that it'll matter at this stage
+			if (SelectedTile) {
+				if (Input.GetButtonDown("Cross") || Input.GetKeyDown(KeyCode.Return))
+				{
+					//See about selecting a tile :)
+
+					if (SelectedTile)
+					{
+						SelectedTile.sectionClick();
+					}
+				}
+				//I'd like to have our hovered tile change the heading on the mission selection screen
+				if (SelectedTile.bNoMansLand)
                 {
-					SelectedTile.sectionClick();
+					if (SelectedTile.bIsConflicted)
+					{
+						if (SelectedTile.conflictTeam == 0)
+						{
+							TileDescriptionText.text = "Friendly Operation: " + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
+						} else
+						{
+							TileDescriptionText.text = "Enemy Operation: " + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
+						}
+					} else
+					{
+						TileDescriptionText.text = "Fly Mission Over Front Line";
+
+					}
+                } else
+                {
+					if (SelectedTile.team == 0)	//Friendly team
+                    {
+						TileDescriptionText.text = "Friendly Territory";
+
+					} else //Enemy team
+                    {
+						TileDescriptionText.text = "Enemy Territory";
+                    }
                 }
+			} else
+            {
+				TileDescriptionText.text = "";
             }
 		}
 	}

@@ -85,7 +85,8 @@ public class MissionEventObject : MonoBehaviour {
         //handle in a group
         //specialTrigger(thisEvent, healthRatio);
         //Pass this event up to our master controller
-        ourMissionEventManager.actorTakingDamage(thisEvent, thisActor, healthRatio);    //This is problematic as it'll cause an iterate on every bullet hit, everywhere...
+        //PROBLEM: This is causing process lags
+        //ourMissionEventManager.actorTakingDamage(thisEvent, thisActor, healthRatio);    //This is problematic as it'll cause an iterate on every bullet hit, everywhere...
     }
 
     public virtual void actorCallbackDie(Actor thisActor)
@@ -144,7 +145,7 @@ public class MissionEventObject : MonoBehaviour {
 
     public virtual void checkTrigger(float gameTime)
     {
-        if (!bCanTrigger) { return;  }
+        if (!bCanTrigger) { return; }
         
             //So do we look to see if an event should be triggered here, or is it handled in the levelController?
             //Ok, in theory six of one and a half-dozen of another I suppose

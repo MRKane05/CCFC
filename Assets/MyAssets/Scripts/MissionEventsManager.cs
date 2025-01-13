@@ -39,15 +39,76 @@ public class MissionEventsManager : MonoBehaviour {
 		//Quickly knock something together
 		
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
-		LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 3);
-		LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 3);
-		ListLevelObjectives.Add(newObjective);
+		//LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 3);
+		LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
+		//ListLevelObjectives.Add(newObjective);
 		ListLevelObjectives.Add(balloonObjective);
 		ConstructMission(ListLevelObjectives, 4);
 
 		Debug.Log("Starting Mission");
 		ProcessMissionEvents();
+
+		//We also need to add our wingmen
+		//AddWingmen();
     }
+
+	public virtual void AddWingmen()
+    {
+		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 5f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
+		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 5f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
+	}
+
+	public actorWrapper addWingman(int thisTeam, GameObject thisPrefab, Vector3 thisPosition, Quaternion thisRotation, string groupTag, int formationPosition)
+	{
+
+		GameObject newTarget = Instantiate(thisPrefab, thisPosition, thisRotation) as GameObject;
+
+		actorWrapper newActor;
+
+		//Assign our stuff
+		newActor = new actorWrapper();
+		newActor.vehicle = newTarget;
+		newActor.actor = newTarget.GetComponent<Actor>(); //Was aircraft controller but we don't need to be that high up the stack really
+														  //newActor.vehicle = newActor.actor.getModel();
+		newActor.team = thisTeam;
+
+		//not totally sure this is the best option
+		newActor.ourController = newTarget.GetComponentInChildren<ActorController>(); //might cause issues with AI guns...
+																					  //Optional link pulled from the AircraftController perhaps?
+
+		newActor.ourController.team = thisTeam;
+		newActor.actor.setTeam(thisTeam);
+		//Need to assign the variables to the aircraft controller
+
+		//Handle our radar stuff
+		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
+		newActor.radarObject.transform.SetParent(LevelController.Instance.targetRadar.gameObject.transform); //child it to this.
+		newActor.radarObject.transform.localScale = Vector3.one;
+		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
+
+
+		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // LevelController.Instance.getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
+																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
+		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
+
+		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft.gameObject; //follow this
+		((AI_Fighter)newActor.ourController).flightGroup = groupTag;
+
+		//Now we need to figure out which list we add it to
+		if (thisTeam == 0)
+		{
+			LevelController.Instance.friendlyList.Add(newActor);
+		}
+		else if (thisTeam == 1)
+		{
+			LevelController.Instance.enemyList.Add(newActor);
+			newActor.actor.gradeSkill(0.5f);
+
+		}
+
+		//return newTarget; //for those of us who need the vehicle
+		return newActor;
+	}
 
 	//So I think the core question is "where do we construct our mission?"
 	void ConstructMission(List<LevelObjectiveSet> objectives, float difficulty) //, enObjectiveType secondaryObjective, enObjectiveType tirtaryObjective)
@@ -99,7 +160,8 @@ public class MissionEventsManager : MonoBehaviour {
 
 		newEvent.eventTeam = 1; //Enemies for the moment
 
-		int flightCount = Mathf.RoundToInt(Random.Range(1, 1));
+		int flightCount = Mathf.RoundToInt(Random.Range(3, 5));
+		flightCount = 1;	//PROBLEM this is a testing hack
 		float lineAngle = Random.Range(0f, 360f);
 		Quaternion AngleAxis = Quaternion.AngleAxis(lineAngle, Vector3.up);
 		Vector3 lineForward = new Vector3(clusterSpacing, 0, 0);
@@ -122,8 +184,8 @@ public class MissionEventsManager : MonoBehaviour {
 
 	void createFighterEvent() { 
 		//For the moment lets dump in a collection of elements
-		int numElements = Mathf.RoundToInt(Random.Range(1, 1));
-		numElements = 1;
+		int numElements = Mathf.RoundToInt(Random.Range(3, 5));
+		//numElements = 1;
 		for (int i=0; i<numElements; i++)
         {
 			missionEvent newEvent = MEV_MakeFlight();
@@ -300,9 +362,10 @@ public class MissionEventsManager : MonoBehaviour {
 		//I'm not sure what we can do with this now? Send a trigger through the system? I can see it being useful, but likewise I'm not sure how it'll
 		//handle in a group
 		//specialTrigger(thisEvent, healthRatio);
+		/*
 		foreach (MissionEventObject thisMissionEvent in gameMissionEvents)
 		{
 			thisMissionEvent.specialTrigger(thisEvent, healthRatio);
-		}
+		}*/
 	}
 }

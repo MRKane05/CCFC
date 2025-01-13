@@ -46,7 +46,7 @@ public class gameManager : MonoBehaviour {
 	
 	IEnumerator loadMission() {
 		//load our level
-		AsyncOperation async = Application.LoadLevelAsync(1); //PROBLEM: Need better level loading logic here
+		AsyncOperation async = Application.LoadLevelAsync("Level"); //PROBLEM: Need better level loading logic here
 		yield return async;
 		Debug.Log ("Loading complete");
 		
@@ -66,8 +66,9 @@ public class gameManager : MonoBehaviour {
 
 	IEnumerator doConcludeMission(int targetTile)
 	{
+		Time.timeScale = 1f;
 		//load our level
-		AsyncOperation async = Application.LoadLevelAsync(0); //PROBLEM: Need better level loading logic here
+		AsyncOperation async = Application.LoadLevelAsync("MissionSelection"); //PROBLEM: Need better level loading logic here
 		yield return async;
 		Debug.Log("Loading complete");
 

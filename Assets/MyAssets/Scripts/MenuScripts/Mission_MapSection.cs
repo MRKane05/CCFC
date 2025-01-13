@@ -22,6 +22,9 @@ public class Mission_MapSection : MonoBehaviour {
 	protected float m_areaForce = 20f;
 
 	public bool bNoMansLand = false;    //Used by our system to know if this is a tile where fighting is happening
+	public bool bIsConflicted = false;
+	public int conflictTeam = -1;
+	public int conflictDaysRemaining = -1;
 
 	Color TileColor = Color.white;
 	public int team { 
@@ -39,12 +42,16 @@ public class Mission_MapSection : MonoBehaviour {
 		KeyAreaMarker.SetActive(bEnabled);
 	}
 
-	public void setConflictMarker(Color thisTint, string thisText, bool bIsOn)
+	public void setConflictMarker(Color thisTint, int newConflictTeam, int newConflictDays, bool bIsOn)
     {
 		conflictMarker.SetActive(bIsOn);
 		//Because we're just using text...
 		ConflictText.color = thisTint;
-		ConflictText.text = thisText;
+		ConflictText.text = newConflictDays.ToString();
+
+		bIsConflicted = true;
+		conflictTeam = newConflictTeam;
+		conflictDaysRemaining = newConflictDays;
 	}
 
 	public void setConflictMarkerText(string thisText)

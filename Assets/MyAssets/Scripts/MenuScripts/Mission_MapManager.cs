@@ -118,7 +118,7 @@ public class Mission_MapManager : MonoBehaviour {
 		conflictTiles.Add(newConflictTile);
 
 		//Seeing as this is called after the map is resolved we need to set our tile tints here
-		mapArray[newTileNumber].mapScript.setConflictMarker(teamColors[team], turnsRemaining.ToString(), true);
+		mapArray[newTileNumber].mapScript.setConflictMarker(teamColors[team], team, turnsRemaining, true);
 	}
 
 	void addKeyLocation(int team, keyLocation.enKeyLocationType locationType)
@@ -263,7 +263,7 @@ public class Mission_MapManager : MonoBehaviour {
 			foreach (conflictTile removeTile in conflictTilesToRemove)
             {
 				//Clear our marker...
-				mapArray[removeTile.tileNumber].mapScript.setConflictMarker(teamColors[removeTile.conflictTeam], "", false);
+				mapArray[removeTile.tileNumber].mapScript.setConflictMarker(teamColors[removeTile.conflictTeam], -1, -1, false);
 				conflictTiles.Remove(removeTile);	//And remove our entry
 			}
         }
@@ -287,7 +287,7 @@ public class Mission_MapManager : MonoBehaviour {
 					if (PlayerIntervened)
 					{
 						//for the moment we'd just remove this conflict						
-						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(teamColors[thisTile.conflictTeam], "", false);
+						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(teamColors[thisTile.conflictTeam], thisTile.conflictTeam, -1, false);
 						//conflictTiles.Remove(thisTile);   //And remove our entry
 						conflictsToRemove.Add(thisTile);
 					}
@@ -666,7 +666,7 @@ public class Mission_MapManager : MonoBehaviour {
 
 			GameObject newMapTile = Instantiate(mapTile) as GameObject;
 
-			newMapTile.transform.parent = transform; //set it to this, which will also be linked to the handler
+			newMapTile.transform.SetParent(transform); //set it to this, which will also be linked to the handler
 
 			if (Mathf.Approximately(y / 2F, y / 2)) //this is a normal section
 				newMapTile.transform.localPosition = new Vector3((x - mapWidth / 2F) * tileWidth, (mapHeight / 4F - y / 2F) * tileHeight, 0);
@@ -716,7 +716,7 @@ public class Mission_MapManager : MonoBehaviour {
 			conflictTiles.Add(newConflictTile);
 
 			//Seeing as this is called after the map is resolved we need to set our tile tints here
-			mapArray[thisConflict.tileNumber].mapScript.setConflictMarker(teamColors[thisConflict.conflictTeam], thisConflict.turnsRemaining.ToString(), true);
+			mapArray[thisConflict.tileNumber].mapScript.setConflictMarker(teamColors[thisConflict.conflictTeam], thisConflict.conflictTeam, thisConflict.turnsRemaining, true);
 		}
 	}
 
@@ -788,7 +788,7 @@ public class Mission_MapManager : MonoBehaviour {
 		SetTileTeam(tileNumber, bWon ? friendlyTeam : enemyTeam);
 		runMapTints(true);
 		//After this turn we need to go around our events and see if any of them have changed or need updating
-
+		endTurn();	//Make sure we count down our turn here too
 
 		saveMapState(); //For the moment this can go here
 	}

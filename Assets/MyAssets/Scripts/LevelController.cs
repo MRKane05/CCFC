@@ -65,8 +65,8 @@ public class LevelController : MonoBehaviour {
 	public waypointWrapper[] waypoints; //we can make this active so that the targeting system could always see it?
 	public int currentWaypoint=0; //because 0 is always the level start
 
-	public enum enPlayState { Setup, Playing, Finished }
-	public enPlayState playState = enPlayState.Setup;
+	public enum enPlayState { NULL, SETUP, PLAYING, PAUSED, FINISHED }
+	public enPlayState playState = enPlayState.SETUP;
 	
 	#endregion
 	//These need to be changed into lists so that we can start handling our target changes/additions/removals
@@ -400,7 +400,7 @@ public class LevelController : MonoBehaviour {
 		
 		//Handle our radar stuff
 		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
-		newActor.radarObject.transform.parent = targetRadar.gameObject.transform; //child it to this.
+		newActor.radarObject.transform.SetParent(targetRadar.gameObject.transform); //child it to this.
 		newActor.radarObject.transform.localScale = Vector3.one;
 		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
@@ -420,9 +420,17 @@ public class LevelController : MonoBehaviour {
 		return newActor;
 	}
 	
-	void Start() {
+	IEnumerator Start() {
+		yield return null;
+		//This all needs to be disabled if we're outside of testing
+		/*
+		if (!prefabManager.Instance)
+        {
+			yield return null;
+        }
 		//For the moment:
 		//StartCoroutine(StartMatch());
+		createMatch(3, 3);*/
 		
 	}
 	
@@ -439,12 +447,17 @@ public class LevelController : MonoBehaviour {
     {
 		//Of course we need some concept of how well this has gone
 		StartCoroutine(FinishLevel());
-    }
+		//gameManager.Instance.ConcludeMission();
+	}
 
 	IEnumerator FinishLevel()
     {
 		yield return new WaitForSeconds(3f);    //Give a little pause after it's complete
-		gameManager.Instance.ConcludeMission();
+												//We want to load our panel scene here and pause so that the player can bask in the warm glow of seeing a mission complete scene
+		AsyncOperation async = Application.LoadLevelAsync("LevelComplete_Win");	//We're assuming that the player won...
+		yield return async;
+		Time.timeScale = 0f;	//Going to need to turn this back on somewhere...
+		//What we could actually start doing now is loading our other scene in the background...I'm not sure just how that'll work however, so for the moment fuck it, lets get it working!
     }
 
 	// Use this to make a game

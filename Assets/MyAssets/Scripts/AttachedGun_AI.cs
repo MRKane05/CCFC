@@ -51,47 +51,4 @@ public class AttachedGun_AI : AttachedGun {
 		Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose
 		ReFireTime = Time.time+RefireRate;
 	}
-	/*
-	public virtual void doFireEffect() {
-					
-		//Get our shot vector and factor in the accuracy of the shot.
-		Vector3 shotVector = (transform.forward + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread))).normalized;
-		
-		//Try doing a fire raycast as we're slightly shifting the system approach.
-		RaycastHit hit;
-		//Physics.Raycast(Ray, distance, LayerMask);
-		Debug.DrawLine(transform.position, transform.position+shotVector*shotDistance);
-		Ray ourRay = new Ray(transform.position, shotVector);
-		
-		//Sort this out so that we can only hit things on this layer
-		//This is all very well until we're working with an AI...
-		if (Physics.Raycast(ourRay, out hit, shotDistance, targetLayer)) {
-			//Debug.Log ("Hit: " + hit.collider.gameObject.name);
-			//So now we need to find the AircraftController attached to this object.
-			AircraftController thisAircraftMP = hit.collider.gameObject.transform.parent.gameObject.GetComponent<AircraftController>() as AircraftController;
-			thisAircraftMP.takeDamage(damage, "NORMAL", transform.parent.parent.gameObject); //return our parent, but this is a messy process...
-			
-		}
-		
-    	//if (Physics.Raycast(transform.position, shotVector*shotDistance, out hit)) {
-		//	Debug.Log ("Hit: " + hit.collider.gameObject.name);
-			
-		
-		//}
-        	
-		
-		
-		//Make the fire graphic
-		latestBullet = Instantiate(bulletPrefab, transform.position+transform.forward.normalized*forwardStep, transform.rotation) as GameObject;
-		latestBulletMP = latestBullet.GetComponent<Bullet>();
-		//latestBulletMP.Movement = transform.forward*BulletSpeed;
-		//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
-		latestBulletMP.SetBulletAction(shotVector*BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
-		
-		
-		Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose
-		ReFireTime = Time.time+RefireRate;
-	
-	}
-	*/
 }

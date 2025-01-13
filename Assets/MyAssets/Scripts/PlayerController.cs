@@ -42,8 +42,6 @@ public class PlayerController : ActorController {
 
 
 	void Start () {
-		
-		
 		if (instance)
 		{
 			Debug.Log("Duplicate attempt to create PlayerController");
@@ -206,6 +204,37 @@ public class PlayerController : ActorController {
 #else
 		handleVitaControls(); 
 #endif
+
+		//I want to add a little higher function to the game in the form of slowing time to help with the players aiming
+		if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder")) {
+			Time.timeScale = 0.5f;
+        } else
+        {
+			Time.timeScale = 1f;
+        }
+
+		//Basic targetting systems
+		if (Input.GetKeyDown(KeyCode.T) || Input.GetButtonDown("Triangle")) {   //Try to target the enemy right in front of us
+			GameObject bestEnemy = null;
+			float bestAngle = 180f;
+			Actor bestActor = null;
+			foreach (actorWrapper thisEnemy in LevelController.Instance.enemyList)
+            {
+				float targetAngle = Vector3.Angle(Camera.main.transform.forward, thisEnemy.vehicle.transform.position - gameObject.transform.position);
+				Debug.Log(targetAngle);
+				if (targetAngle < bestAngle)
+                {
+					bestAngle = targetAngle;
+					bestEnemy = thisEnemy.vehicle;
+					bestActor = thisEnemy.actor;
+                }
+            }
+			//And after all of that
+			if (bestAngle < 15) //Maybe over generous
+            {
+				targetCallback(bestActor, bestEnemy, 1);
+			}
+        }
 	}
 
 	void handleVitaControls()

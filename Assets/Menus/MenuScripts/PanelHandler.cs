@@ -233,6 +233,6 @@ public class PanelHandler : MonoBehaviour {
     public void CallFunctionOnGameController(string functionName)
     {
         //PROBLEM: We don't have a GameController to call against yet
-        //GameController.Instance.Invoke(functionName, 0f);
+        gameManager.Instance.Invoke(functionName, 0f);
     }
 }

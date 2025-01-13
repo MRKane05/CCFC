@@ -15,7 +15,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 	GameObject[] enemyNodes;
 	
 	void Start() {
-		setupLevel();
+		//setupLevel();
 	}
 
 	//will need some sort of difficulty measure passed through to this...
@@ -64,8 +64,8 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 		LevelController.Instance.populateWaypoints(newWaypoints, endGoal);
 		*/
 		//can we add a wingman through this also.
-		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back*5f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
-		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back*5f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
+		//addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back*5f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
+		//addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back*5f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
 
 
 	}
@@ -94,7 +94,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 		
 		//Handle our radar stuff
 		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
-		newActor.radarObject.transform.parent = LevelController.Instance.targetRadar.gameObject.transform; //child it to this.
+		newActor.radarObject.transform.SetParent(LevelController.Instance.targetRadar.gameObject.transform); //child it to this.
 		newActor.radarObject.transform.localScale = Vector3.one;
 		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
