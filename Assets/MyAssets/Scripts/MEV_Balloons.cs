@@ -8,7 +8,10 @@ public class MEV_Balloons : MissionEventObject {
 	public override void doTrigger()
 	{
 		base.doTrigger();
-		Debug.LogError("Triggering Balloons Event");
+		if (gameManager.Instance.bDebugEvents)
+		{
+			Debug.LogError("Triggering Balloons Event");
+		}
 		//So much of this will depend on where our player fighter is, and how it's presented for the "best play" option...
 		/*
 		Vector3 playerLocation = PlayerController.Instance.ourAircraft.transform.position; //spwan around this.

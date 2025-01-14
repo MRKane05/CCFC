@@ -26,6 +26,10 @@ public class gameManager : MonoBehaviour {
     #region Level Load Screen
     public GameObject LoadingScreenBase;
 	public Slider LoadingSlider;
+	#endregion
+
+	#region Universal Debug Flags
+	public bool bDebugEvents = false;
     #endregion
     // Use this for initialization
     void Awake () {
@@ -51,7 +55,7 @@ public class gameManager : MonoBehaviour {
 	public void MakeMission(int selectedTile) { //load a level we're going to play on
 		currentlySelectedTile = selectedTile;
 		enemies = Mathf.RoundToInt(enemyActivity*12F);
-		wingmen = 3; //standard flight group.
+		wingmen = 2; //standard flight group.
 		
 		//Before doing this we need to "save the state" of our map
 

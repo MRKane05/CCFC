@@ -39,7 +39,7 @@ public class MissionEventsManager : MonoBehaviour {
 		//Quickly knock something together
 		
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
-		LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 3);
+		LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 1);
 		//LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
 		ListLevelObjectives.Add(newObjective);
 		//ListLevelObjectives.Add(balloonObjective);
@@ -182,9 +182,9 @@ public class MissionEventsManager : MonoBehaviour {
 		missionEvents.Add(newEvent);
 	}
 
-	void createFighterEvent() { 
+	void createFighterEvent() {
 		//For the moment lets dump in a collection of elements
-		int numElements = Mathf.RoundToInt(Random.Range(3, 5));
+		int numElements = 1; // Mathf.RoundToInt(Random.Range(3, 5));
 		//numElements = 1;
 		for (int i=0; i<numElements; i++)
         {
@@ -295,7 +295,10 @@ public class MissionEventsManager : MonoBehaviour {
 
 	public void EventComplete(MissionEventObject thisEvent)
     {
-		Debug.LogError("Event Complete Callback: " + thisEvent);
+		if (gameManager.Instance.bDebugEvents)
+		{
+			Debug.LogError("Event Complete Callback: " + thisEvent);
+		}
 		if (activeEvents.Contains(thisEvent.ourMissionEvent)) {
 			activeEvents.Remove(thisEvent.ourMissionEvent);
         }
@@ -315,7 +318,10 @@ public class MissionEventsManager : MonoBehaviour {
 		}
 
 		if (activeEvents.Count == 0) {  //we have no more active events therefore the level is finished
-			Debug.LogError("All active events cleared");
+			if (gameManager.Instance.bDebugEvents)
+			{
+				Debug.LogError("All active events cleared");
+			}
 			//Notify our systems
 			LevelController.Instance.finishMatch(false);
 		}
@@ -325,7 +331,10 @@ public class MissionEventsManager : MonoBehaviour {
     {
 		//This will then need to check against objectives (fail/complete) and pass information through to our other events least this has to
 		//trigger something if we need to
-		Debug.LogError("Entire missionEvent destroyed");
+		if (gameManager.Instance.bDebugEvents)
+		{
+			Debug.LogError("Entire missionEvent destroyed");
+		}
 		//if (thisEvent) //Check to see if this is critical for the mission completion (or logic like that)
 		//For the moment lets check and see if we've got any mission events left active
 		/*

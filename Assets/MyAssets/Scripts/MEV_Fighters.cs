@@ -8,7 +8,7 @@ public class MEV_Fighters : MissionEventObject {
 	public override void doTrigger()
     {
 		base.doTrigger();
-		Debug.LogError("Triggering fighters Event");
+		if (gameManager.Instance.bDebugEvents) { Debug.LogError("Triggering fighters Event"); }
 		//So much of this will depend on where our player fighter is, and how it's presented for the "best play" option...
 		Vector3 playerLocation = PlayerController.Instance.ourAircraft.transform.position; //spwan around this.
 		Vector3 playerRotation = PlayerController.Instance.ourAircraft.transform.eulerAngles;

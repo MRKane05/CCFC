@@ -124,7 +124,7 @@ public class Menu_MapPointerHandler : MonoBehaviour {
                 }
 			} else
             {
-				TileDescriptionText.text = "";
+				TileDescriptionText.text = "Select a White Tile to Fly";
             }
 		}
 	}

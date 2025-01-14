@@ -113,7 +113,10 @@ public class MissionEventObject : MonoBehaviour {
 
         if (!someAlive) { //we need to report back to our missions event manager that this group is all dead
             bAllDestroyed = true;
-            Debug.LogError("AllDestroyed");
+            if (gameManager.Instance.bDebugEvents)
+            {
+                Debug.LogError("AllDestroyed");
+            }
             //We should look to see if this is our "complete" state
             if (ourMissionEvent.playerTask == missionEvent.enPlayerTask.DESTROY) {
                 ourMissionEventManager.EventComplete(this);

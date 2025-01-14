@@ -519,7 +519,7 @@ public class AI_Fighter : ActorController {
 
 		if (Time.time - patternTime > patternDuration) { //Our usual breaker?
 			if (pattern=="PATROL") {
-				Debug.LogError("Broke Patrol");
+				if (gameManager.Instance.bDebugEvents) {Debug.LogError("Broke Patrol"); }
 			}
 			pattern="ATTACK";
 			patternStage="ATTACK";
