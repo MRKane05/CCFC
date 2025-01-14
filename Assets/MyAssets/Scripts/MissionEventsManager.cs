@@ -39,10 +39,10 @@ public class MissionEventsManager : MonoBehaviour {
 		//Quickly knock something together
 		
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
-		//LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 3);
-		LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
-		//ListLevelObjectives.Add(newObjective);
-		ListLevelObjectives.Add(balloonObjective);
+		LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 3);
+		//LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
+		ListLevelObjectives.Add(newObjective);
+		//ListLevelObjectives.Add(balloonObjective);
 		ConstructMission(ListLevelObjectives, 4);
 
 		Debug.Log("Starting Mission");
@@ -317,7 +317,7 @@ public class MissionEventsManager : MonoBehaviour {
 		if (activeEvents.Count == 0) {  //we have no more active events therefore the level is finished
 			Debug.LogError("All active events cleared");
 			//Notify our systems
-			LevelController.Instance.finishMatch();
+			LevelController.Instance.finishMatch(false);
 		}
 	}
 

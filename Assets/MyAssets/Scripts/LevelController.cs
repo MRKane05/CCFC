@@ -370,6 +370,12 @@ public class LevelController : MonoBehaviour {
 				}
 			}
 		}
+
+		if (thisActor == playerAircraft)
+        {
+			Debug.LogError("Player Shot Down");
+			finishMatch(true);
+		}
 	}
 	
 	//For the moment
@@ -430,7 +436,8 @@ public class LevelController : MonoBehaviour {
         }
 		//For the moment:
 		//StartCoroutine(StartMatch());
-		createMatch(3, 3);*/
+		*/
+		createMatch(3, 3);
 		
 	}
 	
@@ -443,19 +450,29 @@ public class LevelController : MonoBehaviour {
 
 	}
 
-	public void finishMatch()
+	public void finishMatch(bool bPlayerDestroyed)
     {
 		//Of course we need some concept of how well this has gone
-		StartCoroutine(FinishLevel());
+		//PROBLEM: Mission success evaluation isn't complete yet
+		gameManager.Instance.levelResults.bWonLevel = !bPlayerDestroyed;	//Flip this if we're destroyed for the moment
+		StartCoroutine(FinishLevel(bPlayerDestroyed));
 		//gameManager.Instance.ConcludeMission();
 	}
 
-	IEnumerator FinishLevel()
+	IEnumerator FinishLevel(bool bPlayerDestroyed)
     {
 		yield return new WaitForSeconds(3f);    //Give a little pause after it's complete
 												//We want to load our panel scene here and pause so that the player can bask in the warm glow of seeing a mission complete scene
-		AsyncOperation async = Application.LoadLevelAsync("LevelComplete_Win");	//We're assuming that the player won...
-		yield return async;
+		if (!bPlayerDestroyed)
+		{
+			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_Win"); //We're assuming that the player won...
+			yield return async;
+		}
+		else
+        {
+			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_ShotDown"); //We're assuming that the player won...
+			yield return async;
+		}
 		Time.timeScale = 0f;	//Going to need to turn this back on somewhere...
 		//What we could actually start doing now is loading our other scene in the background...I'm not sure just how that'll work however, so for the moment fuck it, lets get it working!
     }

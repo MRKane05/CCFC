@@ -172,7 +172,10 @@ public class Actor : MonoBehaviour {
     {
 		//So at this stage we've got to look at our group, and perhaps message back to our controller, which will then message back through the system
 		//to complete any events that hinge on this group/object dying
-		owner.actorCallbackDie(this);
+		if (owner)
+		{
+			owner.actorCallbackDie(this);
+		}
     }
 
 	public virtual void doExplode(float d_delay)

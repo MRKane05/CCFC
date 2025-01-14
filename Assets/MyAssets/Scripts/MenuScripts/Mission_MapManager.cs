@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 //manages all of the stuff to do with the map selection, and is a stupidly over-complicated class because of it
 [System.Serializable]
@@ -68,12 +69,14 @@ public class Mission_MapManager : MonoBehaviour {
 
 	public Mission_SelectPanel ourSelectPanel;
 
+	public MapCameraMovement ourCamera;
+
 	int mapWidth = 8, mapHeight = 18;
 
 	float tileWidth = 120.0f, tileHeight = 69.2F; //these are hard-baked values
 	Vector3 alternateStep;
 
-	public GameObject mapTile;
+	public GameObject mapTile;	//What will we make our map out of?
 
 	public List<mapArrayEntry> mapArray = new List<mapArrayEntry>();
 
@@ -86,7 +89,7 @@ public class Mission_MapManager : MonoBehaviour {
 
 	[HideInInspector] public bool bMapLoaded = false;
 	//Called whenever we want to add a new "conflict" point
-	void addNewConflictTile(int team, int turnsRemaining, int tilesGained)
+	int addNewConflictTile(int team, int turnsRemaining, int tilesGained)
 	{
 		Debug.Log("Team Added: " + team);
 		List<int> openTiles = new List<int>();
@@ -119,6 +122,7 @@ public class Mission_MapManager : MonoBehaviour {
 
 		//Seeing as this is called after the map is resolved we need to set our tile tints here
 		mapArray[newTileNumber].mapScript.setConflictMarker(teamColors[team], team, turnsRemaining, true);
+		return newTileNumber;
 	}
 
 	void addKeyLocation(int team, keyLocation.enKeyLocationType locationType)
@@ -214,25 +218,50 @@ public class Mission_MapManager : MonoBehaviour {
 		playTile (enemyTeam);
 		runMapTints(true);
 	}
-    #endregion
-    public void endTurn()
-    {
+	#endregion
+
+	float tileViewDistance = 5f;
+	float cameraTileMoveSpeed = 0.5f;
+	float cameraTileWait = 1f;
+	public Vector3 GetCameraLookAtTile(int thisTileNumber)
+	{
+		return mapArray[thisTileNumber].mapTile.transform.position - ourCamera.transform.forward * tileViewDistance;
+	}
+
+	/*
+	public void endTurn()
+	{
+		ourCamera.bDoingLerp = true;
+		//This might have to be a tween
+		Sequence firstSequence = DOTween.Sequence();
+		//firstSequence.AppendInterval(3f);   //Wait for a few seconds
+		firstSequence.Append(ourCamera.transform.DOMove(GetCameraLookAtTile(flownTile), cameraTileMoveSpeed).OnComplete(()=>runMapTints(true)));
+		firstSequence.AppendInterval(cameraTileWait * 2f).OnComplete(() => HandleConflicts());	//Call handle conflicts after doing our move and resolve
+		
+
+		//yield return StartCoroutine(ourCamera.moveToPosition(GetCameraLookAtTile(flownTile)));
+		//ourCamera.transform.position = GetCameraLookAtTile(flownTile);
 		//Go through the conflict tiles and see if anything has changed
 		//Update the map to reflect this showing things changing (somehow) - could this be set on the tiles themselves so they flash?
-		runMapTints(true); //Go through and fix up all the map tints
+		//runMapTints(true); //Go through and fix up all the map tints
 						   //We need to look at what our conflicts are doing
-		HandleConflicts();
+		//HandleConflicts();
     }
 
+	//I think that the tween approach isn't winning for me here :/
 	void HandleConflicts()
 	{
+		Sequence conflictsSequence = DOTween.Sequence();
+
 		//So...
 		if (conflictTiles.Count < 4)
 		{
 			//Perhaps we add some more tiles if there aren't enough
 			if (true || Random.value > 0.75f)
 			{
-				addNewConflictTile(Random.value < 0.25 ? friendlyTeam : enemyTeam, Mathf.RoundToInt(Random.RandomRange(3, 6)), 1);
+				int newConflictTile = addNewConflictTile(Random.value < 0.25 ? friendlyTeam : enemyTeam, Mathf.RoundToInt(Random.RandomRange(3, 6)), 1);
+				conflictsSequence.Append(ourCamera.transform.DOMove(GetCameraLookAtTile(newConflictTile), cameraTileMoveSpeed).OnComplete(() => runMapTints(true)));
+				conflictsSequence.AppendInterval(cameraTileWait);
 			}
 		}
 
@@ -240,21 +269,27 @@ public class Mission_MapManager : MonoBehaviour {
 		//Dependig on the number of conflictTiles we might want to add some more
 		foreach (conflictTile thisTile in conflictTiles)
 		{
+			//Move our camera first
+			conflictsSequence.Append(ourCamera.transform.DOMove(GetCameraLookAtTile(thisTile.tileNumber), cameraTileMoveSpeed).OnComplete(() => runMapTints(true)));
+
 			//We want to move the camera to this tile, and show it counting down. 
 			//For the moment shall we just handle them basically
 			//Decrease our day count on the conflict tiles
 			//If at zero resolve
 			thisTile.turnsRemaining--;
-			if (thisTile.turnsRemaining < 0)
+			if (thisTile.turnsRemaining <= 0)
 			{
 				//need to resolve this tile, which involves switching the teams for the six touching it's sides
-				ResolveConflictTile(thisTile.tileNumber, thisTile.conflictTeam, false);
+				conflictsSequence.AppendInterval(0.5f).OnComplete(() => ResolveConflictTile(thisTile.tileNumber, thisTile.conflictTeam, false));
 				conflictTilesToRemove.Add(thisTile);
 			} else
 			{
 				//Update our tile
-				mapArray[thisTile.tileNumber].mapScript.setConflictMarkerText(thisTile.turnsRemaining.ToString());
+				mapArray[thisTile.tileNumber].mapScript.updateConflictMarkerText(thisTile.turnsRemaining.ToString());	//This updates the information we want to get with our sequence
+				conflictsSequence.AppendInterval(0.5f).OnComplete(() => mapArray[thisTile.tileNumber].mapScript.setConflictMarkerText());	//This triggers a tile marker update
 			}
+			
+			conflictsSequence.AppendInterval(cameraTileWait);
 		}
 
 		//See if we need to remove some of the conflict markers
@@ -268,6 +303,81 @@ public class Mission_MapManager : MonoBehaviour {
 			}
         }
 		runMapTints(true); //So that we can see things resolve
+	}
+	*/
+
+	public void endTurn()
+	{
+
+		StartCoroutine(ShowEndMapResults());
+	}
+
+	IEnumerator ShowEndMapResults() {
+
+		yield return new WaitForSeconds(1f);
+		ourCamera.DoMoveToPosition(GetCameraLookAtTile(flownTile));	//Move our camera to this position
+		yield return new WaitForSeconds(3f);
+		//Go through the conflict tiles and see if anything has changed
+		//Update the map to reflect this showing things changing (somehow) - could this be set on the tiles themselves so they flash?
+		runMapTints(true); //Go through and fix up all the map tints
+						   //We need to look at what our conflicts are doing
+		//HandleConflicts();
+	//}
+
+	//void HandleConflicts()
+	//{
+		//So...
+		if (conflictTiles.Count < 4)
+		{
+			//Perhaps we add some more tiles if there aren't enough
+			if (true || Random.value > 0.75f)
+			{
+				int newConflict = addNewConflictTile(Random.value < 0.25 ? friendlyTeam : enemyTeam, Mathf.RoundToInt(Random.RandomRange(3, 6)), 1);
+				ourCamera.DoMoveToPosition(GetCameraLookAtTile(newConflict)); //Move our camera to this position
+				yield return new WaitForSeconds(2f);
+			}
+		}
+
+		List<conflictTile> conflictTilesToRemove = new List<conflictTile>();
+		//Dependig on the number of conflictTiles we might want to add some more
+		foreach (conflictTile thisTile in conflictTiles)
+		{
+			//We want to move the camera to this tile, and show it counting down. 
+			//For the moment shall we just handle them basically
+			//Decrease our day count on the conflict tiles
+			//If at zero resolve
+			ourCamera.DoMoveToPosition(GetCameraLookAtTile(thisTile.tileNumber)); //Move our camera to this position
+			yield return new WaitForSeconds(0.75f);
+			thisTile.turnsRemaining--;
+			if (thisTile.turnsRemaining <= 0)
+			{
+				//need to resolve this tile, which involves switching the teams for the six touching it's sides
+				ResolveConflictTile(thisTile.tileNumber, thisTile.conflictTeam, false);
+				conflictTilesToRemove.Add(thisTile);
+				mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, 0, 0, false);
+			}
+			else
+			{
+				//Update our tile
+				mapArray[thisTile.tileNumber].mapScript.setConflictMarkerText(thisTile.turnsRemaining.ToString());
+				mapArray[thisTile.tileNumber].mapTile.transform.DOPunchScale(Vector3.one*0.25f, 0.5f, 2);
+			}
+			runMapTints(true);
+			yield return new WaitForSeconds(1f);
+		}
+
+		//See if we need to remove some of the conflict markers
+		if (conflictTilesToRemove.Count > 0)
+		{
+			foreach (conflictTile removeTile in conflictTilesToRemove)
+			{
+				//Clear our marker...
+				mapArray[removeTile.tileNumber].mapScript.setConflictMarker(teamColors[removeTile.conflictTeam], -1, -1, false);
+				conflictTiles.Remove(removeTile);   //And remove our entry
+			}
+		}
+		runMapTints(true); //So that we can see things resolve
+		ourCamera.returnToStart();
 	}
 
 	public void ResolveConflictTile(int tileNumber, int conflictTeam, bool PlayerIntervened)
@@ -777,9 +887,11 @@ public class Mission_MapManager : MonoBehaviour {
 			populateMapFromSave(ourSaveForm);
 		}
 	}
-    #endregion
+	#endregion
 
-    #region GameMapReturnFunctions
+	#region GameMapReturnFunctions
+	int flownTile = 56;
+
 	//This is where our gameManager will send a callback following a mission concluding. We'll evaluate our tile and see what's changed
 	public void LevelCompleted(int tileNumber, bool bWon)
     {
@@ -788,9 +900,10 @@ public class Mission_MapManager : MonoBehaviour {
 		SetTileTeam(tileNumber, bWon ? friendlyTeam : enemyTeam);
 		runMapTints(true);
 		//After this turn we need to go around our events and see if any of them have changed or need updating
+		flownTile = tileNumber;
 		endTurn();	//Make sure we count down our turn here too
 
-		saveMapState(); //For the moment this can go here
+		//saveMapState(); //For the moment this can go here
 	}
     #endregion
 }

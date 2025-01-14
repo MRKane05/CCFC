@@ -1,5 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+
+[System.Serializable]
+public class LevelResults
+{
+	public bool bWonLevel = true;
+}
 
 //This is the core of all the game mechanics, it handles the information transfer sections basically.
 //Can't be too cluttered
@@ -11,9 +18,17 @@ public class gameManager : MonoBehaviour {
 	float enemyActivity=0;
 	int currentlySelectedTile = -1;
 	//need some way of knowing which level we'd want to load
-	
-	// Use this for initialization
-	void Awake () {
+
+	#region Level Results to Pass Through
+	public LevelResults levelResults;
+    #endregion
+
+    #region Level Load Screen
+    public GameObject LoadingScreenBase;
+	public Slider LoadingSlider;
+    #endregion
+    // Use this for initialization
+    void Awake () {
 		if (instance)
 		{
 			Debug.Log("Duplicate attempt to create gameManager");
@@ -43,12 +58,31 @@ public class gameManager : MonoBehaviour {
 		///something something something map.
 		StartCoroutine(loadMission()); //now boot up our mission function stuff
 	}
+
+	public IEnumerator loadScene(string SceneName)
+    {
+		//This extra block of code handles the loading bar and loading screen
+		AsyncOperation async = Application.LoadLevelAsync(SceneName); //PROBLEM: Need better level loading logic here
+		LoadingScreenBase.SetActive(true);
+		while (!async.isDone)
+		{
+			LoadingSlider.value = async.progress;
+			Debug.Log(LoadingSlider.value);
+			if (async.progress >= 0.9f)
+			{
+				LoadingSlider.value = 1f;
+				async.allowSceneActivation = true;
+			}
+			yield return null;
+		}
+		yield return async;
+		LoadingScreenBase.SetActive(false);
+		Debug.Log("Loading complete");
+	}
 	
 	IEnumerator loadMission() {
 		//load our level
-		AsyncOperation async = Application.LoadLevelAsync("Level"); //PROBLEM: Need better level loading logic here
-		yield return async;
-		Debug.Log ("Loading complete");
+		yield return StartCoroutine(loadScene("Level"));
 		
 		yield return null;
 		
@@ -67,9 +101,12 @@ public class gameManager : MonoBehaviour {
 	IEnumerator doConcludeMission(int targetTile)
 	{
 		Time.timeScale = 1f;
+		/*
 		//load our level
 		AsyncOperation async = Application.LoadLevelAsync("MissionSelection"); //PROBLEM: Need better level loading logic here
 		yield return async;
+		*/
+		yield return StartCoroutine(loadScene("MissionSelection"));
 		Debug.Log("Loading complete");
 
 		yield return null;
@@ -84,6 +121,7 @@ public class gameManager : MonoBehaviour {
 			yield return null;
         }
 		//We need to report back to our system/map manager somehow. I don't know where this part of the game is centered...
-		Mission_MapManager.Instance.LevelCompleted(targetTile, true); //For the moment lets hard-code this
+		//PROBLEM: This is a hacky way to figure things out (and knowing my luck it'll stay, forever)
+		Mission_MapManager.Instance.LevelCompleted(targetTile, levelResults.bWonLevel); //For the moment lets hard-code this
 	}
 }

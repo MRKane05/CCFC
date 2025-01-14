@@ -27,6 +27,7 @@ public class Mission_MapSection : MonoBehaviour {
 	public int conflictDaysRemaining = -1;
 
 	Color TileColor = Color.white;
+	string pendingMarkerText = "";
 	public int team { 
 		get {return m_team; }
 		set {m_team = value; }
@@ -52,6 +53,12 @@ public class Mission_MapSection : MonoBehaviour {
 		bIsConflicted = true;
 		conflictTeam = newConflictTeam;
 		conflictDaysRemaining = newConflictDays;
+	}
+
+	public void updateConflictMarkerText(string thisText)
+    {
+		pendingMarkerText = thisText;
+
 	}
 
 	public void setConflictMarkerText(string thisText)
