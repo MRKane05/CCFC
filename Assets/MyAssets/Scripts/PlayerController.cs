@@ -237,8 +237,10 @@ public class PlayerController : ActorController {
         }
 	}
 
+	float rollReturnSensitivity = 0.1f;
+
 	void handleVitaControls()
-    {
+	{
 
 		//Why did we do this again?
 		if (Input.GetButtonDown("Right Shoulder"))
@@ -253,7 +255,34 @@ public class PlayerController : ActorController {
 		else
 			bFiring = false;
 
-		ourAircraft.UpdateInput(yAxisBias*Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+		//ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+
+		if (Mathf.Abs(Input.GetAxis("Left Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Left Stick Horizontal")) < rollReturnSensitivity
+			&& Mathf.Abs(Input.GetAxis("Right Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Right Stick Horizontal")) < rollReturnSensitivity)
+		{
+
+			RollReturnTime = Time.time + RollReturnWait;
+			//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1] * YControl), ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
+			ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+		}
+		else if (Time.time > RollReturnTime)	//Roll our aircraft back to level flight
+		{
+			//a Transform.LookAt does the trick!
+			returnAngles.SetLookRotation(gunSightObject.transform.position, Vector3.up);
+
+			//Turned off for the quick engine hack...
+
+			//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
+
+			//editor input hack
+			//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch), ControlSensitivityCurve.Evaluate(roll), InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), throttleControl, bFiring, FireState);
+			ourAircraft.UpdateInput(0, 0, InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+
+		}
+		else
+		{ //annol input for the controls.
+			ourAircraft.UpdateInput(0, 0, 0, 0, bFiring, FireState);
+		}
 	}
 
 	void handleInputControls() { 
