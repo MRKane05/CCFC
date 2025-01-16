@@ -572,8 +572,15 @@ public class Mission_MapManager : MonoBehaviour {
 		//6: number - height
 		if (tileIsTouching(thisTile, friendlyTeam) || mapArray[thisTile].mapScript.team==friendlyTeam) { //acceptable tile selection
 			//We need to check if this is a conflict tile
-			ourSelectPanel.selectThis(thisTile); //call up our information and select panel
-			//Debug.LogError("Tile Valid");
+			//ourSelectPanel.selectThis(thisTile); //call up our information and select panel
+			gameManager.Instance.bCanSelectMission = false; //Disable our interaction until we've either selected the mission or released it from our panel
+															//We need to bring up ourpanel to handle this
+															//Debug.LogError("Tile Valid");
+			gameManager.Instance.selectedTile = thisTile;
+			if (UIMenuHandler.Instance)
+			{
+				UIMenuHandler.Instance.LoadMenuSceneAdditively("MissionSelectPanel", null, null);
+			}
 		} else
         {
 			//Debug.LogError("Tile not Valid");

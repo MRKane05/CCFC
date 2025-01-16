@@ -30,6 +30,11 @@ public class gameManager : MonoBehaviour {
 
 	#region Universal Debug Flags
 	public bool bDebugEvents = false;
+	#endregion
+
+	#region Level Selection Details
+	public bool bCanSelectMission = true;
+	public int selectedTile = -1;
     #endregion
     // Use this for initialization
     void Awake () {
@@ -48,10 +53,22 @@ public class gameManager : MonoBehaviour {
 	
 	int enemies, wingmen;
 	
+	public void reEnableMapInteraction()
+    {
+		bCanSelectMission = true;
+    }
+
 	public void setEnemyActivity(float newActivity) {
 		enemyActivity = newActivity;	
 	}
-	
+
+	//This is called from our panel accepting the mission so we've got to store our informatoin and boot off of that. It's minimal for now.
+
+	public void StartMissionFromUI()
+    {
+		MakeMission(selectedTile);
+    }
+
 	public void MakeMission(int selectedTile) { //load a level we're going to play on
 		currentlySelectedTile = selectedTile;
 		enemies = Mathf.RoundToInt(enemyActivity*12F);
@@ -128,4 +145,5 @@ public class gameManager : MonoBehaviour {
 		//PROBLEM: This is a hacky way to figure things out (and knowing my luck it'll stay, forever)
 		Mission_MapManager.Instance.LevelCompleted(targetTile, levelResults.bWonLevel); //For the moment lets hard-code this
 	}
+
 }

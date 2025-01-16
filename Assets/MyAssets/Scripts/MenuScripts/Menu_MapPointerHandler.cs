@@ -89,7 +89,7 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 				{
 					//See about selecting a tile :)
 
-					if (SelectedTile)
+					if (SelectedTile && gameManager.Instance.bCanSelectMission)
 					{
 						SelectedTile.sectionClick();
 					}
