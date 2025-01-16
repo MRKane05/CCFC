@@ -344,6 +344,7 @@ public class Mission_MapManager : MonoBehaviour {
 						//conflictsToRemove.Add(thisTile);
 						thisTile.bTurnValid = false;	//This will mark us for removal
 						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, -1, -1, false);  //Disable this conflict marker
+						mapArray[thisTile.tileNumber].mapScript.setTeam(friendlyTeam);	//So that we "win" this tile when we've won the conflict
 					}
 					else
 					{
