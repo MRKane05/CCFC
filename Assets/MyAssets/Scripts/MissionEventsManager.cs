@@ -160,8 +160,8 @@ public class MissionEventsManager : MonoBehaviour {
 
 		newEvent.eventTeam = 1; //Enemies for the moment
 
-		int flightCount = Mathf.RoundToInt(Random.Range(3, 5));
-		flightCount = 1;	//PROBLEM this is a testing hack
+		int flightCount = Mathf.RoundToInt(Random.Range(1, 3));
+		//int flightCount = 1;	//PROBLEM this is a testing hack
 		float lineAngle = Random.Range(0f, 360f);
 		Quaternion AngleAxis = Quaternion.AngleAxis(lineAngle, Vector3.up);
 		Vector3 lineForward = new Vector3(clusterSpacing, 0, 0);
@@ -182,13 +182,14 @@ public class MissionEventsManager : MonoBehaviour {
 		missionEvents.Add(newEvent);
 	}
 
+	//Really we need to have details for our setup passed through to us here instead of this crappy setup I've got
 	void createFighterEvent() {
 		//For the moment lets dump in a collection of elements
-		int numElements = 1; // Mathf.RoundToInt(Random.Range(3, 5));
+		int numElements = 1; //Why do we even have this? I want to add the event, not multiples OF the event
 		//numElements = 1;
 		for (int i=0; i<numElements; i++)
         {
-			missionEvent newEvent = MEV_MakeFlight();
+			missionEvent newEvent = MEV_MakeFlight();	//The fighers are added in the event, where as the balloons are added in the create event function
 			newEvent.triggerType = missionEvent.enTriggerType.TIME;
 			newEvent.triggerValue = 3 + i * 10;
 			missionEvents.Add(newEvent);
@@ -205,8 +206,8 @@ public class MissionEventsManager : MonoBehaviour {
 
 		newFlight.eventTeam = 1; //Enemies for the moment
 
-		int flightCount = Mathf.RoundToInt(Random.Range(1, 1));
-
+		int flightCount = Mathf.RoundToInt(Random.Range(1, 3));
+		flightCount = 1;
 		for (int i=0; i<flightCount; i++)
         {
 			newFlight.spawnObject.Add(prefabManager.Instance.enemyPrefabList[0]);

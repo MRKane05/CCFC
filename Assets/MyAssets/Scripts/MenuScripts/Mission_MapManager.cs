@@ -62,6 +62,7 @@ public class conflictTile
 	public int turnsRemaining = 3;  //How many turns until this conflict is resolved
 	public int tilesGained = 1;	//How many tiles can be gained/lost if this is resolved
 	public int conflictTeam = 0; //Which team will win this conflict?
+	public bool bTurnValid = true;	//This is disabled if we're removed by an action
 }
 
 public class Mission_MapManager : MonoBehaviour {
@@ -241,8 +242,16 @@ public class Mission_MapManager : MonoBehaviour {
 		ourCamera.DoMoveToPosition(GetCameraLookAtTile(flownTileNumber));	//Move our camera to this position
 		yield return new WaitForSeconds(1f);
 		//if we win this tile it becomes friendly territory
-		SetTileTeam(flownTileNumber, bTileWon ? friendlyTeam : enemyTeam);
-		ResolveConflictTile(ourSelectPanel.selectedTile, friendlyTeam, true);	//If we've flown a conflict we want it to either be removed or completed
+		if (!mapArray[flownTileNumber].mapScript.bIsConflicted)
+		{
+			SetTileTeam(flownTileNumber, bTileWon ? friendlyTeam : enemyTeam);
+			Debug.Log("Flown Tile colour set");
+		}
+		else
+		{
+			Debug.Log("Flown Tile was a conflict tile");
+			ResolveConflictTile(flownTileNumber, friendlyTeam, true);   //If we've flown a conflict we want it to either be removed or completed
+		}
 		runMapTints(true);
 
 		yield return new WaitForSeconds(1f);	//Wait to show the results of our battle. This might need an icon of sorts
@@ -262,8 +271,6 @@ public class Mission_MapManager : MonoBehaviour {
 				yield return new WaitForSeconds(2f);
 			}
 		}
-
-		List<conflictTile> conflictTilesToRemove = new List<conflictTile>();
 		//Dependig on the number of conflictTiles we might want to add some more
 		foreach (conflictTile thisTile in conflictTiles)
 		{
@@ -271,75 +278,96 @@ public class Mission_MapManager : MonoBehaviour {
 			//For the moment shall we just handle them basically
 			//Decrease our day count on the conflict tiles
 			//If at zero resolve
-			ourCamera.DoMoveToPosition(GetCameraLookAtTile(thisTile.tileNumber)); //Move our camera to this position
-			yield return new WaitForSeconds(0.75f);
-			thisTile.turnsRemaining--;
-			if (thisTile.turnsRemaining <= 0)
+			if (thisTile.bTurnValid)	//if we've been deactivated don't bother running this tile as it lost out in chess-space
 			{
-				//need to resolve this tile, which involves switching the teams for the six touching it's sides
-				ResolveConflictTile(thisTile.tileNumber, thisTile.conflictTeam, false);
-				conflictTilesToRemove.Add(thisTile);
-				mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, 0, 0, false);
+				ourCamera.DoMoveToPosition(GetCameraLookAtTile(thisTile.tileNumber)); //Move our camera to this position
+				yield return new WaitForSeconds(0.75f);
+				thisTile.turnsRemaining--;
+				if (thisTile.turnsRemaining <= 0)
+				{
+					//need to resolve this tile, which involves switching the teams for the six touching it's sides
+					ResolveConflictTile(thisTile.tileNumber, thisTile.conflictTeam, false);
+					thisTile.bTurnValid = false;	//Flat this tile for removal
+					mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, 0, 0, false);
+				}
+				else
+				{
+					//Update our tile
+					mapArray[thisTile.tileNumber].mapScript.setConflictMarkerText(thisTile.turnsRemaining.ToString());
+					mapArray[thisTile.tileNumber].mapTile.transform.DOPunchScale(Vector3.one * 0.25f, 0.5f, 2);
+				}
+				runMapTints(true);
+				yield return new WaitForSeconds(1f);
 			}
-			else
-			{
-				//Update our tile
-				mapArray[thisTile.tileNumber].mapScript.setConflictMarkerText(thisTile.turnsRemaining.ToString());
-				mapArray[thisTile.tileNumber].mapTile.transform.DOPunchScale(Vector3.one*0.25f, 0.5f, 2);
-			}
-			runMapTints(true);
-			yield return new WaitForSeconds(1f);
 		}
 
-		//See if we need to remove some of the conflict markers
-		if (conflictTilesToRemove.Count > 0)
+
+		//Finally we need to go through our conflicts and see if any have been invalidated
+		foreach (conflictTile thisTile in conflictTiles)
 		{
-			foreach (conflictTile removeTile in conflictTilesToRemove)
+			if (!thisTile.bTurnValid)
+            {
+				conflictsToRemove.Add(thisTile);
+            }
+		}
+		
+		//See if we need to remove some of the conflict markers and tiles
+		if (conflictsToRemove.Count > 0)
+		{
+			foreach (conflictTile removeTile in conflictsToRemove)
 			{
 				//Clear our marker...
-				mapArray[removeTile.tileNumber].mapScript.setConflictMarker(teamColors[removeTile.conflictTeam], -1, -1, false);
-				conflictTiles.Remove(removeTile);   //And remove our entry
+				Debug.Log("Doing Tile Remove");
+				RemoveConflictTile(removeTile, true);
+				//I think the problem  is that this value has changed by the time we come to do this
 			}
 		}
 		runMapTints(true); //So that we can see things resolve
 		ourCamera.returnToStart();
 	}
 
+	public List<conflictTile> conflictsToRemove = new List<conflictTile>();
 	public void ResolveConflictTile(int tileNumber, int conflictTeam, bool PlayerIntervened)
 	{
-		//I want to call this after every player flight (for simplicity) and when a tile expires
-		//So in this case we've got a couple of options,
-		//if it's friendly we win the tiles
-		//If the player affected this enemy conflict it goes away
-		//if the player left the enemy conflict then the enemy team wins tiles (what do we do with a base?)
-		List<conflictTile> conflictsToRemove = new List<conflictTile>();
 		foreach (conflictTile thisTile in conflictTiles)
 		{
 			if (thisTile.tileNumber == tileNumber) //we have a hit!
 			{
+				//Debug.Log("Have Conflict Tile");
 				if (thisTile.conflictTeam == enemyTeam)
 				{
 					if (PlayerIntervened)
 					{
 						//for the moment we'd just remove this conflict						
-						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(teamColors[thisTile.conflictTeam], thisTile.conflictTeam, -1, false);
+						//mapArray[thisTile.tileNumber].mapScript.setConflictMarker(teamColors[thisTile.conflictTeam], thisTile.conflictTeam, -1, false);
 						//conflictTiles.Remove(thisTile);   //And remove our entry
-						conflictsToRemove.Add(thisTile);
+						//conflictsToRemove.Add(thisTile);
+						thisTile.bTurnValid = false;	//This will mark us for removal
+						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, -1, -1, false);  //Disable this conflict marker
 					}
 					else
 					{
-						ConflictWinTiles(tileNumber, conflictTeam);	//In theory...
+						ConflictWinTiles(tileNumber, conflictTeam); //In theory...
+						mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, -1, -1, false);  //Disable this conflict marker
 					}
 				} else {  //handle our friendly team
+					//Debug.Log("Doing Friendly Resolve");
 					ConflictWinTiles(tileNumber, conflictTeam); //In theory...
+					//conflictsToRemove.Add(thisTile);
+					thisTile.bTurnValid = false;
+					mapArray[thisTile.tileNumber].mapScript.setConflictMarker(Color.white, -1, -1, false);  //Disable this conflict marker
 				}
 			}
 		}
+	}
 
-		foreach (conflictTile thisTile in conflictsToRemove)
+	void RemoveConflictTile(conflictTile thisTile, bool bAlsoRemoveEntry)
+    {
+		mapArray[thisTile.tileNumber].mapScript.setConflictMarker(teamColors[thisTile.conflictTeam], thisTile.conflictTeam, -1, false);
+		if (bAlsoRemoveEntry)
         {
 			conflictTiles.Remove(thisTile);
-        }
+		}
 	}
 
 	public void ConflictClaimTile(int tileNum, int conflictTeam)
@@ -355,8 +383,8 @@ public class Mission_MapManager : MonoBehaviour {
                 {
 					if (thisConflict.tileNumber == tileNum)
                     {
-						conflictTiles.Remove(thisConflict);
-                    }
+						thisConflict.bTurnValid = false;
+					}
                 }
 			}
         }
@@ -413,6 +441,7 @@ public class Mission_MapManager : MonoBehaviour {
 			{
 				//mapArray[tileBottomLeft].mapScript.setTeam(conflictTeam);
 				ConflictClaimTile(tileBottomLeft, conflictTeam);
+				
 				//if (mapArray[tileBottomLeft].mapScript.team == thisTeam) { return true; }
 			}
 		}
@@ -452,10 +481,11 @@ public class Mission_MapManager : MonoBehaviour {
 
 		//Bottom tile:
 		int tileBottom = tileNum - mapWidth * 2;
-		if (tileBottom > 0)
+		if (tileBottom >= 0)
 		{
 			//mapArray[tileBottom].mapScript.setTeam(conflictTeam);
 			ConflictClaimTile(tileBottom, conflictTeam);
+			Debug.Log("tileBottom: " + tileBottom);
 			//if (mapArray[tileBottom].mapScript.team == thisTeam) { return true; }
 		}
 		//return false;
