@@ -154,7 +154,7 @@ public class Mission_MapManager : MonoBehaviour {
 	}
 
 	IEnumerator mapGenerate() {
-
+		gameManager.Instance.SetLoadingScreen("Generating Map", 0, true);
 		//We need to scram our map before generating a new one
 		while (transform.childCount > 0)
         {
@@ -169,7 +169,7 @@ public class Mission_MapManager : MonoBehaviour {
 		mapArray = new List<mapArrayEntry>();
 		conflictTiles.Clear();
 		conflictTiles = new List<conflictTile>();
-		populateMap();
+		yield return StartCoroutine(PopulateMap());
 		runMapTints(false);  //Necessary to figure out what's no-mans land
 							 //Add a few conflict tiles
 		addNewConflictTile(enemyTeam, 3, 2);
@@ -187,16 +187,19 @@ public class Mission_MapManager : MonoBehaviour {
 		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
 		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
 		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
-
+		gameManager.Instance.SetLoadingScreen("Generating Map", 1, false);
 		bMapLoaded = true;
+		//We need to save our map
+		saveMapState();
 	}
 
 	// Use this for initialization
 	void Start () {
 		Instance = this;
 		alternateStep = new Vector3(-mapWidth/2F, 0, -mapHeight/2F); //used to offset our hex areas
-		if (!SaveUtility.Instance.CheckSaveFile("mapTileState.json"))
+		if (!SaveUtility.Instance.CheckSaveFile("mapTileState.json") || gameManager.Instance.bNeedsNewSave)
 		{ //we need to make a new map
+			gameManager.Instance.bNeedsNewSave = false;
 			GenerateFreshMap();
 		} else
         {
@@ -260,17 +263,7 @@ public class Mission_MapManager : MonoBehaviour {
 		//Update the map to reflect this showing things changing (somehow) - could this be set on the tiles themselves so they flash?
 		runMapTints(true); //Go through and fix up all the map tints
 						   //We need to look at what our conflicts are doing
-		//So...
-		if (conflictTiles.Count < 4)
-		{
-			//Perhaps we add some more tiles if there aren't enough
-			if (true || Random.value > 0.75f)
-			{
-				int newConflict = addNewConflictTile(Random.value < 0.25 ? friendlyTeam : enemyTeam, Mathf.RoundToInt(Random.RandomRange(3, 6)), 1);
-				ourCamera.DoMoveToPosition(GetCameraLookAtTile(newConflict)); //Move our camera to this position
-				yield return new WaitForSeconds(2f);
-			}
-		}
+		
 		//Dependig on the number of conflictTiles we might want to add some more
 		foreach (conflictTile thisTile in conflictTiles)
 		{
@@ -301,6 +294,25 @@ public class Mission_MapManager : MonoBehaviour {
 			}
 		}
 
+		//So...
+		if (conflictTiles.Count < 4)
+		{
+			for (int i = 0; i < 4 - conflictTiles.Count; i++)
+			{
+				//Debug.Log("Giving chance of adding conflict tile");
+				//Perhaps we add some more tiles if there aren't enough
+				if (Random.value > 0.125f)
+				{
+					Debug.Log("Adding new Conflict");
+					int newConflict = addNewConflictTile(Random.value < 0.25 ? friendlyTeam : enemyTeam, Mathf.RoundToInt(Random.RandomRange(3, 6)), 1);
+					ourCamera.DoMoveToPosition(GetCameraLookAtTile(newConflict)); //Move our camera to this position
+					yield return new WaitForSeconds(0.75f);
+					mapArray[newConflict].mapTile.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f, 4);
+					yield return new WaitForSeconds(1f);
+				}
+			}
+		}
+
 
 		//Finally we need to go through our conflicts and see if any have been invalidated
 		foreach (conflictTile thisTile in conflictTiles)
@@ -324,6 +336,7 @@ public class Mission_MapManager : MonoBehaviour {
 		}
 		runMapTints(true); //So that we can see things resolve
 		ourCamera.returnToStart();
+		saveMapState(); //Save our new map
 	}
 
 	public List<conflictTile> conflictsToRemove = new List<conflictTile>();
@@ -688,7 +701,7 @@ public class Mission_MapManager : MonoBehaviour {
         }
     }
 
-	void populateMap()
+	IEnumerator PopulateMap()
 	{ //go through and put down all our markers
 	  //blank map population function
 
@@ -733,6 +746,8 @@ public class Mission_MapManager : MonoBehaviour {
 
 				ent++; //cycle this up one
 			}
+			gameManager.Instance.SetLoadingScreen("Generating Map", (float)y/(float)mapHeight, true);
+			yield return null;
 		}
 
 		//we need to populate our map for starting colours (friendly/otherwise) and it's best if it's not in the above loop

@@ -12,12 +12,21 @@ public class AircraftController : Actor {
 	public GameObject[] CannonEmpties; //these are the empties attached to our aircraft that denote cannons
 	public AttachedGun[] ourGunMP;
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
-	//public AIController ourAIController; //we can also get information from this
-	//public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
-	//public bool bControlArcade=false;
-	//these wil
-	float mass=7, MaxAirSpeed=6, StallSpeed=1.5F, rollspeed=1.5F, pitchspeed=1.5F, yawspeed=1.5F, throttlespeed=0.5F;
-	float throttle=0.75F, gravity=7, thrust=8, thrustPower = 30f, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
+                                                //public AIController ourAIController; //we can also get information from this
+                                                //public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
+                                                //public bool bControlArcade=false;
+                                                //these wil
+    #region Aircraft Properties For Player Control
+    public float mass = 7;
+	public float MaxAirSpeed = 6;
+	public float StallSpeed = 1.5F;
+	public float rollspeed = 1.5F;		//Used by the AI for doing turns
+	public float pitchspeed = 1.5F;
+	public float yawspeed = 1.5F;		//Used by the AI for doing turns
+	public float throttlespeed=0.5F;
+	#endregion
+
+	float throttle =0.75F, gravity=7, thrust=8, thrustPower = 30f, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
 
 	float enginePitchMin = 0.6f, enginePitchMax = 1.4f;
 	Engine[] engines; //well this is either as simple or as complicated as we want to make it really...
@@ -381,9 +390,9 @@ public class AircraftController : Actor {
 
 			//back off on the force here so that the AI can ditch
 			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*02F);
+				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*02f);
 			else
-				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*02F);
+				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*02f);
 			//yaw commands
 			//transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
 			//throttle details

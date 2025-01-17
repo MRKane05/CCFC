@@ -35,22 +35,48 @@ public class MissionEventsManager : MonoBehaviour {
 	float gameTime = 0;
 	// Use this for initialization
 	public void StartMission()
-    {
+	{
 		//Quickly knock something together
-		
+
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
-		LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 1);
-		//LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
-		ListLevelObjectives.Add(newObjective);
-		//ListLevelObjectives.Add(balloonObjective);
+		//This deserves more setup, but for the moment we can probably just multiply it accordingly
+		int fighterGroups = Random.Range(1, 3);
+		for (int i = 0; i < fighterGroups; i++)
+		{
+			LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 1);
+			ListLevelObjectives.Add(newObjective);
+		}
+
+		//I think if we have more than X many fighter groups we should see about increasing the number of wingmen the player has (or adding a friendly fighter group)
+
+		int balloonGroups = Random.Range(1, 3);
+		for (int i = 0; i < balloonGroups; i++)
+		{
+			LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
+			ListLevelObjectives.Add(balloonObjective);
+		}
+
 		ConstructMission(ListLevelObjectives, 4);
 
 		Debug.Log("Starting Mission");
 		ProcessMissionEvents();
 
 		//We also need to add our wingmen
-		//AddWingmen();
+		AddWingmen();
+		//Consider adding more wingmen based off of the number of events that are present
+		int additionalWingmenGroups = (fighterGroups + balloonGroups) / 3;
+		for (int i=0; i<additionalWingmenGroups; i++)
+        {
+			AddFriendly();
+        }
     }
+
+	public virtual void AddFriendly()
+    {
+		Debug.Log("Adding Friendly");
+		addWingman(0, prefabManager.Instance.getFriendlyFighter(0f, 1f), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * Random.Range(-10f, 10f) + Vector3.right * Random.Range(-10f, 10f), Quaternion.identity, "PATROL", 0);
+
+	}
 
 	public virtual void AddWingmen()
     {
@@ -137,7 +163,10 @@ public class MissionEventsManager : MonoBehaviour {
 					break;
 				case LevelObjectiveSet.enObjectiveType.BALLOONS:
 					//We need a location for these to happen around
+					//This point needs to consider the ground, so lets do a raycast to be sure
+
 					Vector3 randomPoint = new Vector3(Random.Range(-50, 50), 80, Random.Range(-50, 50));
+					randomPoint = getTerrainHeightAtPoint(randomPoint) + Vector3.up * Random.Range(10f, 50f);
 					createBalloonEvent(randomPoint, 12f);
 					break;
 				default:
@@ -147,6 +176,26 @@ public class MissionEventsManager : MonoBehaviour {
 		//For things like the base/balloons we could do with spawning them in a cluster x distance from the starting point of the player,
 		//and then building around this setup
 		//Logically from that the different objectives will have different locatoins too
+	}
+
+	Vector3 getTerrainHeightAtPoint(Vector3 point) {
+		RaycastHit hit;
+		LayerMask maskAll = ~0;
+		// Does the ray intersect any objects excluding the player layer
+		if (Physics.Raycast(point + Vector3.up * 2000f, -Vector3.up, out hit, Mathf.Infinity, maskAll))
+
+		{
+			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+			Debug.Log("Did Hit");
+			return hit.point;
+		}
+		else
+		{
+			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
+			Debug.Log("Did not Hit");
+		}
+		return point;	//Assume we didn't find anything so lets go ahead
+
 	}
 
 	void createBalloonEvent(Vector3 clusterCenter, float clusterSpacing)
@@ -187,13 +236,13 @@ public class MissionEventsManager : MonoBehaviour {
 		//For the moment lets dump in a collection of elements
 		int numElements = 1; //Why do we even have this? I want to add the event, not multiples OF the event
 		//numElements = 1;
-		for (int i=0; i<numElements; i++)
-        {
-			missionEvent newEvent = MEV_MakeFlight();	//The fighers are added in the event, where as the balloons are added in the create event function
-			newEvent.triggerType = missionEvent.enTriggerType.TIME;
-			newEvent.triggerValue = 3 + i * 10;
-			missionEvents.Add(newEvent);
-        }
+		//for (int i=0; i<numElements; i++)
+        //{
+		missionEvent newEvent = MEV_MakeFlight();	//The fighers are added in the event, where as the balloons are added in the create event function
+		newEvent.triggerType = missionEvent.enTriggerType.START; //Just toss everything in together
+		newEvent.triggerValue = 5f;
+		missionEvents.Add(newEvent);
+        //}
     }
 
 	//Make a flight of fighters as a mission event object
@@ -206,8 +255,8 @@ public class MissionEventsManager : MonoBehaviour {
 
 		newFlight.eventTeam = 1; //Enemies for the moment
 
-		int flightCount = Mathf.RoundToInt(Random.Range(1, 3));
-		flightCount = 1;
+		int flightCount = Mathf.RoundToInt(Random.Range(3, 5));	//Increase the number so as to get a bit of a group of fighters happening
+		
 		for (int i=0; i<flightCount; i++)
         {
 			newFlight.spawnObject.Add(prefabManager.Instance.enemyPrefabList[0]);

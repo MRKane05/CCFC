@@ -8,6 +8,8 @@ public class zone_AckAck : MonoBehaviour {
 	float reTriggerTime = 0.5f;
 
 	public GameObject ackAckPrefab;
+	public Range ZoneWidth = new Range(-10, 10);
+	public Range ZoneHeight = new Range(-5, 5);
 
 	// have the Ack Ack seek the enemy fighters to some degree...which now means that this
 	//thing needs a team and class extension etc.
@@ -17,7 +19,7 @@ public class zone_AckAck : MonoBehaviour {
 			//make an Ack Ack!
 			lastTriggerTime = Time.time;
 
-			Vector3 spawnPoint = transform.position + new Vector3(Random.Range(-10, 10), Random.Range (-5, 5), Random.Range(-10, 10));
+			Vector3 spawnPoint = transform.position + new Vector3(ZoneWidth.GetRandom(), ZoneHeight.GetRandom(), ZoneWidth.GetRandom());
 		
 			Instantiate(ackAckPrefab, spawnPoint, Quaternion.identity);
 		}

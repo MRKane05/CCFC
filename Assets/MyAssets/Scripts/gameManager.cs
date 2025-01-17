@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using TMPro;
 
 [System.Serializable]
 public class LevelResults
@@ -21,9 +22,10 @@ public class gameManager : MonoBehaviour {
 
 	#region Level Results to Pass Through
 	public LevelResults levelResults;
-    #endregion
+	#endregion
 
-    #region Level Load Screen
+	#region Level Load Screen
+	public TextMeshProUGUI loadingScreenMessage;
     public GameObject LoadingScreenBase;
 	public Slider LoadingSlider;
 	#endregion
@@ -80,15 +82,23 @@ public class gameManager : MonoBehaviour {
 		StartCoroutine(loadMission()); //now boot up our mission function stuff
 	}
 
+	public void SetLoadingScreen(string loadingMessage, float amount, bool bIsVisible)
+    {
+		LoadingScreenBase.SetActive(bIsVisible);
+		loadingScreenMessage.text = loadingMessage;
+		LoadingSlider.value = amount;
+    }
+
 	public IEnumerator loadScene(string SceneName)
     {
 		//This extra block of code handles the loading bar and loading screen
 		AsyncOperation async = Application.LoadLevelAsync(SceneName); //PROBLEM: Need better level loading logic here
+		loadingScreenMessage.text = "Loading...";
 		LoadingScreenBase.SetActive(true);
 		while (!async.isDone)
 		{
 			LoadingSlider.value = async.progress;
-			Debug.Log(LoadingSlider.value);
+			//Debug.Log(LoadingSlider.value);
 			if (async.progress >= 0.9f)
 			{
 				LoadingSlider.value = 1f;
@@ -103,6 +113,7 @@ public class gameManager : MonoBehaviour {
 	
 	IEnumerator loadMission() {
 		//load our level
+		UIMusicHandler.Instance.SetMusicTrack(false);	//Set our combat track playing
 		yield return StartCoroutine(loadScene("Level"));
 		
 		yield return null;
@@ -127,6 +138,7 @@ public class gameManager : MonoBehaviour {
 		AsyncOperation async = Application.LoadLevelAsync("MissionSelection"); //PROBLEM: Need better level loading logic here
 		yield return async;
 		*/
+		UIMusicHandler.Instance.SetMusicTrack(true); //Set our menu music playing
 		yield return StartCoroutine(loadScene("MissionSelection"));
 		Debug.Log("Loading complete");
 
@@ -146,4 +158,10 @@ public class gameManager : MonoBehaviour {
 		Mission_MapManager.Instance.LevelCompleted(targetTile, levelResults.bWonLevel); //For the moment lets hard-code this
 	}
 
+	[HideInInspector]
+	public bool bNeedsNewSave = false;
+	public void StartNewGame()
+    {
+		bNeedsNewSave = true;
+    }
 }

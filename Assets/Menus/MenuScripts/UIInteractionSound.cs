@@ -22,7 +22,10 @@ public class UIInteractionSound : MonoBehaviour {
 		else
 		{
 			instance = this;
-			ourAudioSource = gameObject.GetComponent<AudioSource>();
+			if (!ourAudioSource)
+			{
+				ourAudioSource = gameObject.GetComponent<AudioSource>();
+			}
 		}
 	}
 

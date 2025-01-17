@@ -96,7 +96,10 @@ public class MissionEventObject : MonoBehaviour {
         {
             if (thisWrapper.actor == thisActor)
             {
-                Debug.LogError("Actor marked as dead");
+                if (gameManager.Instance.bDebugEvents)
+                {
+                    Debug.LogError("Actor marked as dead");
+                }
                 thisWrapper.bActorDead = true;
             }
         }

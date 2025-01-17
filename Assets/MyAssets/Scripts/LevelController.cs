@@ -91,6 +91,8 @@ public class LevelController : MonoBehaviour {
 
 	Vector2 endGoal2D = Vector2.zero;
 
+	public GameObject basicAckAck;
+
 	public void populateWaypoints(GameObject[] theseWaypoint, GameObject endGoal) {
 
 		missionEndGoal = endGoal; //is more of a formality actually
@@ -428,6 +430,7 @@ public class LevelController : MonoBehaviour {
 	
 	IEnumerator Start() {
 		yield return null;
+		basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?
 		//This all needs to be disabled if we're outside of testing
 		/*
 		if (!prefabManager.Instance)
@@ -437,8 +440,7 @@ public class LevelController : MonoBehaviour {
 		//For the moment:
 		//StartCoroutine(StartMatch());
 		*/
-		createMatch(3, 3);
-		
+		//createMatch(3, 3);	
 	}
 	
 	//This needs another number to gauge the difficulity
@@ -529,7 +531,6 @@ public class LevelController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		//monitorWaypoints(); //shouldn't be called until it's all setup properly
-
 		//checkLevelClear();
 	}
 

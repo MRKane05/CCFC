@@ -19,7 +19,7 @@ public class Effect_TextDriver : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		//when we're created...almost. We might be doing this prompted to save on instantiation in the future.
-		ourLabel = GetComponentInChildren<Text>();
+		ourLabel = gameObject.GetComponentInChildren<Text>();
 		startTime = Time.time;
 		startScale = transform.localScale;
 
