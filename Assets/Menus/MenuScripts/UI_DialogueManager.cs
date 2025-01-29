@@ -9,7 +9,9 @@ using System.Text.RegularExpressions;
 public class CharacterPortrait
 {
 	public string characterPortrait = ""; //What portrait will we load for this line of dialogue?
-	public bool bCharacterActive = true;
+	public bool bCharacterActive = false;
+	public bool bNeedsAnimateOn = false;
+	public bool bNeedsAnimateOff = false;
 }
 
 [System.Serializable]
@@ -81,10 +83,40 @@ public class UI_DialogueManager : MonoBehaviour {
 	string lineCodon = "charLine:";
 	string audioCodon = "charAudio:";
 
+	CharacterPortrait parseCharacterData(string thisCharacter)
+    {
+		CharacterPortrait newCharacter = new CharacterPortrait();
+		string newEntry = thisCharacter.Trim();
+		if (newEntry.Length > 3)    //Quick sanity check
+		{
+			bool bCharacterStar = false;
+			if (newEntry.Contains("*"))
+			{
+				newCharacter.bCharacterActive = true;
+				newEntry.Replace("*", "");  //Remove our star so that we don't carry it through to our filename
+			}
+			if (newEntry.Contains(">"))
+            {
+				newCharacter.bNeedsAnimateOn = true;
+				newEntry.Replace(">", "");
+            }
+			if (newEntry.Contains("<"))
+			{
+				newCharacter.bNeedsAnimateOff = true;
+				newEntry.Replace("<", "");
+			}
+			//CharacterPortrait newPortrait = new CharacterPortrait();
+			newCharacter.characterPortrait = "Portraits/" + newEntry;
+		}
+		return newCharacter;
+    }
+
 	void parseDialogueFile(string[] lines)
     {
 		//The idea here is that we'll have a file that's human readable and easy to write for our dialogue interactions i.e.
 		//* denotes scaled character portrait
+		//> denotes that the portrait needs to animate on
+		//< denotes that the portrait needs to animate off
 		//charLeft: Portrait_Farnsworth* 
 		//charRight: Portrait_Terry
 		//charLine: Good news everyone!
@@ -111,14 +143,7 @@ public class UI_DialogueManager : MonoBehaviour {
 					string newEntry = newLeftCharacter.Trim();
 					if (newEntry.Length > 3)    //Quick sanity check
 					{
-						bool bCharacterStar = false;
-						if (newEntry.Contains("*"))
-						{
-							bCharacterStar = true;
-							newEntry.Replace("*", "");  //Remove our star so that we don't carry it through to our filename
-						}
-						CharacterPortrait newPortrait = new CharacterPortrait();
-						newPortrait.characterPortrait = "Portraits/" + newEntry;
+						CharacterPortrait newPortrait = parseCharacterData(newEntry);
 						newDialogue.characterPortraits_Left.Add(newPortrait);
 					}
                 }
@@ -137,15 +162,7 @@ public class UI_DialogueManager : MonoBehaviour {
 					string newEntry = newRightCharacter.Trim();
 					if (newEntry.Length > 3)	//Quick sanity check
 					{
-						bool bCharacterStar = false;
-						if (newEntry.Contains("*"))
-						{
-							bCharacterStar = true;
-							newEntry.Replace("*", "");  //Remove our star so that we don't carry it through to our filename
-						}
-						CharacterPortrait newPortrait = new CharacterPortrait();
-						newPortrait.characterPortrait = "Portraits/" + newEntry;
-						newPortrait.bCharacterActive = bCharacterStar;
+						CharacterPortrait newPortrait = parseCharacterData(newEntry);
 						newDialogue.characterPortraits_Right.Add(newPortrait);
 					}
 				}
