@@ -123,7 +123,7 @@ public class NGUI_Base : MonoBehaviour {
 	}
 	
 	void handleSpeedo() {
-		if (speedo) {
+		if (speedo && PlayerController.Instance) {
 			//speedo.transform.eulerAngles = new Vector3(0, 0, 160-PlayerController.Instance.ourAircraft.getSpeed()*70); //Not the best way to do things
 			speedo.speed = PlayerController.Instance.ourAircraft.getSpeed();
 		}
