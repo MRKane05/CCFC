@@ -160,8 +160,10 @@ public class Actor : MonoBehaviour {
 				Destroy (gameObject);
 			}
 		}
-
-		owner.actorTakingDamage(owner, this, health / maxHealth);
+		if (owner)
+		{
+			owner.actorTakingDamage(owner, this, health / maxHealth);
+		}
 	}
 
 	public virtual GameObject getModel() { //returns the model attached to this controller
@@ -192,5 +194,17 @@ public class Actor : MonoBehaviour {
 		//Explode and delete this in the process
 		LevelController.Instance.removeSelf(gameObject, team); //For the moment I suppose
 		Destroy(gameObject, d_delay); //destroy aircraft after small "effect" delay
+	}
+
+	public void NPClerp(Vector3 targetLoc, float pullSpeed)
+	{
+
+		//the pullSpeed needs graded according to the distance to/from where we want to be...
+
+		pullSpeed *= Mathf.Clamp01((transform.position - targetLoc).magnitude); //should be an easy switch
+
+		//Basically gives the AI a helping hand to catch up to it's designated target, and keeps a status quo when it's at the cofrect point
+		transform.position = Vector3.MoveTowards(transform.position, targetLoc, pullSpeed * Time.deltaTime); //pull this according to speed
+
 	}
 }

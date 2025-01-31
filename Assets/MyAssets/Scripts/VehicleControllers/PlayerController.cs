@@ -180,8 +180,9 @@ public class PlayerController : ActorController {
 		}
 
 		//sundry stuff for the players convience (things like updating the altitude etc.
+		//PROBLEM: Need to handle the altitude stuff better
 		if (ourAircraft) {
-			mAltitude = ourAircraft.checkAltitude();
+			//mAltitude = ourAircraft.checkAltitude();
 		}
 
 

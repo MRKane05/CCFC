@@ -15,9 +15,4 @@ public class NGUI_HealthBar : MonoBehaviour {
 		healthBar.fillAmount = newProp;
 		//= Mathf.RoundToInt(healthBarFull[0]*healthProp); //resize our health bar.
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

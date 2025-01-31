@@ -102,13 +102,16 @@ public class NGUI_Base : MonoBehaviour {
 
 	//this is being pinged twice?
 	public void setTarget(GameObject newTarget) {
-		ourTargetCamera.setTarget(newTarget); //pass this on also
+		if (ourTargetCamera)
+		{
+			ourTargetCamera.setTarget(newTarget); //pass this on also
 
-		//we need to get our target's targetSphere for this
-		//GameObject targetSphere = newTarget.GetComponent<TargetSphereOffset>().targetSphere;
-		//Debug.Log (newTarget);
-		targetFiringMarker.trackObject = newTarget;
-		targetDistanceMarker.trackObject = newTarget; //Ok, so this won't be so simple and will have to be forward calculated...
+			//we need to get our target's targetSphere for this
+			//GameObject targetSphere = newTarget.GetComponent<TargetSphereOffset>().targetSphere;
+			//Debug.Log (newTarget);
+			targetFiringMarker.trackObject = newTarget;
+			targetDistanceMarker.trackObject = newTarget; //Ok, so this won't be so simple and will have to be forward calculated...
+		}
 	}
 
 	#endregion

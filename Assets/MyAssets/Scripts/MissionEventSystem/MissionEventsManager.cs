@@ -41,6 +41,7 @@ public class MissionEventsManager : MonoBehaviour {
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
 		//This deserves more setup, but for the moment we can probably just multiply it accordingly
 		int fighterGroups = Random.Range(1, 3);
+		fighterGroups = 1;
 		for (int i = 0; i < fighterGroups; i++)
 		{
 			LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.FIGHTERS, 1);
@@ -50,6 +51,7 @@ public class MissionEventsManager : MonoBehaviour {
 		//I think if we have more than X many fighter groups we should see about increasing the number of wingmen the player has (or adding a friendly fighter group)
 
 		int balloonGroups = Random.Range(1, 3);
+		balloonGroups = 0;
 		for (int i = 0; i < balloonGroups; i++)
 		{
 			LevelObjectiveSet balloonObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BALLOONS, 1);
@@ -62,7 +64,7 @@ public class MissionEventsManager : MonoBehaviour {
 		ProcessMissionEvents();
 
 		//We also need to add our wingmen
-		AddWingmen();
+		//AddWingmen();
 		//Consider adding more wingmen based off of the number of events that are present
 		int additionalWingmenGroups = (fighterGroups + balloonGroups) / 3;
 		for (int i=0; i<additionalWingmenGroups; i++)
@@ -117,7 +119,7 @@ public class MissionEventsManager : MonoBehaviour {
 																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
 		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
 
-		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft.gameObject; //follow this
+		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft; //follow this
 		((AI_Fighter)newActor.ourController).flightGroup = groupTag;
 
 		//Now we need to figure out which list we add it to

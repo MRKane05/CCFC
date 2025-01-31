@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class ActorController : MonoBehaviour {
-	public AircraftController ourAircraft;
+	public Actor ourAircraft;
 
 	public bool bControlArcade=true; //are we using an arcade input style?
 	public int team=-1;

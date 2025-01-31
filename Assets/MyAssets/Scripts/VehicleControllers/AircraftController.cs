@@ -413,17 +413,6 @@ public class AircraftController : Actor {
 			checkGroundContacts();
 	
 	}
-
-	public void NPClerp (Vector3 targetLoc, float pullSpeed) { 
-
-		//the pullSpeed needs graded according to the distance to/from where we want to be...
-
-		pullSpeed *= Mathf.Clamp01((transform.position-targetLoc).magnitude); //should be an easy switch
-
-		//Basically gives the AI a helping hand to catch up to it's designated target, and keeps a status quo when it's at the cofrect point
-		transform.position = Vector3.MoveTowards(transform.position, targetLoc, pullSpeed*Time.deltaTime); //pull this according to speed
-
-	}
 	
 	void NPCUpdate() {
 		//Rotates us around the world origin...
@@ -471,6 +460,7 @@ public class AircraftController : Actor {
 
 	//returns (unrealistically) our altitude above the current terrain
 	public float checkAltitude() {
+		if (!groundCollider) { return 100;  }
 		Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
 		
 		RaycastHit hit;

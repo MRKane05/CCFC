@@ -210,18 +210,7 @@ public class LevelController : MonoBehaviour {
 		//If this is an ambush:
 
 		return addActor(thisTeam, thisFighter, thisLocation, thisRotation, groupTag, thisOwner);
-		/*
-		for (int i=0; i< enemyCount; i++) {
-			
-			float angle = Random.Range(0, 360);
-			float distance = Random.Range (60, 150);
-			Vector3 spawnOffset = new Vector3(Mathf.Sin (angle*Mathf.Deg2Rad) * distance, Random.Range (-40, 40), Mathf.Cos (angle*Mathf.Deg2Rad)*distance);
-			
-			addActor(1, prefabManager.Instance.getEnemyFighter(0F, 1F), playerAircraft.transform.position+spawnOffset, Quaternion.identity);
-			
-		}
-		*/
-		
+	
 	}
 	
 	#endregion
@@ -432,15 +421,16 @@ public class LevelController : MonoBehaviour {
 		yield return null;
 		basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?
 		//This all needs to be disabled if we're outside of testing
-		/*
+		
 		if (!prefabManager.Instance)
         {
 			yield return null;
         }
 		//For the moment:
-		//StartCoroutine(StartMatch());
-		*/
-		//createMatch(3, 3);	
+		//StartCoroutine(StartMatch(3, 0));
+
+		//createMatch(1, 0);
+		//StartCoroutine(DoBomberRunEnemies());
 	}
 	
 	//This needs another number to gauge the difficulity
@@ -448,7 +438,10 @@ public class LevelController : MonoBehaviour {
 														//will need to call the LevelBuilder_ that we're using for this match when it's all in pace, not this system...
 														//StartCoroutine(StartMatch(enemies, wingmen));
 														//Lets use this for the moment
-		ourMissionEventsManager.StartMission(); //precanned hardwired setup
+		if (ourMissionEventsManager)	//As this won't exist for the tailgunner missions and will be replaced with a hacky drop-in class
+		{
+			ourMissionEventsManager.StartMission(); //precanned hardwired setup
+		}
 
 	}
 
@@ -486,7 +479,7 @@ public class LevelController : MonoBehaviour {
 		friendlyCount=wingmen;
 		enemyCount=enemies;
 		
-		ourGUIText.text = "SCORE: " + 0F;
+		//ourGUIText.text = "SCORE: " + 0F;
 		
 		//if (enemyList == null || enemyList.Length < 3) {
 		

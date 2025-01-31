@@ -17,7 +17,7 @@ public class MEV_Fighters : MissionEventObject {
 
 		Vector3 targetPoint = playerLocation + playerQuat * Vector3.forward * dropRadius / 3f; //this is forward of the player, we're looking toward it I'd guess
 
-		NGUI_Base.Instance.setGameMessage("A group of Enemies!");
+		//NGUI_Base.Instance.setGameMessage("A group of Enemies!");
 
 		float randomDirection = Random.Range(0F, 360F * Mathf.Deg2Rad);
 

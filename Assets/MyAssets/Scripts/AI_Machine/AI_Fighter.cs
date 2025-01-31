@@ -24,11 +24,13 @@ public class AI_Fighter : ActorController {
 	//we've got some magic numbers here
 	float timerVariance=0.5F; //Plus Minus to our variables
 	float attackBreakTime=0.7F; //How long do we break away for between fire bursts
-	float attackDuration=1.2F; //How long will we fire for?
+	public float attackDuration=1.2F; //How long will we fire for?
 	float attackSetupTime=2F; //how long do we take to setup?
 	
-	float evadeDuration=5F;
-	float escapeDuration=7F;
+
+	public Range evadeDuration = new Range(3f, 7f);
+	public Range escapeDuration = new Range(5f, 9f);
+
 	#endregion
 	
 	public string pattern="ATTACK", patternStage="SETUP"; //what pattern are we in? attack etc. and what stage are we in the pattern?
@@ -55,7 +57,7 @@ public class AI_Fighter : ActorController {
 	Quaternion lastRotation;
 	float lastYaw;
 
-	public GameObject followTarg; //Target that we're following - is either what we're "protecting" or our wing leader
+	public Actor followTarg; //Target that we're following - is either what we're "protecting" or our wing leader
 	public int formationNumber = -1; //assign this dynamically
 	//ATTACK: ATTACK, SETUP
 	//STOP: COLLABORATE AND LISTEN hehehe
@@ -129,7 +131,7 @@ public class AI_Fighter : ActorController {
 			if (followTarg && formationNumber==-1) {
 				//Need to request a number here...somehow...
 				//Might actually be smarter to request it from the Level controller.
-				formationNumber = LevelController.Instance.getFormationNumber(team, followTarg);
+				formationNumber = LevelController.Instance.getFormationNumber(team, followTarg.gameObject);
 				pattern="FOLLOW"; //go back to following our group lead.
 
 			}
@@ -183,7 +185,7 @@ public class AI_Fighter : ActorController {
 				else if (patternStage == "SETUP") {
 					//Lets drop this into an evade...
 					pattern = "EVADE";
-					patternDuration = evadeDuration;
+					patternDuration = evadeDuration.GetRandom();
 					patternTime = Time.time;
 					damageTaken = 0;
 				}				
@@ -192,7 +194,7 @@ public class AI_Fighter : ActorController {
 				Debug.Log("Evade damage Change");
 				pattern = "DOEVASIVE";
 				patternStage = "PICK";
-				patternDuration = escapeDuration;
+				patternDuration = escapeDuration.GetRandom();
 				patternTime = Time.time;
 				damageTaken = 0;
 			}
@@ -237,7 +239,6 @@ public class AI_Fighter : ActorController {
 				patternStage="ATTACK"; //staight attack
 			}
 		}
-
 	}
 	
 	public virtual void PatrolPattern() { //moves through pre-defined waypoints. Not sure how I'll do this yet
@@ -299,7 +300,7 @@ public class AI_Fighter : ActorController {
 				patternStage="ATTACK";
 				//Clear our firing flags
 				bWasFiring=false;
-				patternDuration=evadeDuration; //this should be cleared by the master section of this pattern (but may sometimes huff)
+				patternDuration=evadeDuration.GetRandom(); //this should be cleared by the master section of this pattern (but may sometimes huff)
 			}
 		}
 		if (patternStage=="SETUP") {
@@ -323,7 +324,7 @@ public class AI_Fighter : ActorController {
 					pattern = "DOEVASIVE";
 					patternStage = "PICK";
 					patternTime = Time.time;
-					patternDuration = escapeDuration;
+					patternDuration = escapeDuration.GetRandom();
 				}
 				else {
 					pattern="ATTACK";
@@ -332,18 +333,6 @@ public class AI_Fighter : ActorController {
 					patternDuration = attackDuration;
 				}
 			}
-					
-			//patternStage == "VERTICAL" //This is a wingover or similar here
-			//patternStage == "IMMELMAN" //Immelman turn
-			//patternStage == "NORMAL" //just usual tatical stuff
-			
-			//At what point to we decide to break our evasion pattern?
-			/*
-			if (Time.time > patternTime) { //then we go back on the attack
-				pattern="ATTACK";
-				patternStage="ATTACK";
-			}
-			*/
 		}
 		
 		if (pattern=="DOEVASIVE") {
@@ -370,7 +359,6 @@ public class AI_Fighter : ActorController {
 				targetSpeed = 0.75F + Mathf.Sin(Time.time) * 0.25F; //vary our time, although this needs a better ticker
 				CheckBreak();
 			}
-			
 		}	
 	}
 	
@@ -461,7 +449,9 @@ public class AI_Fighter : ActorController {
 			//at this point we should probably put something in that'll prevent the fighter from crashing,
 			//the rest of the system should sort itself out in due time.
 		}
-
+		//groundCollider should be a global.
+		//PROBLEM: Need to fix the ground collider settings here
+		/*
 		if (ourAircraft.groundCollider) { //check for the possiblity of needing to evade
 
 			Ray ray = new Ray(ourAircraft.transform.position, Vector3.Lerp(ourAircraft.transform.forward, -Vector3.up, 0.3F)); //shoot this ray down to see where we contact
@@ -476,7 +466,7 @@ public class AI_Fighter : ActorController {
 				return;
 			}
 		}
-
+		*/
 		//maybe not the best place?
 		bIsFiring = bFireOnTarget(); //so this will return if we should be shooting at our target 
 
@@ -569,6 +559,8 @@ public class AI_Fighter : ActorController {
 		returnRotation = Quaternion.Lerp (lastRotation, transform.rotation, Time.deltaTime*targetUpdate);
 		lastRotation = returnRotation;
 
+		targetSpeed = followTarg.getSpeed()/((AircraftController)ourAircraft).MaxAirSpeed;
+		//Debug.Log("target Speed: " + targetSpeed);
 		//now we need to look at lerping this fighter into position...
 		//public void NPClerp (Vector3 targetLoc, float pullSpeed) {
 		//this is working, but lacks a little soul at the moment
@@ -582,7 +574,7 @@ public class AI_Fighter : ActorController {
 	//====Manuvers...can probably be mixed with things============================================================
 	//Manuvers should be mixed with function to add some severe variance to flight
 	//The basic loop. There's no function to check when we're done however.
-	void DoLoop(out Quaternion newRotation, out float newYaw, float factor) {
+	public void DoLoop(out Quaternion newRotation, out float newYaw, float factor) {
 		transform.rotation = ourAircraft.gameObject.transform.rotation; //reset this sucker.
 		
 		transform.RotateAround(transform.right, -factor); //Well I'll buy that for a dollar despite it not working
@@ -592,7 +584,7 @@ public class AI_Fighter : ActorController {
 	}
 	
 	//Weave is a feedback pattern around a rotational axis - it serves no function but provides an interesting mechanic.
-	void DoWeave(out Quaternion newRotation, out float newYaw, float factor) { //this is a delightful little messup.
+	public void DoWeave(out Quaternion newRotation, out float newYaw, float factor) { //this is a delightful little messup.
 		transform.rotation = ourAircraft.gameObject.transform.rotation; //reset this sucker.
 		
 		transform.RotateAroundLocal(transform.right, factor); //Well I'll buy that for a dollar despite it not working
@@ -760,7 +752,7 @@ public class AI_Fighter : ActorController {
 	}
 	
 	
-	void DoTaticalManuver(out Quaternion newRotation, out float newYaw) {
+	public void DoTaticalManuver(out Quaternion newRotation, out float newYaw) {
 		//===========Target Avoidance/Dodge Functions...====================
 		//These would be selecting a different angle and then turning to it for a few beats, then shake dry and repeat...
 		//This works as expected but it lacks soul if you get what I mean...
@@ -788,6 +780,5 @@ public class AI_Fighter : ActorController {
 
 		newRotation = targetRotation;
 		//ourAircraft.AIUpdateInput(targetRotation, newYaw);
-		
 	}
 }

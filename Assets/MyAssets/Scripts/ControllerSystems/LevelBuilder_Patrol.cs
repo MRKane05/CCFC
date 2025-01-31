@@ -103,7 +103,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 		//newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
 		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
 
-		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft.gameObject; //follow this
+		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft; //follow this
 		((AI_Fighter)newActor.ourController).flightGroup = groupTag;
 
 		//Now we need to figure out which list we add it to
