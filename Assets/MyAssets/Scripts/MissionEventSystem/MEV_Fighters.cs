@@ -32,7 +32,7 @@ public class MEV_Fighters : MissionEventObject {
 
 		Quaternion transQuat = Quaternion.Euler(0, startAngle + 90, 0);
 
-		//LevelController.Instance.waypointCallbackEnemy(enemyCount);
+		//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(enemyCount);
 
 		float waypointStagger = 3; //how far apart are our fighters?
 
@@ -59,10 +59,10 @@ public class MEV_Fighters : MissionEventObject {
 				}
 			}
 
-			//LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
-			//actorWrapper newActor = LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
 			//Add this actor to our level controller so it'll show up on radar etc.
-			actorWrapper newActor = LevelController.Instance.addFighterActor(ourMissionEvent.spawnObject[i], ourMissionEvent.eventTeam, patrolStart + patrolOffset, startQuat, groupTag, this);
+			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(ourMissionEvent.spawnObject[i], ourMissionEvent.eventTeam, patrolStart + patrolOffset, startQuat, groupTag, this);
 			//Assign our AI actions for this fighter
 			((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
 			groupActors.Add(newActor);

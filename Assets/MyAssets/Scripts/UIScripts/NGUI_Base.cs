@@ -72,22 +72,22 @@ public class NGUI_Base : MonoBehaviour {
 	#region targeting
 	public void targetBest() {
 		//This needs to be sent through to the players systems having elected a best target from the levelController
-		LevelController.Instance.requestTarget(PlayerController.Instance); //should callback the controller with the target
+		((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance); //should callback the controller with the target
 
 	}
 
 	public void nextTarget() {
 		if (PlayerController.Instance.target!=null)
-			LevelController.Instance.requestListTarget(1, PlayerController.Instance);
+((LevelController)LevelControllerBase.Instance).requestListTarget(1, PlayerController.Instance);
 		else
-			LevelController.Instance.requestTarget(PlayerController.Instance);
+((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance);
 	}
 
 	public void previousTarget() { //Cycle this stuff backwards
 		if (PlayerController.Instance.target!=null)
-			LevelController.Instance.requestListTarget(-1, PlayerController.Instance);
+((LevelController)LevelControllerBase.Instance).requestListTarget(-1, PlayerController.Instance);
 		else
-			LevelController.Instance.requestTarget(PlayerController.Instance);
+((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance);
 	}
 
 	public void objectiveTarget() {

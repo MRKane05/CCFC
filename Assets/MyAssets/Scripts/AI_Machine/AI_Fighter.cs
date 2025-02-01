@@ -131,7 +131,7 @@ public class AI_Fighter : ActorController {
 			if (followTarg && formationNumber==-1) {
 				//Need to request a number here...somehow...
 				//Might actually be smarter to request it from the Level controller.
-				formationNumber = LevelController.Instance.getFormationNumber(team, followTarg.gameObject);
+				formationNumber = ((LevelController)LevelControllerBase.Instance).getFormationNumber(team, followTarg.gameObject);
 				pattern="FOLLOW"; //go back to following our group lead.
 
 			}
@@ -219,7 +219,7 @@ public class AI_Fighter : ActorController {
 		if (pattern=="PATROL" || pattern=="FOLLOW") {
 
 			//notify the other fighters in our group that we're being attacked
-			LevelController.Instance.notifyWithTag(team, "PATROLBREAK", flightGroup); 
+((LevelController)LevelControllerBase.Instance).notifyWithTag(team, "PATROLBREAK", flightGroup); 
 
 			//do an escape panic or flat out attack...oh the choices!
 			float randomDraw = Random.value;
@@ -416,7 +416,7 @@ public class AI_Fighter : ActorController {
 		if (pattern=="PATROL") {
 			//shouldn't need to do anything, at least for the moment, the AI will break as necessary
 			//so here we should stay alert for seeing any enemy (but not always go for the enemy that we're looking at)
-			if (LevelController.Instance.checkSight(this, 45F)) { //that's quite a tight FOV...
+			if (((LevelController)LevelControllerBase.Instance).checkSight(this, 45F)) { //that's quite a tight FOV...
 				pattern="ATTACK";
 				patternStage="ATTACK";
 				//Debug.LogError("Sight Break Patrol");
@@ -492,7 +492,7 @@ public class AI_Fighter : ActorController {
 		//so our calls will come through when we change state etc.
 		//lets try something simple here
 		//Debug.Log ("Checking Situation");
-		LevelController.Instance.requestTarget(this);
+		((LevelController)LevelControllerBase.Instance).requestTarget(this);
 
 
 	}

@@ -38,11 +38,11 @@ public class TargetIndicator : MonoBehaviour {
 			}
 		}
 		else { //see if we've a valid waypoint that we should be aiming toward.
-			if (LevelController.Instance.getMissionEndGoal!=null) {//(LevelController.Instance.currentWaypoint < LevelController.Instance.waypoints.Length) {
+			if (((LevelController)LevelControllerBase.Instance).getMissionEndGoal!=null) {//(((LevelController)LevelControllerBase.Instance).currentWaypoint < ((LevelController)LevelControllerBase.Instance).waypoints.Length) {
 				//we can look at this because we've a valid waypoint to point at.
-				if (!IsVisibleFrom(LevelController.Instance.getMissionEndGoal.GetComponent<Renderer>(), Camera.main)) { //can we see this? Then make it dominant
+				if (!IsVisibleFrom(((LevelController)LevelControllerBase.Instance).getMissionEndGoal.GetComponent<Renderer>(), Camera.main)) { //can we see this? Then make it dominant
 
-					transform.LookAt(LevelController.Instance.getMissionEndGoal.transform.position);
+					transform.LookAt(((LevelController)LevelControllerBase.Instance).getMissionEndGoal.transform.position);
 					targetColor = Color.yellow;
 
 				}

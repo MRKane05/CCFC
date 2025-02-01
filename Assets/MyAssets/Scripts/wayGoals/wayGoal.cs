@@ -40,7 +40,7 @@ public class wayGoal : waypoint {
 				waypointState = enWaypointState.Done;
 				
 				//call back to our main system and tell it that this is done...
-				LevelController.Instance.waypointCallback(gameObject);
+	((LevelController)LevelControllerBase.Instance).waypointCallback(gameObject);
 			}
 		}
 	}

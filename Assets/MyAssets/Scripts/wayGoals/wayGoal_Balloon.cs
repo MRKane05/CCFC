@@ -18,7 +18,7 @@ public class wayGoal_Balloon : wayGoal {
 
 
 		//our waypoint distance from the end waypoint through to the player...
-		Vector3 endPoint = LevelController.Instance.getMissionEndGoal.transform.position;
+		Vector3 endPoint = ((LevelController)LevelControllerBase.Instance).getMissionEndGoal.transform.position;
 		Vector3 playerPoint = PlayerController.Instance.ourAircraft.transform.position;
 
 		//so along the above vector find our start point for these balloons...
@@ -61,7 +61,7 @@ public class wayGoal_Balloon : wayGoal {
 			//for the moment lets just put them in a line...
 			Vector3 balloonPoint = clusterPoint + Vector3.forward * i * 10f; //in a line!
 
-			wayActors[i] = LevelController.Instance.addFighterActor(prefabManager.Instance.getEnemyBalloon(0F, 1F), 1, balloonPoint, Quaternion.identity, "", null);
+			wayActors[i] = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyBalloon(0F, 1F), 1, balloonPoint, Quaternion.identity, "", null);
 
 		}
 

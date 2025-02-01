@@ -151,14 +151,14 @@ public class BalloonController : Actor {
 			if (health<0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
 				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					LevelController.Instance.addKill(); //rack it up!
+		((LevelController)LevelControllerBase.Instance).addKill(); //rack it up!
 				
 				//doExplode(); //whack this.
 				bIsDead=true;
 				applyShotDown();
 				callbackDie();
 				//we can't remove this as it'll mean the player can't shoot it...
-				//LevelController.Instance.removeSelf(gameObject, team); //but our targeting system needs to know I suppose
+				//((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //but our targeting system needs to know I suppose
 				//Destroy (gameObject); //Just destroy it for now
 			}
 		}

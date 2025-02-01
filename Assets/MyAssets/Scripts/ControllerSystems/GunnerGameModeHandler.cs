@@ -53,7 +53,7 @@ public class GunnerGameModeHandler : MonoBehaviour {
 
 		Quaternion transQuat = Quaternion.Euler(0, startAngle + 90, 0);
 
-		//LevelController.Instance.waypointCallbackEnemy(enemyCount);
+		//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(enemyCount);
 
 		float waypointStagger = 3; //how far apart are our fighters?
 
@@ -80,10 +80,10 @@ public class GunnerGameModeHandler : MonoBehaviour {
 				}
 			}
 
-			//LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
-			//actorWrapper newActor = LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
 			//Add this actor to our level controller so it'll show up on radar etc.
-			actorWrapper newActor = LevelController.Instance.addFighterActor(prefabManager.Instance.enemyPrefabList[0], team, patrolStart + patrolOffset, startQuat, groupTag, null);
+			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.enemyPrefabList[0], team, patrolStart + patrolOffset, startQuat, groupTag, null);
 			//Assign our AI actions for this fighter
 			((AI_Fighter)newActor.ourController).setPatrol(2f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
 			//groupActors.Add(newActor);
@@ -116,13 +116,13 @@ public class GunnerGameModeHandler : MonoBehaviour {
 		//Handle our radar stuff
 		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
 
-		newActor.radarObject.transform.SetParent(LevelController.Instance.targetRadar.gameObject.transform); //child it to this.
+		newActor.radarObject.transform.SetParent(((LevelController)LevelControllerBase.Instance).targetRadar.gameObject.transform); //child it to this.
 		newActor.radarObject.transform.localScale = Vector3.one;
 		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
 
 
-		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // LevelController.Instance.getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
+		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // ((LevelController)LevelControllerBase.Instance).getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
 																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
 		((AI_Fighter)newActor.ourController).pattern = "PATROL";
 
@@ -132,11 +132,11 @@ public class GunnerGameModeHandler : MonoBehaviour {
 		//Now we need to figure out which list we add it to
 		if (thisTeam == 0)
 		{
-			LevelController.Instance.friendlyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
 		}
 		else if (thisTeam == 1)
 		{
-			LevelController.Instance.enemyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
 			newActor.actor.gradeSkill(0.5f);
 
 		}
@@ -149,7 +149,7 @@ public class GunnerGameModeHandler : MonoBehaviour {
     {
 
 		//Check to see if we should keep adding enemies into the level to harass the player
-		if (LevelController.Instance.enemyList.Count < nextMinSpawnCount && Time.time-levelStartTime > 5f)	//Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
+		if (((LevelController)LevelControllerBase.Instance).enemyList.Count < nextMinSpawnCount && Time.time-levelStartTime > 5f)	//Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
         {
 			AddEnemyFlightGroup(Random.Range(1, 4), 1);
         }
@@ -157,7 +157,7 @@ public class GunnerGameModeHandler : MonoBehaviour {
 		if (Time.time-levelStartTime > levelDuration && !bNextLevelLoading)
         {
 			bNextLevelLoading = true;	//PROBLEM: I really need a better way to handle this because this is very hacky
-			LevelController.Instance.finishMatch(false);
+((LevelController)LevelControllerBase.Instance).finishMatch(false);
         }
     }
 }

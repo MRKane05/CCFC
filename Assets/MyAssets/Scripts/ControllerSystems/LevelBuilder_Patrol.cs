@@ -36,7 +36,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 		Vector3 waypointPosition = playerLoc + PlayerController.Instance.ourAircraft.transform.rotation*Vector3.forward*missionDist; //mission distance...
 
 
-		GameObject endGoal = Instantiate(LevelController.Instance.waypointPrefab, waypointPosition, Quaternion.identity) as GameObject;
+		GameObject endGoal = Instantiate(((LevelController)LevelControllerBase.Instance).waypointPrefab, waypointPosition, Quaternion.identity) as GameObject;
 
 		//really we need to do a random draw here...
 
@@ -61,7 +61,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 
 		}
 
-		LevelController.Instance.populateWaypoints(newWaypoints, endGoal);
+		((LevelController)LevelControllerBase.Instance).populateWaypoints(newWaypoints, endGoal);
 		*/
 		//can we add a wingman through this also.
 		//addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back*5f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
@@ -94,12 +94,12 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 		
 		//Handle our radar stuff
 		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
-		newActor.radarObject.transform.SetParent(LevelController.Instance.targetRadar.gameObject.transform); //child it to this.
+		newActor.radarObject.transform.SetParent(((LevelController)LevelControllerBase.Instance).targetRadar.gameObject.transform); //child it to this.
 		newActor.radarObject.transform.localScale = Vector3.one;
 		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
 
-		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // LevelController.Instance.getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
+		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // ((LevelController)LevelControllerBase.Instance).getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
 		//newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
 		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
 
@@ -108,10 +108,10 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 
 		//Now we need to figure out which list we add it to
 		if (thisTeam==0) {
-			LevelController.Instance.friendlyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
 		}
 		else if (thisTeam==1) {
-			LevelController.Instance.enemyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
 			newActor.actor.gradeSkill(0.5f);
 			
 		}
@@ -138,12 +138,12 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 
 		//somewhere in this system we'll have to make sure that we're not putting waypoints in the ground
 		
-		GameObject lastWaypoint = Instantiate(LevelController.Instance.waypointPrefab, waypointPosition, waypointRotation) as GameObject;
+		GameObject lastWaypoint = Instantiate(((LevelController)LevelControllerBase.Instance).waypointPrefab, waypointPosition, waypointRotation) as GameObject;
 		//Player aircraft for the moment starts at 0, 150, 0 with Quaternion.Identity rotation
 		for (int i=0; i< 5; i++) {
 			waypointPosition += lastWaypoint.transform.forward*Random.Range(waypointDistance[0], waypointDistance[1]);
 			waypointRotation.eulerAngles += new Vector3(0, Random.Range(-Random.Range(waypointAngle[0], waypointAngle[1]), Random.Range (waypointAngle[0], waypointAngle[1])), 0);
-			lastWaypoint = Instantiate(LevelController.Instance.waypointPrefab, waypointPosition, waypointRotation) as GameObject;
+			lastWaypoint = Instantiate(((LevelController)LevelControllerBase.Instance).waypointPrefab, waypointPosition, waypointRotation) as GameObject;
 			lastWaypoint.name = "Waypoint" + i;
 
 			waypoint waypointController = lastWaypoint.GetComponent<waypoint>();
@@ -159,7 +159,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 			newWaypoints[i] = lastWaypoint; //fill this in...although these are only gameobjects and aren't actual waypoint prefabs
 		}
 		
-		LevelController.Instance.populateWaypoints(newWaypoints, newWaypoints[4]);
+		((LevelController)LevelControllerBase.Instance).populateWaypoints(newWaypoints, newWaypoints[4]);
 
 		//need to go through here and populate our instances of enemy nodes.
 
@@ -210,7 +210,7 @@ public class LevelBuilder_Patrol : LevelBuilder_Base {
 			if (bValidNode || cycles > 8) { //this positional stuff has checked out OK...
 				cycles=0; //reset our lock out counter
 				//should add some visulisation to these for debugging purposes
-				enemyNodes[placedEnemyNodes] = Instantiate(LevelController.Instance.enemySpawnNodePrefab, nodeLocation, Quaternion.identity) as GameObject;
+				enemyNodes[placedEnemyNodes] = Instantiate(((LevelController)LevelControllerBase.Instance).enemySpawnNodePrefab, nodeLocation, Quaternion.identity) as GameObject;
 				//we really need to pass this information through to the system how...?
 				placedEnemyNodes++; //this is all fine. Cycle this on
 		

@@ -95,7 +95,7 @@ public class AircraftController : Actor {
 			Destroy (thisCannon); //remove our guns.
 
 		//we'll need to tweak the smoke so that it's rising now instead of trailing.
-		LevelController.Instance.removeSelf(gameObject, team); //For the moment I suppose
+		((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
 		Destroy (this); //remove this script.
 
 		//we also need to remove from the 
@@ -111,7 +111,7 @@ public class AircraftController : Actor {
 		}
 
 		//Explode and delete this in the process
-		LevelController.Instance.removeSelf(gameObject, team); //For the moment I suppose
+		((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
 		Destroy (gameObject, d_delay); //destroy aircraft after small "effect" delay
 	}*/
 
@@ -273,21 +273,21 @@ public class AircraftController : Actor {
 			if (health<0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
 				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					LevelController.Instance.addKill(); //rack it up!
+		((LevelController)LevelControllerBase.Instance).addKill(); //rack it up!
 
 				//doExplode(); //whack this.
 				bIsDead=true;
 				applyShotDown();
 				//we can't remove this as it'll mean the player can't shoot it...
-				//LevelController.Instance.removeSelf(gameObject, team); //but our targeting system needs to know I suppose
+				//((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //but our targeting system needs to know I suppose
 				//Destroy (gameObject); //Just destroy it for now
 			}
 			/*
 			if (health<-maxHealth/2) { //then destroy this aircraft fully for whatever reason
 				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					LevelController.Instance.addMurder(); //not a good thing actually, and we're counting it
+		((LevelController)LevelControllerBase.Instance).addMurder(); //not a good thing actually, and we're counting it
 
-				LevelController.Instance.removeSelf(gameObject, team); //For the moment I suppose
+	((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
 				Destroy (gameObject);
 			}
 			*/

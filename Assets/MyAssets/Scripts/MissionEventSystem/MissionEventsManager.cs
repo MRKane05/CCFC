@@ -110,12 +110,12 @@ public class MissionEventsManager : MonoBehaviour {
 
 		//Handle our radar stuff
 		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
-		newActor.radarObject.transform.SetParent(LevelController.Instance.targetRadar.gameObject.transform); //child it to this.
+		newActor.radarObject.transform.SetParent(((LevelController)LevelControllerBase.Instance).targetRadar.gameObject.transform); //child it to this.
 		newActor.radarObject.transform.localScale = Vector3.one;
 		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
 
-		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // LevelController.Instance.getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
+		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // ((LevelController)LevelControllerBase.Instance).getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
 																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
 		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
 
@@ -125,11 +125,11 @@ public class MissionEventsManager : MonoBehaviour {
 		//Now we need to figure out which list we add it to
 		if (thisTeam == 0)
 		{
-			LevelController.Instance.friendlyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
 		}
 		else if (thisTeam == 1)
 		{
-			LevelController.Instance.enemyList.Add(newActor);
+((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
 			newActor.actor.gradeSkill(0.5f);
 
 		}
@@ -375,7 +375,7 @@ public class MissionEventsManager : MonoBehaviour {
 				Debug.LogError("All active events cleared");
 			}
 			//Notify our systems
-			LevelController.Instance.finishMatch(false);
+((LevelController)LevelControllerBase.Instance).finishMatch(false);
 		}
 	}
 

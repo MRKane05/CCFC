@@ -57,7 +57,7 @@ public class waypoint : MonoBehaviour {
 
 			//specialTargets.Add (targetActor); //will still need to check and cycle through these.
 			//add the interest target to our list
-			//specialTargets[0] = LevelController.Instance.addActor(1, prefabManager.Instance.getEnemyBalloon(0, 0), gameObject.transform.position, Quaternion.identity, "NONE").GetComponent<Actor>();
+			//specialTargets[0] = ((LevelController)LevelControllerBase.Instance).addActor(1, prefabManager.Instance.getEnemyBalloon(0, 0), gameObject.transform.position, Quaternion.identity, "NONE").GetComponent<Actor>();
 		
 		}
 	}
@@ -106,6 +106,6 @@ public class waypoint : MonoBehaviour {
 	}
 
 	public virtual void triggerWaypoint() {
-		//LevelController.Instance.waypointCallback(); //calls back to the level controller to say that we're done setting this up...
+		//((LevelController)LevelControllerBase.Instance).waypointCallback(); //calls back to the level controller to say that we're done setting this up...
 	}
 }

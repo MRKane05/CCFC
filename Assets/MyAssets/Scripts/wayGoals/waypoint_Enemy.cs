@@ -24,8 +24,8 @@ public class waypoint_Enemy : waypoint {
 
 	//this is really all we need to worry about
 	public override void triggerWaypoint() {
-		//LevelController.Instance.triggerEnemies(); //with some details about what where etc.
-		//LevelController.Instance.waypointCallback();
+		//((LevelController)LevelControllerBase.Instance).triggerEnemies(); //with some details about what where etc.
+		//((LevelController)LevelControllerBase.Instance).waypointCallback();
 
 		//return; //don't enable this to activate
 
@@ -66,7 +66,7 @@ public class waypoint_Enemy : waypoint {
 
 				string groupTag = gameObject.name;
 
-				LevelController.Instance.addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, ambushPoint, startQuat, groupTag, null);
+	((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, ambushPoint, startQuat, groupTag, null);
 
 			}
 		}
@@ -87,7 +87,7 @@ public class waypoint_Enemy : waypoint {
 
 			Quaternion transQuat = Quaternion.Euler (0, startAngle + 90, 0);
 
-			//LevelController.Instance.waypointCallbackEnemy(enemyCount);
+			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(enemyCount);
 
 			float waypointStagger = 3; //how far apart are our fighters?
 
@@ -108,7 +108,7 @@ public class waypoint_Enemy : waypoint {
 					}
 				}
 
-				LevelController.Instance.addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, patrolStart + patrolOffset, startQuat, groupTag, null);
+	((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, patrolStart + patrolOffset, startQuat, groupTag, null);
 			
 			}
 		}

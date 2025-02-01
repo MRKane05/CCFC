@@ -24,13 +24,13 @@ public class Player_Radar : MonoBehaviour {
 		
 		
 		//Register this with the level controller
-		while (LevelController.Instance == null) {
+		while (((LevelController)LevelControllerBase.Instance) == null) {
 			yield return null;
 		}
 		
-		LevelController.Instance.setRadar(this);
+		((LevelController)LevelControllerBase.Instance).setRadar(this);
 		
-		levelLink = LevelController.Instance;
+		levelLink = ((LevelController)LevelControllerBase.Instance);
 		
 		yield return null; //ok, we're done
 		

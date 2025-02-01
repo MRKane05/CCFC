@@ -37,14 +37,12 @@ public class waypointWrapper {
 	public waypoint wayScript;
 }
 
-public class LevelController : MonoBehaviour {
+public class LevelController : LevelControllerBase {
 
 	public enum enEndMethod { ALL, WAYPOINTS, ENEMIES, TIME } //different mission end conditions...not sure how these will "evolve" if you will
 	public enEndMethod endMethod = enEndMethod.ALL;
 
 	public float enemyFactor=0.5F; //what our enemies are skill wise.
-	private static LevelController instance = null;
-	public static LevelController Instance {get {return instance;}}
 
 	public MissionEventsManager ourMissionEventsManager;
 
@@ -231,17 +229,6 @@ public class LevelController : MonoBehaviour {
 		targetRadar = thisRadar;	
 	}
 	
-	void Awake() {
-		if (instance)
-		{
-			Debug.Log("Duplicate attempt to create LevelController");
-			Destroy(this);
-			return;
-		}
-		
-		instance = this;
-	}
-
 	//this used by the AI to see if its spotted anything
 	public bool checkSight(ActorController thisController, float FOVAngle) {
 		if (thisController.team == 0)
@@ -445,33 +432,6 @@ public class LevelController : MonoBehaviour {
 
 	}
 
-	public void finishMatch(bool bPlayerDestroyed)
-    {
-		//Of course we need some concept of how well this has gone
-		//PROBLEM: Mission success evaluation isn't complete yet
-		gameManager.Instance.levelResults.bWonLevel = !bPlayerDestroyed;	//Flip this if we're destroyed for the moment
-		StartCoroutine(FinishLevel(bPlayerDestroyed));
-		//gameManager.Instance.ConcludeMission();
-	}
-
-	IEnumerator FinishLevel(bool bPlayerDestroyed)
-    {
-		yield return new WaitForSeconds(3f);    //Give a little pause after it's complete
-												//We want to load our panel scene here and pause so that the player can bask in the warm glow of seeing a mission complete scene
-		if (!bPlayerDestroyed)
-		{
-			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_Win"); //We're assuming that the player won...
-			yield return async;
-		}
-		else
-        {
-			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_ShotDown"); //We're assuming that the player won...
-			yield return async;
-		}
-		Time.timeScale = 0f;	//Going to need to turn this back on somewhere...
-		//What we could actually start doing now is loading our other scene in the background...I'm not sure just how that'll work however, so for the moment fuck it, lets get it working!
-    }
-
 	// Use this to make a game
 	IEnumerator StartMatch (int enemies, int wingmen) {
 		
@@ -519,12 +479,6 @@ public class LevelController : MonoBehaviour {
 		}
 		*/
 		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		//monitorWaypoints(); //shouldn't be called until it's all setup properly
-		//checkLevelClear();
 	}
 
 	void checkLevelClear() {

@@ -14,8 +14,8 @@ public class wayGoal_Ambush : wayGoal {
 		waypointState = enWaypointState.Active;
 
 		//in this case spawn a whole heap of fighters, and have the player shoot them up!
-		//LevelController.Instance.triggerEnemies(); //with some details about what where etc.
-		//LevelController.Instance.waypointCallback();
+		//((LevelController)LevelControllerBase.Instance).triggerEnemies(); //with some details about what where etc.
+		//((LevelController)LevelControllerBase.Instance).waypointCallback();
 		
 		//return; //don't enable this to activate
 		
@@ -60,7 +60,7 @@ public class wayGoal_Ambush : wayGoal {
 			string groupTag = gameObject.name;
 
 			//this adds the enemy, but we don't really have a reference to it...
-			wayActors[i] = LevelController.Instance.addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, ambushPoint, startQuat, groupTag, null);
+			wayActors[i] = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, ambushPoint, startQuat, groupTag, null);
 			
 			//because this is an ambush don't be afraid to set these fighters into attack mode!
 		

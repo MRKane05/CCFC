@@ -138,7 +138,7 @@ public class PlayerController : ActorController {
 				targetController.bIsTarget = false; //release this target
 			targetController = null;
 
-			//NGUI_Base.Instance.setTarget (LevelController.Instance.getMissionEndGoal); //we don't really want this, the other systems should handle it
+			//NGUI_Base.Instance.setTarget (((LevelController)LevelControllerBase.Instance).getMissionEndGoal); //we don't really want this, the other systems should handle it
 		}
 	
 	}
@@ -158,18 +158,18 @@ public class PlayerController : ActorController {
 
 		//base function...make sure we've a target if there are targets (auto switch)
 		if (!target) {
-			if (LevelController.Instance.enemyList.Count > 0) {
-				LevelController.Instance.requestTarget(this); //populate our target system
+			if (((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
+	((LevelController)LevelControllerBase.Instance).requestTarget(this); //populate our target system
 			}
 		}
 		else { //we've got a target
-			if (targetController.bIsDead && LevelController.Instance.enemyList.Count > 1) {
-				LevelController.Instance.requestTarget(this); //we tagged out our prior fighter, call a new target
+			if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count > 1) {
+	((LevelController)LevelControllerBase.Instance).requestTarget(this); //we tagged out our prior fighter, call a new target
 			}
 
 			//is getting an error when the enemies run out...
 			if (targetController != null) {
-				if (targetController.bIsDead && LevelController.Instance.enemyList.Count == 1) { //this is the last enemy on the system
+				if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count == 1) { //this is the last enemy on the system
 					target = null;
 					targetController.bIsTarget = false; //cleanup
 					targetController = null;
@@ -190,8 +190,8 @@ public class PlayerController : ActorController {
 		/*
 		//case we've got the controller shot out
 		if (targetController) {
-			if (targetController.bIsDead && LevelController.Instance.enemyList.Count > 0) {
-				LevelController.Instance.requestTarget(this); //call something if we've lost this target (to discourage players from drilling something out)
+			if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
+	((LevelController)LevelControllerBase.Instance).requestTarget(this); //call something if we've lost this target (to discourage players from drilling something out)
 			}
 			else { //send through that we're discarding our targets
 				target = null;
@@ -219,7 +219,7 @@ public class PlayerController : ActorController {
 			GameObject bestEnemy = null;
 			float bestAngle = 180f;
 			Actor bestActor = null;
-			foreach (actorWrapper thisEnemy in LevelController.Instance.enemyList)
+			foreach (actorWrapper thisEnemy in ((LevelController)LevelControllerBase.Instance).enemyList)
             {
 				float targetAngle = Vector3.Angle(Camera.main.transform.forward, thisEnemy.vehicle.transform.position - gameObject.transform.position);
 				Debug.Log(targetAngle);

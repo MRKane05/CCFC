@@ -36,7 +36,7 @@ public class MEV_Balloons : MissionEventObject {
 
 		Quaternion transQuat = Quaternion.Euler(0, startAngle + 90, 0);
 
-		//LevelController.Instance.waypointCallbackEnemy(enemyCount);
+		//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(enemyCount);
 
 		float waypointStagger = 3; //how far apart are our fighters?
 
@@ -52,10 +52,10 @@ public class MEV_Balloons : MissionEventObject {
 		//so when we're putting enemies down it's in a triangle formation
 		for (int i = 0; i < ourMissionEvent.spawnObject.Count; i++)
 		{
-			//LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
-			//actorWrapper newActor = LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			//actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
 			//Add this actor to our level controller so it'll show up on radar etc.
-			actorWrapper newActor = LevelController.Instance.addFighterActor(ourMissionEvent.spawnObject[i], ourMissionEvent.eventTeam, ourMissionEvent.spawnLocations[i], Quaternion.identity, groupTag, this);
+			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(ourMissionEvent.spawnObject[i], ourMissionEvent.eventTeam, ourMissionEvent.spawnLocations[i], Quaternion.identity, groupTag, this);
 			//Assign our AI actions for this fighter
 			//Is there AI for balloons?
 			//((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";

@@ -225,7 +225,7 @@ public class PanelHandler : MonoBehaviour {
     //Used when we've got a button that wants to send a command back to the level controller, and needs setup in its own scene
     public void CallFunctionOnLevelController(string functionName)
     {
-        LevelController.Instance.Invoke(functionName, 0f);
+        ((LevelController)LevelControllerBase.Instance).Invoke(functionName, 0f);
     }
 
 

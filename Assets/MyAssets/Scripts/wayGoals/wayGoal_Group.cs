@@ -37,7 +37,7 @@ public class wayGoal_Group : wayGoal {
 		
 		Quaternion transQuat = Quaternion.Euler (0, startAngle + 90, 0);
 		
-		//LevelController.Instance.waypointCallbackEnemy(enemyCount);
+		//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(enemyCount);
 		
 		float waypointStagger = 3; //how far apart are our fighters?
 		
@@ -60,8 +60,8 @@ public class wayGoal_Group : wayGoal {
 				}
 			}
 			
-			//LevelController.Instance.waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
-			wayActors[i] = LevelController.Instance.addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, patrolStart + patrolOffset, startQuat, groupTag, null);
+			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
+			wayActors[i] = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, patrolStart + patrolOffset, startQuat, groupTag, null);
 
 			((AI_Fighter)wayActors[i].ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
 		}
@@ -84,7 +84,7 @@ public class wayGoal_Group : wayGoal {
 				waypointState = enWaypointState.Done;
 				
 				//call back to our main system and tell it that this is done...
-				LevelController.Instance.waypointCallback(gameObject);
+	((LevelController)LevelControllerBase.Instance).waypointCallback(gameObject);
 			}
 		}
 	}

@@ -119,10 +119,10 @@ public class gameManager : MonoBehaviour {
 		yield return null;
 		
 		//seems to be getting trapped here for some reason
-		while (LevelController.Instance == null)
+		while (((LevelController)LevelControllerBase.Instance) == null)
 			yield return null; //we can't setup our game just yet
 		
-		LevelController.Instance.createMatch(enemies, wingmen); //will do for the moment
+		((LevelController)LevelControllerBase.Instance).createMatch(enemies, wingmen); //will do for the moment
 	}
 
 	public void ConcludeMission()

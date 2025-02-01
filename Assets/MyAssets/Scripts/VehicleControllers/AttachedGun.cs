@@ -102,8 +102,8 @@ public class AttachedGun : MonoBehaviour {
 		Vector3 shotVector = (transform.forward + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread))).normalized;
 		
 		//assume for now that the player is allied
-		if (LevelController.Instance.enemyList.Count > 0) {
-			foreach (actorWrapper thisActor in LevelController.Instance.enemyList) {
+		if (((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
+			foreach (actorWrapper thisActor in ((LevelController)LevelControllerBase.Instance).enemyList) {
 				Vector3 targetLead = thisActor.vehicle.transform.position + thisActor.vehicle.transform.forward*(transform.position - thisActor.vehicle.transform.position).magnitude *thisActor.actor.getSpeed()/BulletSpeed;
 				
 				float shotMagnitude = (transform.position - targetLead).magnitude;
