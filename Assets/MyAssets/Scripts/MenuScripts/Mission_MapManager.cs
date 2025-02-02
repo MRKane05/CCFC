@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using static Mission_MapSection;
 
 //manages all of the stuff to do with the map selection, and is a stupidly over-complicated class because of it
 [System.Serializable]
@@ -337,6 +338,7 @@ public class Mission_MapManager : MonoBehaviour {
 		runMapTints(true); //So that we can see things resolve
 		ourCamera.returnToStart();
 		saveMapState(); //Save our new map
+		gameManager.Instance.reEnableMapInteraction();	//Make sure we give control back to our player
 	}
 
 	public List<conflictTile> conflictsToRemove = new List<conflictTile>();
@@ -568,7 +570,7 @@ public class Mission_MapManager : MonoBehaviour {
     }
 
 	//the player has pressed this button, check it over
-	public void selectMapSegment(int thisTile) {
+	public void selectMapSegment(int thisTile, enMissionType missionType) {
 		//Check this tile to see if it's "flyable"
 		//...linked tiles are:
 		//   2
@@ -589,10 +591,11 @@ public class Mission_MapManager : MonoBehaviour {
 			gameManager.Instance.bCanSelectMission = false; //Disable our interaction until we've either selected the mission or released it from our panel
 															//We need to bring up ourpanel to handle this
 															//Debug.LogError("Tile Valid");
+			gameManager.Instance.missionType = missionType;
 			gameManager.Instance.selectedTile = thisTile;
 			if (UIMenuHandler.Instance)
 			{
-				UIMenuHandler.Instance.LoadMenuSceneAdditively("MissionSelectPanel", null, null);
+				UIMenuHandler.Instance.LoadMenuSceneAdditively("MissionSelectPanel", null, null);	//We need some way of telling our player what this is going to be...
 			}
 		} else
         {

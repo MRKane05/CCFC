@@ -734,21 +734,22 @@ public class AI_Fighter : ActorController {
 	//Almost need to have something in here that'll make us flee up, or down, or something other than horizontal.
 	void FleeTarget(out Quaternion newRotation, out float newYaw) {
 		//===========Target Seeking Functions...in reverse...======================
-		//if (false) { 
-			transform.LookAt(target.transform.position,Vector3.up); //we can have our GameObject do this as it's a child of the aircraft
-			//And the opposite direction to this isn't the inverse...
-			
+		//PROBLEM: This AI function breaks during tailgunner missions
+		if (target)
+		{
+			transform.LookAt(target.transform.position, Vector3.up); //we can have our GameObject do this as it's a child of the aircraft
+																	 //And the opposite direction to this isn't the inverse...
 			transform.eulerAngles += new Vector3(0, 180, 0);
-			//Figure out what our turn angles should be doing...
-			newYaw = 1.0f;
-			if (transform.localEulerAngles[1] > 180)
-				newYaw = -1F;
+		}
+		//Figure out what our turn angles should be doing...
+		newYaw = 1.0f;
+		if (transform.localEulerAngles[1] > 180)
+			newYaw = -1F;
 			
 			
-			newYaw *= aircraftRollCurve.Evaluate(Mathf.Abs(transform.localEulerAngles[1]));	
-			newRotation = transform.rotation;
-			//ourAircraft.AIUpdateInput(transform.rotation, newYaw);
-		//}
+		newYaw *= aircraftRollCurve.Evaluate(Mathf.Abs(transform.localEulerAngles[1]));	
+		newRotation = transform.rotation;
+		//ourAircraft.AIUpdateInput(transform.rotation, newYaw);
 	}
 	
 	

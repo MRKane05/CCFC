@@ -31,9 +31,10 @@ public class BombingAircraftHandler : MonoBehaviour {
     {
 		//This isn't a good way of doing this, because we sill need to slow down...
 		//This is option A...
-		targetPlayerVelocity = Vector3.forward * Input.GetAxis("Left Stick Vertical") * maxMoveSpeed;
+		targetPlayerVelocity = -Vector3.forward * Input.GetAxis("Left Stick Vertical") * maxMoveSpeed;
 		targetPlayerVelocity += Vector3.right * Input.GetAxis("Left Stick Horizontal") * maxMoveSpeed;
 
+#if UNITY_EDITOR
 		float XAxis = 0;
 		float YAxis = 0;
 		//But we need to be able to test this on the computer, so:
@@ -56,6 +57,7 @@ public class BombingAircraftHandler : MonoBehaviour {
 		}
 		targetPlayerVelocity = Vector3.forward * YAxis * maxMoveSpeed;
 		targetPlayerVelocity += Vector3.right * XAxis * maxMoveSpeed;
+#endif
 
 		//Set this up so that the plane feels "weighty" to control
 		playerVelocity = Vector3.Lerp(playerVelocity, targetPlayerVelocity, Time.deltaTime * lerpHeaviness);
@@ -83,6 +85,10 @@ public class BombingAircraftHandler : MonoBehaviour {
 		float healthFraction = PlayerHealth / PlayerMaxHealth;
 		NGUI_Base.Instance.assignHealth(healthFraction);
 
+		if (PlayerHealth <= 0)
+        {
+			((LevelControllerBomberMinigame)LevelControllerBase.Instance).finishMatch(true);	//Do our fail state
+        }
 		//PROBLEM: This needs to play a sound and apply some sort of visual effect so that the player knows we're taking damage
     }
 }

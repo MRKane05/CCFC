@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using static Mission_MapSection;
 
 public class Menu_MapPointerHandler : MonoBehaviour {
 	private static Menu_MapPointerHandler instance;
@@ -18,6 +19,7 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 	public TextMeshProUGUI TileDescriptionText;
 
 	[HideInInspector] public GameObject HoveredTile;
+
 
 	void Start()
     {
@@ -83,7 +85,9 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 		{
 			//Debug.Log(hit.collider.gameObject.name);
 			HoveredTile = hit.collider.gameObject;  //So that our buttons can figure out which one is being hovered over
-			Mission_MapSection SelectedTile = HoveredTile.GetComponent<Mission_MapSection>();	//PROBLEM: Seems pointless to run this every tick, but I don't think that it'll matter at this stage
+			Mission_MapSection SelectedTile = HoveredTile.GetComponent<Mission_MapSection>();   //PROBLEM: Seems pointless to run this every tick, but I don't think that it'll matter at this stage
+			enMissionType tileMissionType = SelectedTile.getMissionType();
+			
 			if (SelectedTile) {
 				if (Input.GetButtonDown("Cross") || Input.GetKeyDown(KeyCode.Return))
 				{
@@ -91,7 +95,7 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 
 					if (SelectedTile && gameManager.Instance.bCanSelectMission)
 					{
-						SelectedTile.sectionClick();
+						SelectedTile.sectionClick(SelectedTile.getMissionType());	//Probably doesn't hurt to call this twice
 					}
 				}
 				//I'd like to have our hovered tile change the heading on the mission selection screen
@@ -101,14 +105,14 @@ public class Menu_MapPointerHandler : MonoBehaviour {
 					{
 						if (SelectedTile.conflictTeam == 0)
 						{
-							TileDescriptionText.text = "Friendly Operation: " + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
+							TileDescriptionText.text = "Friendly Operation: " + tileMissionType.ToString() + "," + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
 						} else
 						{
-							TileDescriptionText.text = "Enemy Operation: " + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
+							TileDescriptionText.text = "Enemy Operation: " + tileMissionType.ToString() + "," + SelectedTile.conflictDaysRemaining.ToString() + " turns remaining";
 						}
 					} else
 					{
-						TileDescriptionText.text = "Fly Mission Over Front Line";
+						TileDescriptionText.text = "Fly " + tileMissionType.ToString() + " Mission Over Front Line";
 
 					}
                 } else

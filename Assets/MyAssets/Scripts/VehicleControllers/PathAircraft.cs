@@ -19,5 +19,9 @@ public class PathAircraft : Actor {
 
         //update our health bar
         NGUI_Base.Instance.assignHealth(damageProp);
+        if (health<=0)
+        {
+            ((LevelController)LevelControllerBase.Instance).finishMatch(true);  //Handle our die state
+        }
     }
 }

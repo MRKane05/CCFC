@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using TMPro;
+using static Mission_MapSection;
 
 [System.Serializable]
 public class LevelResults
@@ -37,9 +38,10 @@ public class gameManager : MonoBehaviour {
 	#region Level Selection Details
 	public bool bCanSelectMission = true;
 	public int selectedTile = -1;
-    #endregion
-    // Use this for initialization
-    void Awake () {
+	public enMissionType missionType = enMissionType.FLIGHT;
+	#endregion
+	// Use this for initialization
+	void Awake () {
 		if (instance)
 		{
 			Debug.Log("Duplicate attempt to create gameManager");
@@ -113,13 +115,22 @@ public class gameManager : MonoBehaviour {
 	
 	IEnumerator loadMission() {
 		//load our level
-		UIMusicHandler.Instance.SetMusicTrack(false);	//Set our combat track playing
-		yield return StartCoroutine(loadScene("Level"));
+		UIMusicHandler.Instance.SetMusicTrack(false);   //Set our combat track playing
+		if (missionType == enMissionType.FLIGHT)
+		{
+			yield return StartCoroutine(loadScene("Level"));
+		} else if (missionType == enMissionType.TURRET)
+        {
+			yield return StartCoroutine(loadScene("TailgunnerSetupScene"));
+		} else if (missionType == enMissionType.BOMBING)
+        {
+			yield return StartCoroutine(loadScene("BombingRunMinigame"));
+		}
 		
 		yield return null;
 		
 		//seems to be getting trapped here for some reason
-		while (((LevelController)LevelControllerBase.Instance) == null)
+		while (LevelControllerBase.Instance == null)
 			yield return null; //we can't setup our game just yet
 		
 		((LevelController)LevelControllerBase.Instance).createMatch(enemies, wingmen); //will do for the moment

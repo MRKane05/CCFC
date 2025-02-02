@@ -6,6 +6,7 @@ using TMPro;
 
 //Handles input from each section, and should also be used to populate the menu information etc.
 public class Mission_MapSection : MonoBehaviour {
+	public enum enMissionType { NULL, FLIGHT, TURRET, BOMBING }
 
 	public Text tileLabel;
 
@@ -37,6 +38,21 @@ public class Mission_MapSection : MonoBehaviour {
 		get { return m_areaForce; }
 		set { m_areaForce = value; }
 	}
+
+	public enMissionType getMissionType()
+	{
+		int missionTypeSelection = segmentNumber % 5;
+
+		if (missionTypeSelection == 0) {
+			return enMissionType.BOMBING;
+		}
+		if (missionTypeSelection == 1)
+        {
+			return enMissionType.TURRET;
+        }
+
+		return enMissionType.FLIGHT;
+    }
 
 	public void setKeyArea(bool bEnabled)
     {
@@ -101,7 +117,7 @@ public class Mission_MapSection : MonoBehaviour {
 	}
 
 	//this button has been pressed
-	public void sectionClick() {
-		ourManager.selectMapSegment(segmentNumber);
+	public void sectionClick(enMissionType missionType) {
+		ourManager.selectMapSegment(segmentNumber, missionType);
 	}
 }
