@@ -11,9 +11,9 @@ public class AI_EvadeState : AI_State {
 		return base.enter();
     }
 
-    public override void DoUpdate()
-    {
-        base.DoUpdate();
+    public override void DoUpdate(out Quaternion returnRotation, out float aircraftYaw)
+	{
+        //base.DoUpdate(out Quaternion newRotation, out float newYaw);
 		baseAI.DoTaticalManuver(out returnRotation, out aircraftYaw);
 
 		if (patternStage == "PICK")
@@ -70,6 +70,5 @@ public class AI_EvadeState : AI_State {
 				patternDuration = baseAI.attackDuration;    //Really this should be set when entering the state
 			}
 		}
-
 	}
 }

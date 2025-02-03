@@ -10,10 +10,13 @@ public class BomberTargetSight : MonoBehaviour {
 	public LayerMask bombHitMask;
 	public GameObject bombObject;
 	public GameObject groundObject; //To use as a "world object" for dropping bombs
+
+	public float targetSightHeight = 40f;
+	public int bombsAvaliable = 6;
 	
 	// Update is called once per frame
 	void Update () {
-		Vector3 targetPosition = new Vector3(bomber.transform.position.x, 40, bomber.transform.position.z + forwardDistance);
+		Vector3 targetPosition = new Vector3(bomber.transform.position.x, targetSightHeight, bomber.transform.position.z + forwardDistance);
 		gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, Time.deltaTime * lerpSpeed);
 
 		//Ok, I'm happy with how that feels. Lets see about doing our bomb dropping stuff :)
@@ -25,6 +28,8 @@ public class BomberTargetSight : MonoBehaviour {
 
 	public void doDropBomb()
     {
+		if (bombsAvaliable <=0 ) { return; }
+		bombsAvaliable -= 1;
 		//We need to do a raycast through the center of our sight object (this) and see where it hits the ground (or another target)
 		//Actually this is simply screen position to targetsignt position
 		Vector3 rayDir = gameObject.transform.position- Camera.main.transform.position;

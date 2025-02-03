@@ -32,9 +32,10 @@ public class AI_State : MonoBehaviour {
 
 
 	//Our state update tick
-	public virtual void DoUpdate()
-    {
-
+	public virtual void DoUpdate(out Quaternion newRotation, out float newYaw)
+	{
+		newRotation = Quaternion.identity;
+		newYaw = 1;
     }
 
 	public virtual void DoLateUpdate()

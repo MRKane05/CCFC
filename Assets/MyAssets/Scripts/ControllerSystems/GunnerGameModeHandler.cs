@@ -22,8 +22,8 @@ public class GunnerGameModeHandler : MonoBehaviour {
 		yield return null;
 
 		//This isn't working because of speeds. It's going to need a little extra AI logic I think
-		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 7f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
-		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 7f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
+		//addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 7f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
+		//addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 7f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
 	}
 	
 	public void AddEnemyFlightGroup(int enemyCount, int team)

@@ -6,7 +6,8 @@ public class AI_Fighter : ActorController {
 	//public GameObject target;
 	//public Actor targetController;
 	
-	AnimationCurve aircraftRollCurve;
+	[HideInInspector]
+	public AnimationCurve aircraftRollCurve;
 	float aircraftYaw;
 	
 	Vector3 targetLead; //will be set by seek target.
@@ -30,7 +31,7 @@ public class AI_Fighter : ActorController {
 
 	public Range evadeDuration = new Range(3f, 7f);
 	public Range escapeDuration = new Range(5f, 9f);
-
+	public Range attackSetupDuration = new Range(1f, 3f);
 	#endregion
 	
 	public string pattern="ATTACK", patternStage="SETUP"; //what pattern are we in? attack etc. and what stage are we in the pattern?
@@ -219,7 +220,7 @@ public class AI_Fighter : ActorController {
 		if (pattern=="PATROL" || pattern=="FOLLOW") {
 
 			//notify the other fighters in our group that we're being attacked
-((LevelController)LevelControllerBase.Instance).notifyWithTag(team, "PATROLBREAK", flightGroup); 
+			((LevelController)LevelControllerBase.Instance).notifyWithTag(team, "PATROLBREAK", flightGroup); 
 
 			//do an escape panic or flat out attack...oh the choices!
 			float randomDraw = Random.value;
@@ -314,7 +315,7 @@ public class AI_Fighter : ActorController {
 		}
 	}
 	
-	public virtual void EvadePattern() {
+	public virtual void EvadePattern() {	//This is in state machines
 		if (pattern=="EVADE") { //Also useful for a mid-fight pattern. Aka scramble patterns before going into a long engage.
 			//Generally do our escape stuff...
 			DoTaticalManuver (out returnRotation, out aircraftYaw);
@@ -432,7 +433,7 @@ public class AI_Fighter : ActorController {
 			}
 
 			if (pattern=="EVADE" || pattern=="DOEVASIVE") {
-				EvadePattern();	
+				EvadePattern();		//Is in state machine
 			}
 			
 
@@ -661,7 +662,7 @@ public class AI_Fighter : ActorController {
 	}
 	
 	//===========Flight Function==============================
-	void SeekTarget(out Quaternion newRotation, out float newYaw) {
+	public void SeekTarget(out Quaternion newRotation, out float newYaw) {
 		//===========Target Seeking Functions...======================
 		//if (false) {
 		//This needs to be leading the target to be proper
@@ -732,7 +733,7 @@ public class AI_Fighter : ActorController {
 	
 	//This flies away but we stay at the same vertical level as our target...
 	//Almost need to have something in here that'll make us flee up, or down, or something other than horizontal.
-	void FleeTarget(out Quaternion newRotation, out float newYaw) {
+	void FleeTarget(out Quaternion newRotation, out float newYaw) {	//Is in State Machine
 		//===========Target Seeking Functions...in reverse...======================
 		//PROBLEM: This AI function breaks during tailgunner missions
 		if (target)
