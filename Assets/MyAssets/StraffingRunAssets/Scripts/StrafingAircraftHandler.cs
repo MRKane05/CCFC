@@ -18,6 +18,10 @@ public class MuzzleFlareType
 
 //Something to control our player movement for the bombing aircraft
 public class StrafingAircraftHandler : MonoBehaviour {
+	private static StrafingAircraftHandler instance = null;
+	public static StrafingAircraftHandler Instance { get { return instance; } }
+
+	public GameObject aircraftPrefabBase;
 	public LayerMask hitLayers;
 
 	public Range LimitX = new Range(-20, 7);
@@ -52,6 +56,7 @@ public class StrafingAircraftHandler : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 		ourAudio = gameObject.GetComponent<AudioSource>();
 	}
 	
@@ -162,7 +167,8 @@ public class StrafingAircraftHandler : MonoBehaviour {
 			Mathf.Clamp(gameObject.transform.position.z, Mathf.Lerp(LimitYFar.Min, LimitYClose.Min, inverseScreenPos), Mathf.Lerp(LimitYFar.Max, LimitYClose.Max, inverseScreenPos)));
 
 		//Finally handle our roll :)
-		gameObject.transform.eulerAngles = new Vector3(270+rollShiftAmount * playerVelocity.x / maxMoveSpeed, 90, 270); //This is weird because blender is right handed z up, and Unity is left handed Y up...because they wanted the world to burn I assume
+		//gameObject.transform.eulerAngles = new Vector3(270+rollShiftAmount * playerVelocity.x / maxMoveSpeed, 90, 270); //This is weird because blender is right handed z up, and Unity is left handed Y up...because they wanted the world to burn I assume
+		aircraftPrefabBase.transform.localEulerAngles = new Vector3(0, 0, -rollShiftAmount * playerVelocity.x / maxMoveSpeed);
 	}
 
 	public void TakeDamage(float damageAmount)

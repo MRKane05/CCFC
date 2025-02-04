@@ -25,7 +25,7 @@ public class ParticleController : MonoBehaviour {
 		instance = this;
 	}
 	
-	public void addParticle(Transform fromThis) {
+	public void addParticle(Transform fromThis, float velocity, float size, float lifetime) {
 		//For the moment
 		UnityEngine.ParticleSystem.Particle newParticle = new UnityEngine.ParticleSystem.Particle();
 		newParticle.remainingLifetime=3;
@@ -33,7 +33,7 @@ public class ParticleController : MonoBehaviour {
 		//newParticle.rotation = fromThis.rotation;
 
 
-		particleSystem.Emit(fromThis.position, fromThis.forward*2, 1, 3, Color.white);
+		particleSystem.Emit(fromThis.position, fromThis.forward*velocity, size, lifetime, Color.white);
 			
 	}
 }

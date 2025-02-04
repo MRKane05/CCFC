@@ -18,8 +18,11 @@ public class DestructableObject : MonoBehaviour {
             Debug.LogError("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");
         }
         //Set our necessary states
-        liveObject.SetActive(true);
-        destroyedObject.SetActive(false);
+        if (liveObject && destroyedObject)
+        {
+            liveObject.SetActive(true);
+            destroyedObject.SetActive(false);
+        }
     }
 
     public virtual void TakeDamage(float damageAmount)

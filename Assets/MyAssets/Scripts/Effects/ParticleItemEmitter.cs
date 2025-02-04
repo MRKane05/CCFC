@@ -13,7 +13,7 @@ public class ParticleItemEmitter : MonoBehaviour {
 	void Update () {
 
 		if (Time.time > lastEmitTime) {
-			ParticleController.Instance.addParticle(transform);
+			ParticleController.Instance.addParticle(transform, 2, 1, 3);
 			lastEmitTime = Time.time+1;
 		}
 	}
