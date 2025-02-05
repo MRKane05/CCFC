@@ -6,7 +6,7 @@ using TMPro;
 
 //Handles input from each section, and should also be used to populate the menu information etc.
 public class Mission_MapSection : MonoBehaviour {
-	public enum enMissionType { NULL, FLIGHT, TURRET, BOMBING }
+	public enum enMissionType { NULL, FLIGHT, TURRET, BOMBING, STRAFING }
 
 	public Text tileLabel;
 
@@ -49,6 +49,10 @@ public class Mission_MapSection : MonoBehaviour {
 		if (missionTypeSelection == 1)
         {
 			return enMissionType.TURRET;
+        }
+		if (missionTypeSelection == 2)
+        {
+			return enMissionType.STRAFING;
         }
 
 		return enMissionType.FLIGHT;

@@ -27,7 +27,32 @@ ModelImporter:
     4300004: Truck_Destroyed
     7400000: Default Take
     9500000: //RootNode
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SedanDynamic
+    second: {fileID: 2100000, guid: 4ba5e869184ba2640a31032847b74fbd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn14
+    second: {fileID: 2100000, guid: 351f61bf9508fc848a4ecfe49fdd5533, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn15
+    second: {fileID: 2100000, guid: 0a2ae50c431bbee46aa8d02a32b8983b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn17
+    second: {fileID: 2100000, guid: f10430ff84fd4c74e8c3973bde58937f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert3
+    second: {fileID: 2100000, guid: 8c15959d875933e458d36c751125b93c, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

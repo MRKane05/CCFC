@@ -9,13 +9,14 @@ public class DestructableObject : MonoBehaviour {
     public float Health = 500f; //I've no idea what this'll be
     public bool bDestroyed = false;
     public GameObject liveObject, destroyedObject;
+    public GameObject explosionPrefab, burningPrefab;   //Our prefabs for effects
 
 
     void Start()
     {
         if (!liveObject || !destroyedObject)
         {
-            Debug.LogError("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");
+            Debug.Log("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");
         }
         //Set our necessary states
         if (liveObject && destroyedObject)
@@ -30,18 +31,40 @@ public class DestructableObject : MonoBehaviour {
         Health -= damageAmount;
         if (Health <=0 && !bDestroyed)
         {
-            if (liveObject != null)
-            {
-                liveObject.SetActive(false);
-            }
-            if (destroyedObject != null)
-            {
-                destroyedObject.SetActive(true);
-            }
-            bDestroyed = true;
+            DoDestroy();
             //Destroy(gameObject); //remove this from the scene
             //PROBLEM: Need to add our scoring for this being a target or not to the levelController (or whatever is in charge of everything)
             ((LevelControllerBomberMinigame)LevelControllerBase.Instance).ObjectDestroyed(gameObject, this);
+        }
+    }
+
+    protected virtual void DoDestroy()
+    {
+        if (liveObject != null)
+        {
+            liveObject.SetActive(false);
+        }
+        if (destroyedObject != null)
+        {
+            destroyedObject.SetActive(true);
+        }
+        bDestroyed = true;
+
+        //And our effects!
+        if (explosionPrefab)
+        {
+            GameObject newExplosion = Instantiate(explosionPrefab) as GameObject;
+            newExplosion.gameObject.transform.position = gameObject.transform.position;
+            newExplosion.transform.SetParent(gameObject.transform);
+            Destroy(newExplosion, 4f);//destroy our explosion after a limited amount of time
+        }
+
+        if (burningPrefab)
+        {
+            GameObject newBurning = Instantiate(burningPrefab) as GameObject;
+            newBurning.gameObject.transform.position = gameObject.transform.position;
+            newBurning.transform.SetParent(gameObject.transform);
+            Destroy(newBurning, 15f); //Clear our burning, but later
         }
     }
 }

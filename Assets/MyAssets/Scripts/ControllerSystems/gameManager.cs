@@ -125,7 +125,10 @@ public class gameManager : MonoBehaviour {
 		} else if (missionType == enMissionType.BOMBING)
         {
 			yield return StartCoroutine(loadScene("BombingRunMinigame"));
-		}
+		} else if (missionType == enMissionType.STRAFING)
+        {
+			yield return StartCoroutine(loadScene("StrafingRun"));
+        }
 		
 		yield return null;
 		
@@ -133,7 +136,10 @@ public class gameManager : MonoBehaviour {
 		while (LevelControllerBase.Instance == null)
 			yield return null; //we can't setup our game just yet
 		
-		((LevelController)LevelControllerBase.Instance).createMatch(enemies, wingmen); //will do for the moment
+		if (missionType == enMissionType.FLIGHT)
+		{
+			((LevelController)LevelControllerBase.Instance).createMatch(enemies, wingmen); //will do for the moment
+		}
 	}
 
 	public void ConcludeMission()

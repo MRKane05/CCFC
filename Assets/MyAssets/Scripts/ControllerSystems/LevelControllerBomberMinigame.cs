@@ -11,6 +11,8 @@ public class LevelControllerBomberMinigame : LevelControllerBase {
 
 	bool bLevelRunning = true;
 
+	public int targetsSuccess = 0;
+
 	public void ObjectDestroyed(GameObject thisObject, DestructableObject thisDestructable)
     {
 		//PROBLEM: Need to add some sort of feedback for destroying this object
@@ -25,7 +27,7 @@ public class LevelControllerBomberMinigame : LevelControllerBase {
 		if (groundObject.transform.position.z < GroundEndPoint && bLevelRunning)
         {
 			bLevelRunning = false;
-			finishMatch(levelTargets.Count > 0); //because true is a fail
+			finishMatch(levelTargets.Count >= targetsSuccess); //because true is a fail
         }
     }
 }
