@@ -42,6 +42,8 @@ public class StrafingAircraftHandler : MonoBehaviour {
 
 	public List<MuzzleFlareType> MuzzleFlares = new List<MuzzleFlareType>();
 	public List<GameObject> GunTargetPoints = new List<GameObject>();
+	public GameObject aimerBase;
+	public Range aimerDriftRange = new Range(-5, 0);	//Basically this offsets as we move towards the upper part of the screen to give the player full coverage
 
 	bool bFireLeft = true;
 	float refireTime = 0.15f;
@@ -123,7 +125,7 @@ public class StrafingAircraftHandler : MonoBehaviour {
     {
 		//This isn't a good way of doing this, because we sill need to slow down...
 		//This is option A...
-		targetPlayerVelocity = -Vector3.right * Input.GetAxis("Left Stick Vertical") * maxMoveSpeed;
+		targetPlayerVelocity = Vector3.right * Input.GetAxis("Left Stick Vertical") * maxMoveSpeed;
 		targetPlayerVelocity += Vector3.forward * Input.GetAxis("Left Stick Horizontal") * maxMoveSpeed;
 
 #if UNITY_EDITOR
@@ -162,6 +164,7 @@ public class StrafingAircraftHandler : MonoBehaviour {
 
 		//Compound lerp to make sure that the plane positions itself within the screenspace
 		float inverseScreenPos = Mathf.InverseLerp(LimitX.Min, LimitX.Max, gameObject.transform.position.x);
+		aimerBase.transform.localPosition = new Vector3(Mathf.Lerp(aimerDriftRange.Min, aimerDriftRange.Max, inverseScreenPos), aimerBase.transform.localPosition.y, aimerBase.transform.localPosition.z);
 		//And clamp our poisition so that we can't exit the bounds of the screen
 		gameObject.transform.position = new Vector3(Mathf.Clamp(gameObject.transform.position.x, LimitX.Min, LimitX.Max), aircraftHeight,
 			Mathf.Clamp(gameObject.transform.position.z, Mathf.Lerp(LimitYFar.Min, LimitYClose.Min, inverseScreenPos), Mathf.Lerp(LimitYFar.Max, LimitYClose.Max, inverseScreenPos)));
