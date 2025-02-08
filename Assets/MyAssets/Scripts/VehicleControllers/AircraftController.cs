@@ -20,9 +20,9 @@ public class AircraftController : Actor {
     public float mass = 7;
 	public float MaxAirSpeed = 6;
 	public float StallSpeed = 1.5F;
-	public float rollspeed = 1.5F;		//Used by the AI for doing turns
-	public float pitchspeed = 1.5F;
-	public float yawspeed = 1.5F;		//Used by the AI for doing turns
+//	public float rollspeed = 1.5F;		//Used by the AI for doing turns
+//	public float pitchspeed = 1.5F;
+//	public float yawspeed = 1.5F;		//Used by the AI for doing turns
 	public float throttlespeed=0.5F;
 	#endregion
 
@@ -382,17 +382,20 @@ public class AircraftController : Actor {
 			//roll commands
 			//transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
 			//pitch commands
-			
+
 			//We want to have this one pointing down...
 			//transform.RotateAroundLocal(transform.right, pitch*pitchspeed*Time.deltaTime);
 			//Make this tend toward "down" as a general direction
 			//Need to graduate this so that the force increases as damage is dealt - that way we can actually fight to keep the aircraft flying
 
 			//back off on the force here so that the AI can ditch
+			/*
 			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*02f);
+				transform.RotateAround(transform.right, c*Time.deltaTime*02f);
 			else
 				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*02f);
+			*/
+			AircraftDeathSpiral();
 			//yaw commands
 			//transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
 			//throttle details

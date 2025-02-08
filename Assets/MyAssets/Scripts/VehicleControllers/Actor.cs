@@ -33,6 +33,11 @@ public class Actor : MonoBehaviour {
 	//Actors need to fade in when they begin...
 	protected float inFadeStart, inFadeTime = 2f;
 
+	//And the movement variables :)
+	public float rollspeed = 1.5F;      //Used by the AI for doing turns
+	public float pitchspeed = 1.5F;
+	public float yawspeed = 1.5F;       //Used by the AI for doing turns
+
 	public float inFade {
 		get { return Mathf.Clamp01((Time.time-inFadeStart)/inFadeTime); }
 	}
@@ -42,7 +47,13 @@ public class Actor : MonoBehaviour {
 		smokeEffect = gameObject.GetComponentInChildren<Emitter_Smoke>();
 
 		inFadeStart = Time.deltaTime;
+		DoStart();
 	}
+
+	public virtual void DoStart()
+    {
+
+    }
 
 
 	public virtual void gradeSkill(float factor) {
@@ -206,5 +217,13 @@ public class Actor : MonoBehaviour {
 		//Basically gives the AI a helping hand to catch up to it's designated target, and keeps a status quo when it's at the cofrect point
 		transform.position = Vector3.MoveTowards(transform.position, targetLoc, pullSpeed * Time.deltaTime); //pull this according to speed
 
+	}
+
+	protected void AircraftDeathSpiral()
+    {
+		if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
+			transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 02f);
+		else
+			transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 02f);
 	}
 }

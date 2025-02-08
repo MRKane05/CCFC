@@ -14,9 +14,11 @@ public class TurretController : Actor {
 	GameObject ourCameraObject;
 
 	public float crusingSpeed = 3;		//It's important that this is the same as the aircraft we're riding on as the AI uses the player object as a reference
-	public float rollspeed = 1.5F;      //Used by the AI for doing turns
-	public float pitchspeed = 1.5F;
-	public float yawspeed = 1.5F;       //Used by the AI for doing turns
+	//public float rollspeed = 1.5F;      //Used by the AI for doing turns
+	//public float pitchspeed = 1.5F;
+	//public float yawspeed = 1.5F;       //Used by the AI for doing turns
+
+	
 
 	// Use this for initialization
 	void Start () {
@@ -55,7 +57,7 @@ public class TurretController : Actor {
 	void PlayerUpdate()
 	{
 
-		transform.RotateAround(Vector3.up, roll * rollspeed * Time.deltaTime);
+		transform.RotateAround(transform.parent.transform.up, roll * rollspeed * Time.deltaTime);
 		transform.RotateAround(ourCameraObject.transform.right, pitch * pitchspeed * Time.deltaTime);
 
 		//Problematically we're dealing with that 360 problem again

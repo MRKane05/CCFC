@@ -16,7 +16,7 @@ public class BalloonController : Actor {
 	//public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
 	//public bool bControlArcade=false;
 	//these wil
-	float mass=7, MaxAirSpeed=6, StallSpeed=1.5F, rollspeed=1.5F, pitchspeed=1.5F, yawspeed=1.5F, throttlespeed=0.5F;
+	float mass=7, MaxAirSpeed=6, StallSpeed=1.5F, throttlespeed=0.5F;
 	float throttle=0.75F, gravity=10, thrust=4, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
 	public GameObject BalloonModel, AircraftMesh, FiringMarker;
 	//int FireState;
