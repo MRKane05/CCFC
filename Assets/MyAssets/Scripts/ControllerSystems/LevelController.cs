@@ -252,20 +252,43 @@ public class LevelController : LevelControllerBase {
 		return false; //nothing sighted
 	}
 	
+
+	//Used by autoturrets and the like
+	public actorWrapper requestRangedTarget(int fromTeam, float range, Vector3 selfPosition)
+    {
+		int target = -1;
+		if (fromTeam == 0)
+        {
+			target = GetBestTarget(selfPosition, Vector3.zero, enemyList);
+			if (target != -1)
+				return enemyList[target];
+			else
+				return null;
+        } else
+        {
+			target = GetBestTarget(selfPosition, Vector3.zero, enemyList);
+			if (target != -1)
+				return friendlyList[target];
+			else
+				return null;
+		}
+
+        return null; //We nave no viable target
+    }
 	
 	//The fighters can use this to call for another target
 	public void requestTarget(ActorController ourController) {
 		//For the moment just assign it something.
 		int target=-1;
 		if (ourController.team==0) { //we're friendly, and a small tweak for testing...
-			target = GetBestTarget(ourController, enemyList);
+			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, enemyList);
 			if (target!=-1)
 				ourController.targetCallback(enemyList[target].actor, enemyList[target].vehicle, 1); //list this target and attack it!
 			else
 				ourController.targetCallback(null, null, -1);
 		}
 		else if (ourController.team==1) { //we're friendly
-			target = GetBestTarget(ourController, friendlyList);
+			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, friendlyList);
 			if (target!=-1)
 				ourController.targetCallback(friendlyList[target].actor, friendlyList[target].vehicle, 1); //list this target and attack it!
 			else
@@ -292,7 +315,7 @@ public class LevelController : LevelControllerBase {
 	}
 
 	//can also be used by the player I suppose. For now this will work.
-	int GetBestTarget(ActorController thisController, List<actorWrapper> listTargets) {
+	int GetBestTarget(Vector3 thisPosition, Vector3 thisForward, List<actorWrapper> listTargets) {
 		int bestTarget = -1;
 		float bestPropensity = float.MaxValue, thisTargetPropensity=0; //we use an inverse system
 
@@ -300,11 +323,11 @@ public class LevelController : LevelControllerBase {
 			for (int i=0; i<listTargets.Count; i++) {
 				thisTargetPropensity = 0; //annul this before recalculating
 				//first step: how far away from us is it?
-				thisTargetPropensity += (thisController.ourAircraft.gameObject.transform.position-listTargets[i].actor.gameObject.transform.position).magnitude;
+				thisTargetPropensity += (thisPosition-listTargets[i].actor.gameObject.transform.position).magnitude;
 			
 				//So now consider our direction to the target (is this the correct way around?)
 				//Graduate a bit. Down by a quater so that it won't be at a 180m range for an override
-				thisTargetPropensity += (Vector3.Angle(thisController.ourAircraft.gameObject.transform.forward, (listTargets[i].actor.gameObject.transform.position-thisController.ourAircraft.gameObject.transform.position)))/4F;
+				thisTargetPropensity += (Vector3.Angle(thisForward, (listTargets[i].actor.gameObject.transform.position-thisPosition)))/4F;
 
 				//Do we want to do something with the health of the target?
 
