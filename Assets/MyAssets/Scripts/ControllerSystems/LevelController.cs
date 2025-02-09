@@ -254,21 +254,21 @@ public class LevelController : LevelControllerBase {
 	
 
 	//Used by autoturrets and the like
-	public actorWrapper requestRangedTarget(int fromTeam, float range, Vector3 selfPosition)
+	public actorWrapper requestRangedTarget(int onTeam, float range, Vector3 selfPosition)
     {
 		int target = -1;
-		if (fromTeam == 0)
+		if (onTeam == 1)
         {
-			target = GetBestTarget(selfPosition, Vector3.zero, enemyList);
+			target = GetBestTarget(selfPosition, Vector3.zero, friendlyList);
 			if (target != -1)
-				return enemyList[target];
+				return friendlyList[target];
 			else
 				return null;
         } else
         {
 			target = GetBestTarget(selfPosition, Vector3.zero, enemyList);
 			if (target != -1)
-				return friendlyList[target];
+				return enemyList[target];
 			else
 				return null;
 		}
@@ -439,7 +439,7 @@ public class LevelController : LevelControllerBase {
 		//For the moment:
 		//StartCoroutine(StartMatch(3, 0));
 
-		//createMatch(1, 0);
+		createMatch(1, 0);
 		//StartCoroutine(DoBomberRunEnemies());
 	}
 	

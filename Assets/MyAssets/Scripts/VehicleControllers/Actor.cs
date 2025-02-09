@@ -5,7 +5,7 @@ using System.Collections;
 public class Actor : MonoBehaviour {
 	public MissionEventObject owner;
 	public bool bIsPlayerVehicle=false;
-	protected int team = 0; //0 friendly 1 enemy (for this anyway)
+	public int team = 0; //0 friendly 1 enemy (for this anyway)
 	protected float speed=6;
 	public float hitSphere = 1.2F; //what is our hit area?
 	public bool bIsTarget=false; //is the player targeting this?

@@ -6,10 +6,12 @@ using DG.Tweening;
 //A fixed gun that'll shoot at enemy targets
 public class AI_FixedGun : MonoBehaviour {
 	public GameObject baseVehicle;
+	Actor baseActor;
 
 	public int team = 0;
 	public float damage = 3;
 	public actorWrapper target;
+	public GameObject targetObject;
 	public float range = 30f;
 	public float BulletSpeed = 50f;
 
@@ -35,24 +37,31 @@ public class AI_FixedGun : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		ourAudio = gameObject.GetComponent<AudioSource>();
+		if (baseVehicle)
+        {
+			baseActor = baseVehicle.GetComponent<Actor>();
+			if (baseActor)
+            {
+				team = baseActor.team;
+            }
+        }
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (!target.actor.gameObject)
+		if (targetObject == null)
 		{
 			targetNext = Time.time + targetTrackTime;	//Apply a timer for how long we'll track a target
 			target = ((LevelController)LevelControllerBase.Instance).requestRangedTarget(team, range, gameObject.transform.position);   //Of course if there are no targets this could really chew up process
+			if (target != null)
+			{
+				targetObject = target.vehicle;
+			}
 		}
 		else
         {
 			TrackTarget();
         }
-		/*
-		if (Vector3.SqrMagnitude(target.transform.position - gameObject.transform.position) > range*range || Time.time > targetNext)
-        {
-			target = null; //Clear our target as it's out of range
-        }*/
 	}
 
 	public virtual void TrackTarget()
