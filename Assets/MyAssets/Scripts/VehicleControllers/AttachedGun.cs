@@ -136,14 +136,21 @@ public class AttachedGun : MonoBehaviour {
 
 		//Make the fire graphic
 		//We could do with making this into an array that gets read from and bullets recycled - I thought this was already in the game but apparently it's not...
-		
-		latestBullet = Instantiate(bulletPrefab, transform.position+transform.forward.normalized*forwardStep, transform.rotation) as GameObject;
-		latestBulletMP = latestBullet.GetComponent<Bullet>();
-		//latestBulletMP.Movement = transform.forward*BulletSpeed;
-		//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
 
-		//we kind of need the shot vector here...
-		latestBulletMP.SetBulletAction(shotVector*BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+		if (!BulletParticleSystem.Instance)
+		{
+			latestBullet = Instantiate(bulletPrefab, transform.position + transform.forward.normalized * forwardStep, transform.rotation) as GameObject;
+			latestBulletMP = latestBullet.GetComponent<Bullet>();
+			//latestBulletMP.Movement = transform.forward*BulletSpeed;
+			//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
+
+			//we kind of need the shot vector here...
+			latestBulletMP.SetBulletAction(shotVector * BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+        }
+        else
+        {
+			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, transform.forward, BulletSpeed, 1, 3);
+        }
 		
 		
 		Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose

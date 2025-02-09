@@ -39,16 +39,24 @@ public class AttachedGun_AI : AttachedGun {
 
 			}
 		}
-				
-		//Make the fire graphic
-		latestBullet = Instantiate(bulletPrefab, transform.position+transform.forward.normalized*forwardStep, transform.rotation) as GameObject;
-		latestBulletMP = latestBullet.GetComponent<Bullet>();
-		//latestBulletMP.Movement = transform.forward*BulletSpeed;
-		//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
-		latestBulletMP.SetBulletAction(shotVector*BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+
+		if (!BulletParticleSystem.Instance)
+		{
+			//Make the fire graphic
+			latestBullet = Instantiate(bulletPrefab, transform.position + transform.forward.normalized * forwardStep, transform.rotation) as GameObject;
+			latestBulletMP = latestBullet.GetComponent<Bullet>();
+			//latestBulletMP.Movement = transform.forward*BulletSpeed;
+			//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
+			latestBulletMP.SetBulletAction(shotVector * BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+			Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose
+		}
+		else
+		{
+			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, transform.forward, BulletSpeed, 1, BulletLife);
+		}
+
+
 		
-		
-		Destroy(latestBullet, BulletLife); //this is equivilent to range I suppose
 		ReFireTime = Time.time+RefireRate;
 	}
 }

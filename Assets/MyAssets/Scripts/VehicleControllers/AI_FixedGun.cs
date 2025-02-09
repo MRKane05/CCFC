@@ -113,13 +113,18 @@ public class AI_FixedGun : MonoBehaviour {
 
 			//Take the distance from here to the targets percieved point, and then multiply, then check the distance to see if we've got a hit
 			//Unlike the insainely optimised code for hit checking on aircraft we might have to raycast this one
-
-			latestBullet = Instantiate(bulletPrefab, transform.position + transform.forward.normalized * forwardStep, transform.rotation) as GameObject;
-			latestBullet.transform.rotation = lookAtAngle;
-			Bullet latestBulletMP = latestBullet.GetComponent<Bullet>();
-			//latestBulletMP.Movement = transform.forward*BulletSpeed;
-			//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
-			latestBulletMP.SetBulletAction(shotVector * BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+			if (!BulletParticleSystem.Instance)
+			{
+				latestBullet = Instantiate(bulletPrefab, transform.position + transform.forward.normalized * forwardStep, transform.rotation) as GameObject;
+				latestBullet.transform.rotation = lookAtAngle;
+				Bullet latestBulletMP = latestBullet.GetComponent<Bullet>();
+				//latestBulletMP.Movement = transform.forward*BulletSpeed;
+				//SetBulletAction (Vector3 nMovement, GameObject nOwner, float nDamage, string nDamageType, string nTeam) {
+				latestBulletMP.SetBulletAction(shotVector * BulletSpeed, gameObject, 3F, "BULLET", "TEAM");
+			} else
+            {
+				BulletParticleSystem.Instance.addParticle(transform.position + shotVector * forwardStep, shotVector, BulletSpeed, 1, 3);
+			}
 
 
 			Destroy(latestBullet, 3); //this is equivilent to range I suppose
