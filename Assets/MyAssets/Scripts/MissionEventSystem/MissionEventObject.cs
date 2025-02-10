@@ -6,7 +6,7 @@ using UnityEngine;
 public class missionEvent
 {
     //The core event itself
-    public enum enEventType { NONE, PLANES, BASE, STATIC, VEHICLES, BALLOON, PHOTO } //This will be an event driver that'll make something of it
+    public enum enEventType { NONE, PLANES, BOMBER, BASE, STATIC, VEHICLES, BALLOON, PHOTO } //This will be an event driver that'll make something of it
     public enEventType eventType = enEventType.NONE;
     //What does the player have to do with said thing?
     public enum enPlayerTask { NONE, DESTROY, PROTECT }
@@ -75,8 +75,10 @@ public class MissionEventObject : MonoBehaviour {
 
     public void doTick(float gameTime)
     {
-        checkTrigger(gameTime);
-
+        if (MissionEventsManager.Instance)  //Don't tick unless we're setup
+        {
+            checkTrigger(gameTime);
+        }
     }
 
     public virtual void actorTakingDamage(MissionEventObject thisEvent, Actor thisActor, float healthRatio)

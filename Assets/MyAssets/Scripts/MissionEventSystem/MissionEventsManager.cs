@@ -13,7 +13,7 @@ public class LevelObjectiveSet
 		thisObjective = newObjective;
 		density = newDensity;
     }
-	public enum enObjectiveType { NONE, FIGHTERS, BALLOONS, BOMBERS, BASE }
+	public enum enObjectiveType { NONE, FIGHTERS, BALLOONS, BOMBERS, PROTECTBOMBERS, BASE }
 	public enObjectiveType thisObjective;
 	public float density = 3.0f;
 }
@@ -31,12 +31,38 @@ public class MissionEventsManager : MonoBehaviour {
 	public List<missionEvent> hiddenActiveEvents = new List<missionEvent>();  //Unlisted events that the player can actively "complete" through an action such as destroying, photographing, etc.
 	public List<missionEvent> hiddenPassiveEvents = new List<missionEvent>(); //Unlisted events that the player cannot "complete" in a level and are intended to last the level duration
 
+	//So we need some way of centering everything. I'd imagine we'll have a few bases in the map that can be turned on/off depending on what the event is
+	//For the moment lets just do a random around zero
+	public Vector3 centerPoint = Vector3.zero;  //This can just be a random point at this stage
+	float centerVariance = 3000;	//Allow our mission to take place this much forward/side
+
+
+	void Awake()
+    {
+		instance = this;
+    }
+
+	public void SetCenter(Vector3 toThis, bool bRandom)
+    {
+		if (!bRandom)
+        {
+			centerPoint = toThis;
+        } else
+        {
+			centerPoint = new Vector3(Random.Range(-centerVariance, centerVariance), 0, Random.Range(centerVariance, centerVariance));
+        }
+
+		//We're going to want to re-position our player to keep up with the location
+		Vector3 newPlayerPos = centerPoint + new Vector3(Random.Range(-200, 200), 0, Random.Range(-200, 200));
+		PlayerController.Instance.ourAircraft.transform.position = getTerrainHeightAtPoint(newPlayerPos) + Vector3.up * Random.Range(10f, 50f);
+
+	}
 
 	float gameTime = 0;
 	// Use this for initialization
 	public void StartMission()
 	{
-		//Quickly knock something together
+		//Quickly knock something together. This doesn't require too much finesse
 
 		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
 		//This deserves more setup, but for the moment we can probably just multiply it accordingly
@@ -72,6 +98,38 @@ public class MissionEventsManager : MonoBehaviour {
 			AddFriendly();
         }
     }
+
+	public void CreateBomberMission()
+    {
+
+		SetCenter(Vector3.zero, true); //For the moment
+		//Our bomber mission will need:
+		//A base location that's going to be bombed
+		//Bombers with a path heading towards that base
+		//Associated elements
+
+		List<LevelObjectiveSet> ListLevelObjectives = new List<LevelObjectiveSet>();
+		//This deserves more setup, but for the moment we can probably just multiply it accordingly
+		int fighterGroups = Random.Range(1, 3);
+		fighterGroups = 1;
+		for (int i = 0; i < fighterGroups; i++)
+		{
+			LevelObjectiveSet newObjective = new LevelObjectiveSet(LevelObjectiveSet.enObjectiveType.BOMBERS, 1);	//This doesn't define team...
+			ListLevelObjectives.Add(newObjective);
+		}
+
+		ConstructMission(ListLevelObjectives, 4);
+
+		Debug.Log("Starting Mission");
+
+		ProcessMissionEvents();
+
+		/*
+		for (int i = 0; i < additionalWingmenGroups; i++)
+		{
+			AddFriendly();
+		}*/
+	}
 
 	public virtual void AddFriendly()
     {
@@ -167,9 +225,13 @@ public class MissionEventsManager : MonoBehaviour {
 					//We need a location for these to happen around
 					//This point needs to consider the ground, so lets do a raycast to be sure
 
-					Vector3 randomPoint = new Vector3(Random.Range(-50, 50), 80, Random.Range(-50, 50));
+					Vector3 randomPoint = MissionEventsManager.instance.centerPoint +  new Vector3(Random.Range(-50, 50), 80, Random.Range(-50, 50));
 					randomPoint = getTerrainHeightAtPoint(randomPoint) + Vector3.up * Random.Range(10f, 50f);
-					createBalloonEvent(randomPoint, 12f);
+					createBalloonEvent(centerPoint + randomPoint, 12f);
+					break;
+				case LevelObjectiveSet.enObjectiveType.BOMBERS:
+					Debug.LogError("creating bombers event");
+					createBomberEvent();
 					break;
 				default:
 					break;
@@ -180,7 +242,7 @@ public class MissionEventsManager : MonoBehaviour {
 		//Logically from that the different objectives will have different locatoins too
 	}
 
-	Vector3 getTerrainHeightAtPoint(Vector3 point) {
+	public Vector3 getTerrainHeightAtPoint(Vector3 point) {
 		RaycastHit hit;
 		LayerMask maskAll = ~0;
 		// Does the ray intersect any objects excluding the player layer
@@ -267,6 +329,39 @@ public class MissionEventsManager : MonoBehaviour {
 		return newFlight;
     }
 
+	void createBomberEvent()
+	{
+		//For the moment lets dump in a collection of elements
+		int numElements = 1; //Why do we even have this? I want to add the event, not multiples OF the event
+							 //numElements = 1;
+							 //for (int i=0; i<numElements; i++)
+							 //{
+		missionEvent newEvent = MEV_MakeBombersEvent();   //The fighers are added in the event, where as the balloons are added in the create event function
+		newEvent.triggerType = missionEvent.enTriggerType.START; //Just toss everything in together
+		newEvent.triggerValue = 5f;
+		missionEvents.Add(newEvent);
+		//}
+	}
+
+	missionEvent MEV_MakeBombersEvent()
+    {
+		missionEvent newFlight = new missionEvent();
+		newFlight.eventType = missionEvent.enEventType.BOMBER;
+		newFlight.playerTask = missionEvent.enPlayerTask.DESTROY;
+		newFlight.objectiveType = missionEvent.enObjectiveType.VISIBLE;
+
+		newFlight.eventTeam = 1; //Enemies for the moment
+
+		int flightCount = Mathf.RoundToInt(Random.Range(3, 5)); //Increase the number so as to get a bit of a group of fighters happening
+		flightCount = 1;
+		for (int i = 0; i < flightCount; i++)
+		{
+			newFlight.spawnObject.Add(prefabManager.Instance.enemyBombers[0]);
+		}
+
+		return newFlight;
+	}
+
 
 	void ProcessMissionEvents () {
 		gameTime = 0;
@@ -314,6 +409,15 @@ public class MissionEventsManager : MonoBehaviour {
 					Debug.Log(newGameMissionEvent); //This is coming through as null?
 					gameMissionEvents.Add(newGameMissionEvent);
 					Debug.Log("Adding balloons mission event");
+					break;
+				case missionEvent.enEventType.BOMBER:
+					//GameObject eventObject = Instantiate(new GameObject("Fighter Event:" + i.ToString()), this.gameObject.transform);
+					newGameMissionEvent = eventObject.AddComponent<MEV_Bombers>();  //new MEV_Fighters();
+					newGameMissionEvent.ourMissionEvent = thisMissionEvent;
+					newGameMissionEvent.ourMissionEventManager = this;
+					Debug.Log(newGameMissionEvent); //This is coming through as null?
+					gameMissionEvents.Add(newGameMissionEvent);
+					Debug.Log("Adding bombers mission event");
 					break;
 				default:
 					//doSomething
