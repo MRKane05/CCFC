@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-//this is any gun attached to the aircraft.
+//this is any gun attached to the aircraft
 public class AttachedGun : MonoBehaviour {
 	public AI_Fighter ourFighterAI; //we're assigning this if we've got one.
 	public GameObject baseVehicle;
@@ -149,7 +149,7 @@ public class AttachedGun : MonoBehaviour {
         }
         else
         {
-			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, transform.forward, BulletSpeed, 1, 3);
+			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, shotVector, BulletSpeed, 1, 3);
         }
 		
 		

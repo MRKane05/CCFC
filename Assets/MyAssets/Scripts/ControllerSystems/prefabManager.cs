@@ -14,6 +14,8 @@ public class prefabManager : MonoBehaviour {
 
 	//now we need to break down our balloons and likewise...
 	public GameObject[] enemyBalloons, friendlyBalloons;
+
+	public GameObject[] enemyBombers, friendlyBombers;
 	
 	
 	// Use this for initialization

@@ -52,7 +52,7 @@ public class AttachedGun_AI : AttachedGun {
 		}
 		else
 		{
-			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, transform.forward, BulletSpeed, 1, BulletLife);
+			BulletParticleSystem.Instance.addParticle(transform.position + transform.forward * forwardStep, shotVector, BulletSpeed, 1, BulletLife);
 		}
 
 

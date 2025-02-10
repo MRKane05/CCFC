@@ -395,7 +395,8 @@ public class LevelController : LevelControllerBase {
 		newActor.team = thisTeam;
 		newActor.actor.owner = thisOwner;
 		//not totally sure this is the best option
-		newActor.ourController = newTarget.GetComponentInChildren<ActorController>(); //might cause issues with AI guns...
+		newActor.ourController = newTarget.GetComponentInChildren<ActorController>(); //might cause issues with AI guns and the likes of the bombers that have no controller...
+		
 		newActor.ourController.flightGroup = groupTag;
 
 		//Debug.Log ("\tGroupTag: " + ((AI_Fighter)newActor.ourController).flightGroup + " | " + groupTag);
@@ -450,9 +451,9 @@ public class LevelController : LevelControllerBase {
 														//Lets use this for the moment
 		if (ourMissionEventsManager)	//As this won't exist for the tailgunner missions and will be replaced with a hacky drop-in class
 		{
-			ourMissionEventsManager.StartMission(); //precanned hardwired setup
+			//ourMissionEventsManager.StartMission(); //precanned hardwired setup
+			ourMissionEventsManager.CreateBomberMission();	//Test bomber mission setup
 		}
-
 	}
 
 	// Use this to make a game
