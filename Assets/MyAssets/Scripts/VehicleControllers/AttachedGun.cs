@@ -112,6 +112,7 @@ public class AttachedGun : MonoBehaviour {
 				Debug.DrawLine(transform.position, hitPosition);
 				//Debug.Log("Hit Disparity: " + (hitPosition-ourFighterAI.getTargetLead()).sqrMagnitude);
 				//Check to see if we're hitting within this objects bounds.
+				//PROBLEM: This would be better as a Vector3.Dot
 				if (Vector3.Angle (transform.position-hitPosition, transform.position- thisActor.vehicle.gameObject.transform.position) < autoAimAngle || (hitPosition - targetLead).sqrMagnitude < thisActor.actor.hitSphere*thisActor.actor.hitSphere) { //then this is a hit!
 					if (shotMagnitude < closestHit) {
 						closestActor = thisActor.actor;
@@ -131,7 +132,6 @@ public class AttachedGun : MonoBehaviour {
 				ourHitEffect.Emit(thisHit);
 			}
 			*/
-
 		}
 
 		//Make the fire graphic

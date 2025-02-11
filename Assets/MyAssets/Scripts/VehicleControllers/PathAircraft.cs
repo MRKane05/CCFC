@@ -32,7 +32,7 @@ public class PathAircraft : Actor {
     {
         speed = crusingSpeed;
         transform.position += transform.forward * Time.deltaTime * speed;   //Simply move this vehicle forward
-        if (pathPositions.Count > 0 && currentPathPosition < pathPositions.Count)
+        if (pathPositions.Count > 0 && currentPathPosition < pathPositions.Count && !bIsDead)
         {
             TurnToFace(pathPositions[currentPathPosition]);
             //Need to check and see if we should move onto our next point
@@ -40,6 +40,11 @@ public class PathAircraft : Actor {
             {
                 currentPathPosition++;
             }
+        }
+        if (bIsDead)
+        {
+            AircraftDeathSpiral();
+            //We'll need to keep a ticker on when to do an explosion effect
         }
     }
 
@@ -82,12 +87,15 @@ public class PathAircraft : Actor {
         base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
         //PROBLEM: We need to update the players UI just for this particular type of aircraft (this is going to get screwy when we add more than one, but for the moment it's getting things on the ground)
         float damageProp =health / maxHealth;
-
-        //update our health bar
-        NGUI_Base.Instance.assignHealth(damageProp);
-        if (health<=0)
+        if (bIsPlayerVehicle)
         {
-            ((LevelController)LevelControllerBase.Instance).finishMatch(true);  //Handle our die state
+            //update our health bar
+            NGUI_Base.Instance.assignHealth(damageProp);
+            if (health <= 0)
+            {
+                bIsDead = true;
+                ((LevelController)LevelControllerBase.Instance).finishMatch(true);  //Handle our die state
+            }
         }
     }
 
