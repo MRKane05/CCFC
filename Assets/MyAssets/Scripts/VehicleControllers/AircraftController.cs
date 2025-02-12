@@ -32,8 +32,6 @@ public class AircraftController : Actor {
 	Engine[] engines; //well this is either as simple or as complicated as we want to make it really...
 
 	//d_ functions (death)
-	float d_delay = 2f; //how many seconds before we go boom
-	int d_parachutes = 1;
 	float d_time = float.MaxValue; //the point where we'll go bang (as set when damage is taken)
 
 	public GameObject AircraftModel, AircraftMesh, FiringMarker;
@@ -304,17 +302,6 @@ public class AircraftController : Actor {
 		if (hitEffect)
 			hitEffect.addHit(delay); //for actually seeing that we're hit!
 		
-	}
-
-	//do our shot down setup stuff...
-	void applyShotDown() {
-		StartCoroutine(shotDownProcess(0.5f, d_delay));
-		callbackDie();	//Callback for this actor dying
-	}
-
-	public IEnumerator shotDownProcess(float parachuteDelay, float explosionDelay) {
-		yield return new WaitForSeconds(parachuteDelay);
-		doExplode(d_delay); //blow this fighter up
 	}
 	
 	// Update is called once per frame

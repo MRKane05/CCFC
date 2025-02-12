@@ -60,4 +60,5 @@ public class MEV_Bombers : MissionEventObject {
 			groupActors.Add(newActor);
 		}
 	}
+
 }

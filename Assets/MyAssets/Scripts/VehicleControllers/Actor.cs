@@ -180,6 +180,14 @@ public class Actor : MonoBehaviour {
 	public virtual GameObject getModel() { //returns the model attached to this controller
 		return gameObject; //plain entry
 	}
+	float explosionDelay = 2f; //how many seconds before we go boom
+	int d_parachutes = 1;
+	//do our shot down setup stuff...
+	protected void applyShotDown()
+	{
+		StartCoroutine(shotDownProcess(0.5f, explosionDelay));
+		callbackDie();  //Callback for this actor dying
+	}
 
 	public virtual void callbackDie()	//Called when we die and is responsible for some housekeeping
     {
@@ -219,11 +227,17 @@ public class Actor : MonoBehaviour {
 
 	}
 
-	protected void AircraftDeathSpiral()
+	public IEnumerator shotDownProcess(float parachuteDelay, float explosionDelay)
+	{
+		yield return new WaitForSeconds(parachuteDelay);
+		doExplode(explosionDelay); //blow this fighter up
+	}
+
+	protected virtual void AircraftDeathSpiral()
     {
 		if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-			transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 02f);
+			transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 2f);
 		else
-			transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 02f);
+			transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 2f);
 	}
 }

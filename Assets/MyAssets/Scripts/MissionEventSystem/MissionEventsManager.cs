@@ -183,11 +183,11 @@ public class MissionEventsManager : MonoBehaviour {
 		//Now we need to figure out which list we add it to
 		if (thisTeam == 0)
 		{
-((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
+			((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
 		}
 		else if (thisTeam == 1)
 		{
-((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
+			((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
 			newActor.actor.gradeSkill(0.5f);
 
 		}

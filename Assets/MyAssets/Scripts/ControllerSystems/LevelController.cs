@@ -44,7 +44,7 @@ public class LevelController : LevelControllerBase {
 
 	public float enemyFactor=0.5F; //what our enemies are skill wise.
 
-	public MissionEventsManager ourMissionEventsManager;
+	//public MissionEventsManager ourMissionEventsManager;
 
 	public CameraController levelCameraController;
 	
@@ -210,7 +210,16 @@ public class LevelController : LevelControllerBase {
 		return addActor(thisTeam, thisFighter, thisLocation, thisRotation, groupTag, thisOwner);
 	
 	}
-	
+
+	public actorWrapper addFighterActor(GameObject thisFighter, int thisTeam, Vector3 thisLocation, Quaternion thisRotation, string groupTag)
+	{
+		//Do something to spawn some enemies around our player
+		//If this is an ambush:
+
+		return addActor(thisTeam, thisFighter, thisLocation, thisRotation, groupTag, null);
+
+	}
+
 	#endregion
 
 	#region scoreKeeping
@@ -449,11 +458,14 @@ public class LevelController : LevelControllerBase {
 														//will need to call the LevelBuilder_ that we're using for this match when it's all in pace, not this system...
 														//StartCoroutine(StartMatch(enemies, wingmen));
 														//Lets use this for the moment
+														/*
 		if (ourMissionEventsManager)	//As this won't exist for the tailgunner missions and will be replaced with a hacky drop-in class
 		{
 			//ourMissionEventsManager.StartMission(); //precanned hardwired setup
 			ourMissionEventsManager.CreateBomberMission();	//Test bomber mission setup
+														
 		}
+														*/
 	}
 
 	// Use this to make a game

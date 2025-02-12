@@ -82,11 +82,18 @@ public class PathAircraft : Actor {
         transform.rotation = targetRotation * Quaternion.AngleAxis(maxAngleRoll * Mathf.Clamp(turnDot, -maxAngleFactor, maxAngleFactor) / maxAngleFactor, transform.forward);
     }
 
+
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay)
 	{
         base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
         //PROBLEM: We need to update the players UI just for this particular type of aircraft (this is going to get screwy when we add more than one, but for the moment it's getting things on the ground)
         float damageProp =health / maxHealth;
+        if (health <= 0 && !bIsDead)
+        {
+            bIsDead = true;
+
+        }
+
         if (bIsPlayerVehicle)
         {
             //update our health bar
@@ -100,4 +107,17 @@ public class PathAircraft : Actor {
     }
 
     //So the idea behind this is that it'll move between a path of points that are assigned to it as an array
+    protected virtual void AircraftDeathSpiral()
+    {
+        if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
+        {
+            transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 2f);
+            transform.RotateAround(transform.forward, rollspeed * Time.deltaTime);
+        }
+        else
+        {
+            transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 2f);
+            transform.RotateAround(transform.forward, -rollspeed * Time.deltaTime);
+        }
+    }
 }
