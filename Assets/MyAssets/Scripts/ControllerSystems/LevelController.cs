@@ -439,7 +439,7 @@ public class LevelController : LevelControllerBase {
 	
 	IEnumerator Start() {
 		yield return null;
-		basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?
+		//basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?
 		//This all needs to be disabled if we're outside of testing
 		
 		if (!prefabManager.Instance)
@@ -449,7 +449,7 @@ public class LevelController : LevelControllerBase {
 		//For the moment:
 		//StartCoroutine(StartMatch(3, 0));
 
-		createMatch(1, 0);
+		//createMatch(1, 0);
 		//StartCoroutine(DoBomberRunEnemies());
 	}
 	
