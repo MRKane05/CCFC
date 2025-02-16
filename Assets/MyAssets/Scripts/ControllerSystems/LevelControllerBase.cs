@@ -46,4 +46,25 @@ public class LevelControllerBase : MonoBehaviour {
 		Time.timeScale = 0f;    //Going to need to turn this back on somewhere...
 								//What we could actually start doing now is loading our other scene in the background...I'm not sure just how that'll work however, so for the moment fuck it, lets get it working!
 	}
+
+	public Vector3 getTerrainHeightAtPoint(Vector3 point)
+	{
+		RaycastHit hit;
+		LayerMask maskAll = 0x01 << LayerMask.NameToLayer("Ground");	//We only want to cast against the terrain
+		// Does the ray intersect any objects excluding the player layer
+		if (Physics.Raycast(point + Vector3.up * 2000f, -Vector3.up, out hit, Mathf.Infinity, maskAll))
+
+		{
+			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+			Debug.Log("Did Hit");
+			return hit.point;
+		}
+		else
+		{
+			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
+			Debug.Log("Did not Hit");
+		}
+		return point;   //Assume we didn't find anything so lets go ahead
+
+	}
 }

@@ -12,6 +12,18 @@ public class PathAircraft : Actor {
     Quaternion transTargRotation;
     public float maxAngleFactor = 0.3f;
     public float maxAngleRoll = 15f;
+
+    //Ok, for the moment lets assume that path vehicles will only be bombers (although I do see them being used for static gunner sections
+    public GameObject bombPrefab;
+    public Vector3 targetDropLocation;  //This'll be set as part of the information for arranging the bomber path and needs to be different for the vehicles flying in formation and doing carpet bombing
+    public float startDropRadius = 15f;
+
+    float nextDropTime = 0;
+    public float dropFrequency = 1f;
+    public int dropNumber = 5;
+    public enum enBombingState { NULL, TOTARGET, BOMBING, FINISHED }
+    public enBombingState bombingState = enBombingState.TOTARGET;
+
     public override void DoStart()
     {
         base.DoStart();
@@ -45,7 +57,58 @@ public class PathAircraft : Actor {
         {
             AircraftDeathSpiral();
             //We'll need to keep a ticker on when to do an explosion effect
+        } else
+        {
+            CheckBombingBehavior();
         }
+    }
+
+    void CheckBombingBehavior()
+    {
+        /*
+        public float startDropRadius = 3f;
+         
+        float nextDropTime = 0;
+        public float dropFrequency = 1f;
+        int dropNumber = 8;
+        bool bBombingComplete = false;
+        */
+
+        //Step 1: check to see if we're close enough to trigger
+        //Step 2: start bombing
+        //Step 3: finish bombing
+        switch (bombingState)
+        {
+            case enBombingState.TOTARGET:
+                //Quick 2D calculation
+                float flatDistance = Vector2.SqrMagnitude(new Vector2(gameObject.transform.position.x, gameObject.transform.position.z) - new Vector2(targetDropLocation.x, targetDropLocation.z));
+                if (flatDistance < startDropRadius * startDropRadius)
+                {
+                    bombingState = enBombingState.BOMBING;  //Switch into our bombing state
+                }
+                break;
+            case enBombingState.BOMBING:
+                if (Time.time > nextDropTime)
+                {
+                    DropBomb();
+                    nextDropTime = Time.time + dropFrequency;
+                    dropNumber--;
+                }
+                if (dropNumber <=0)
+                {
+                    bombingState = enBombingState.FINISHED;
+                }
+                break;
+            case enBombingState.FINISHED:
+                break;
+        }
+    }
+
+    void DropBomb()
+    {
+        GameObject newBomb = Instantiate(bombPrefab, gameObject.transform.position, gameObject.transform.rotation);
+        Bomber_Bomb newBombScript = newBomb.GetComponent<Bomber_Bomb>();
+        newBombScript.SetupProjectile(transform.forward * crusingSpeed, 1, -1);
     }
 
     public static float AngleDir(Vector3 fwd, Vector3 targetDir)

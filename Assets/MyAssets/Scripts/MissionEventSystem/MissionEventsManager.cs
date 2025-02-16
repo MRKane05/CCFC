@@ -242,6 +242,7 @@ public class MissionEventsManager : MonoBehaviour {
 		//Logically from that the different objectives will have different locatoins too
 	}
 
+	//PROBLEM: This should be on the levelcontroller
 	public Vector3 getTerrainHeightAtPoint(Vector3 point) {
 		RaycastHit hit;
 		LayerMask maskAll = ~0;

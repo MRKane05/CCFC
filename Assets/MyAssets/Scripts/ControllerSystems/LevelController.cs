@@ -387,41 +387,47 @@ public class LevelController : LevelControllerBase {
 			finishMatch(true);
 		}
 	}
-	
+
 	//For the moment
 	//We need to do the fighter class stuff somehows
 	public actorWrapper addActor(int thisTeam, GameObject thisPrefab, Vector3 thisPosition, Quaternion thisRotation, string groupTag, MissionEventObject thisOwner) {
 
 		GameObject newTarget = Instantiate(thisPrefab, thisPosition, thisRotation) as GameObject;
-			
+
 		actorWrapper newActor;
-		
+
 		//Assign our stuff
 		newActor = new actorWrapper();
 		newActor.vehicle = newTarget;
 		newActor.actor = newTarget.GetComponent<Actor>(); //Was aircraft controller but we don't need to be that high up the stack really
-		//newActor.vehicle = newActor.actor.getModel();
+														  //newActor.vehicle = newActor.actor.getModel();
 		newActor.team = thisTeam;
 		newActor.actor.owner = thisOwner;
 		//not totally sure this is the best option
 		newActor.ourController = newTarget.GetComponentInChildren<ActorController>(); //might cause issues with AI guns and the likes of the bombers that have no controller...
-		
-		newActor.ourController.flightGroup = groupTag;
+		if (newActor.ourController)
+		{
+			newActor.ourController.flightGroup = groupTag;
 
-		//Debug.Log ("\tGroupTag: " + ((AI_Fighter)newActor.ourController).flightGroup + " | " + groupTag);
+			//Debug.Log ("\tGroupTag: " + ((AI_Fighter)newActor.ourController).flightGroup + " | " + groupTag);
 
 
-		newActor.ourController.team = thisTeam;
+			newActor.ourController.team = thisTeam;
+			newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
+		}
 		newActor.actor.setTeam(thisTeam);
 		//Need to assign the variables to the aircraft controller
-		
-		//Handle our radar stuff
-		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
-		newActor.radarObject.transform.SetParent(targetRadar.gameObject.transform); //child it to this.
-		newActor.radarObject.transform.localScale = Vector3.one;
-		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
 
-		newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
+		//Handle our radar stuff
+		if (newActor.actor.ourRadarPrefab)
+		{
+			newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
+			newActor.radarObject.transform.SetParent(targetRadar.gameObject.transform); //child it to this.
+			newActor.radarObject.transform.localScale = Vector3.one;
+			newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
+		}
+
+		
 
 		//Now we need to figure out which list we add it to
 		if (thisTeam==0) {

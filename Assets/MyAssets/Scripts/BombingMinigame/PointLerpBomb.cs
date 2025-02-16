@@ -50,7 +50,7 @@ public class PointLerpBomb : MonoBehaviour {
 			DestructableObject thisObject = hitCollider.gameObject.GetComponent<DestructableObject>();
 			if (thisObject)
             {
-				thisObject.TakeDamage(Damage);
+				thisObject.TakeDamage(Damage);	//This should really be changed according to the distance to the collision point?
             }
 		}
 

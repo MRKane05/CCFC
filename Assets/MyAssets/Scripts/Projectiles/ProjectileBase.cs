@@ -8,20 +8,30 @@ public class ProjectileBase : MonoBehaviour {
 	public float damage = 3f;
 
 	public void SetupProjectile(Vector3 newMoveDir, float newMoveSpeed, float newDamage)
-    {
+	{
 		moveDir = newMoveDir;
 		moveSpeed = newMoveSpeed;
-		damage = newDamage;
-    }
+		if (newDamage > 0)
+		{
+			damage = newDamage;
+		}
+	}
 
 	public void Update()
-    {
+	{
+		DoUpdate();
+	}
+	public virtual void DoUpdate() {
 		gameObject.transform.position += moveDir * moveSpeed * Time.deltaTime;
     }
 
 	//Upon collision with another GameObject, this GameObject will reverse direction
 	private void OnTriggerEnter(Collider other)
 	{
+		DoOnTriggerEnter(other);
+	}
+
+	public virtual void DoOnTriggerEnter(Collider other) { 
 		if (other.gameObject)
         {
 			StrafingAircraftHandler ourPlayer = other.gameObject.GetComponent<StrafingAircraftHandler>();

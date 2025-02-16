@@ -11,7 +11,6 @@ public class DestructableObject : MonoBehaviour {
     public GameObject liveObject, destroyedObject;
     public GameObject explosionPrefab, burningPrefab;   //Our prefabs for effects
 
-
     void Start()
     {
         if (!liveObject || !destroyedObject)
@@ -29,12 +28,16 @@ public class DestructableObject : MonoBehaviour {
     public virtual void TakeDamage(float damageAmount)
     {
         Health -= damageAmount;
+        Debug.Log("Health: " + Health + " Damage: " + damageAmount);
         if (Health <=0 && !bDestroyed)
         {
             DoDestroy();
             //Destroy(gameObject); //remove this from the scene
             //PROBLEM: Need to add our scoring for this being a target or not to the levelController (or whatever is in charge of everything)
-            ((LevelControllerBomberMinigame)LevelControllerBase.Instance).ObjectDestroyed(gameObject, this);
+            if (((LevelControllerBomberMinigame)LevelControllerBase.Instance))
+            {
+                ((LevelControllerBomberMinigame)LevelControllerBase.Instance).ObjectDestroyed(gameObject, this);
+            } //Else we'll use our 3D world levelcontroller. This isn't an eloquent way to solve this problem
         }
     }
 
