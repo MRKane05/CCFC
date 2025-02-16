@@ -96,9 +96,11 @@ public class Mission_Bombers : MissionConstructionBase
     {
 
         string groupTag = "bomber_Group_" + Time.time.ToString("f0");
-        actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.friendlyBombers[0], 0, baseSpawnLocation + startRotation * formationPosition, startRotation, groupTag, null);
+        actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.friendlyBombers[0], 0, baseSpawnLocation - startRotation * formationPosition, startRotation, groupTag, null);
         //Have to get the controller for this vehicle and set the flight points in it
         PathAircraft bomberController = newActor.vehicle.GetComponent<PathAircraft>();
+        GameObject newPoint = new GameObject("Formation Start");
+        newPoint.transform.position = baseSpawnLocation + startRotation * formationPosition;
         if (bomberController)
         {
             List<Vector3> offsetPathPoints = new List<Vector3>();
@@ -108,17 +110,26 @@ public class Mission_Bombers : MissionConstructionBase
                 if (i < pathPoints.Count - 2) {
                     float angleToNext = Mathf.Atan2(pathPoints[i].x - pathPoints[i + 1].x, pathPoints[i].z - pathPoints[i + 1].z) * 180f / Mathf.PI;
                     Vector3 pointWithOffset = pathPoints[i] + Quaternion.AngleAxis(angleToNext, Vector3.up) * formationPosition;
+                    GameObject newPathPoint = new GameObject("formationPath: " + i.ToString());
+                    newPathPoint.transform.position = pointWithOffset;
                     offsetPathPoints.Add(pointWithOffset);
                 } else
                 {   //We want the point at the end looking back
                     float angleToNext = Mathf.Atan2(pathPoints[i].x - pathPoints[i - 1].x, pathPoints[i].z - pathPoints[i - 1].z) * 180f / Mathf.PI;
                     Vector3 pointWithOffset = pathPoints[i] + Quaternion.AngleAxis(angleToNext + 180, Vector3.up) * formationPosition;
+                    GameObject newPathPoint = new GameObject("formationPath: " + i.ToString());
+                    newPathPoint.transform.position = pointWithOffset;
                     offsetPathPoints.Add(pointWithOffset);
                 }
+
+
             }
 
             bomberController.pathPositions = offsetPathPoints;
-            bomberController.targetDropLocation = baseTargetPosition;   //This'll need some logic applied to it
+
+            //So our base target position will be Count-2
+            float angleToNext = Mathf.Atan2(pathPoints[pathPoints.Count-2].x - pathPoints[pathPoints.Count-1].x, pathPoints[pathPoints.Count-2].z - pathPoints[pathPoints.Count - 1].z) * 180f / Mathf.PI;
+            bomberController.targetDropLocation = baseTargetPosition + Quaternion.AngleAxis(angleToNext, Vector3.up) * formationPosition; ;   //This'll need some logic applied to it
 
             bomberController.pathPositions = offsetPathPoints;
         }
