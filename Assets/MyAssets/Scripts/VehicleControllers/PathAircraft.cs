@@ -16,7 +16,8 @@ public class PathAircraft : Actor {
     //Ok, for the moment lets assume that path vehicles will only be bombers (although I do see them being used for static gunner sections
     public GameObject bombPrefab;
     public Vector3 targetDropLocation;  //This'll be set as part of the information for arranging the bomber path and needs to be different for the vehicles flying in formation and doing carpet bombing
-    public float startDropRadius = 15f;
+    public Range startDropRange = new Range(10, 20);    //Add a bit of variance as to when the AI will start dropping bombs
+    float startDropRadius = 15f;
 
     float nextDropTime = 0;
     public float dropFrequency = 1f;
@@ -27,6 +28,8 @@ public class PathAircraft : Actor {
     public override void DoStart()
     {
         base.DoStart();
+
+        startDropRadius = startDropRange.GetRandom();
 
         targetRotation = gameObject.transform.rotation;
         transTargRotation = gameObject.transform.rotation;
@@ -65,15 +68,6 @@ public class PathAircraft : Actor {
 
     void CheckBombingBehavior()
     {
-        /*
-        public float startDropRadius = 3f;
-         
-        float nextDropTime = 0;
-        public float dropFrequency = 1f;
-        int dropNumber = 8;
-        bool bBombingComplete = false;
-        */
-
         //Step 1: check to see if we're close enough to trigger
         //Step 2: start bombing
         //Step 3: finish bombing

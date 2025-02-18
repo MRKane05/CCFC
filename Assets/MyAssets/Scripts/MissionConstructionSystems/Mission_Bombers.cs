@@ -13,7 +13,7 @@ public class Mission_Bombers : MissionConstructionBase
 
     //Ok, so now I've got to figure out how I'd go about adding in bombers flying in formation
     //Really I'd like to have aircraft in diamond formation (even though this wasn't a thing until WW11
-    float formationDistance = 30;   //This should become public for tweaking
+    float formationDistance = 20;   //This should become public for tweaking
     int numBombers = 4;
 
     public override void DoStart()
@@ -25,7 +25,7 @@ public class Mission_Bombers : MissionConstructionBase
     //This'll need shifted to somewhere better
     public virtual void AddTargetBombers(Vector3 thisTargetLocation, float spawnInRange)
     {
-        int addedBombers = 1;   //Start at 1 for our primary bomber
+        int addedBombers = 4;   //Start at 1 for our primary bomber
         float CruiseHeight = bomberHeight.GetRandom();
         //So basically we need to spawn some bombers in, and assemble a path for them to fly to the target
         float incomingAngle = Random.Range(0, 360);
@@ -89,6 +89,14 @@ public class Mission_Bombers : MissionConstructionBase
         if (numBombers > 1) //We have 1st position
         {
             addFormationBomber(new Vector3(formationDistance, 0, formationDistance), spawnLocation, startQuat, flightPoints, thisTargetLocation);
+        } 
+        if (numBombers > 2)
+        {
+            addFormationBomber(new Vector3(-formationDistance, 0, formationDistance), spawnLocation, startQuat, flightPoints, thisTargetLocation);
+        }
+        if (numBombers > 3)
+        {
+            addFormationBomber(new Vector3(0, 0, formationDistance*2f), spawnLocation, startQuat, flightPoints, thisTargetLocation);
         }
     }
 
@@ -131,7 +139,7 @@ public class Mission_Bombers : MissionConstructionBase
 
             //So our base target position will be Count-2
             angleToNext = Mathf.Atan2(pathPoints[pathPoints.Count-2].x - pathPoints[pathPoints.Count-1].x, pathPoints[pathPoints.Count-2].z - pathPoints[pathPoints.Count - 1].z) * 180f / Mathf.PI;
-            bomberController.targetDropLocation = baseTargetPosition + Quaternion.AngleAxis(angleToNext, Vector3.up) * formationPosition; ;   //This'll need some logic applied to it
+            bomberController.targetDropLocation = baseTargetPosition + Quaternion.AngleAxis(angleToNext, Vector3.up) * new Vector3(formationPosition.x, 0, 0);   //This'll need some logic applied to it
             GameObject targetPathPoint = new GameObject("targetPositionPoint");
             targetPathPoint.transform.position = bomberController.targetDropLocation;
 
