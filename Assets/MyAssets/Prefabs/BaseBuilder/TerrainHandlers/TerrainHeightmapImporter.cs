@@ -28,7 +28,7 @@ public class TerrainHeightmapImporter : MonoBehaviour {
 
     void Start()
     {
-        LoadRandomHeightmapCut();
+        //LoadRandomHeightmapCut();
     }
 
     void Update()

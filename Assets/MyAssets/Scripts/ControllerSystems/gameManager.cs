@@ -17,6 +17,14 @@ public class gameManager : MonoBehaviour {
 	private static gameManager instance = null;
 	public static gameManager Instance {get {return instance;}}
 	
+	public enum enGameState { NULL, MENU, LEVELSETUP, LEVELPLAYING, LEVELENDED, PAUSE}	//for VitaHOT I had states on both the LevelController and gameManager, so we're going to try and put everything here
+	public enGameState GameState = enGameState.NULL;
+
+	public void setGameState(enGameState newState)
+    {
+		GameState = newState;
+    }
+
 	float enemyActivity=0;
 	int currentlySelectedTile = -1;
 	//need some way of knowing which level we'd want to load

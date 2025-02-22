@@ -220,6 +220,46 @@ public class LevelController : LevelControllerBase {
 
 	}
 
+	public void AddFighterFlight(Vector3 generalLocation, float dropRadius, int numFighters, int team)
+    {
+		float randomDirection = Random.Range(0F, 360F * Mathf.Deg2Rad);
+		Vector3 patrolStart = generalLocation + new Vector3(Mathf.Sin(randomDirection) * dropRadius, Random.Range(-dropRadius / 4F, dropRadius / 4F), Mathf.Cos(randomDirection) * dropRadius);
+
+
+		//need to calc what our directional stuff is for this group
+		Vector2 targetDir = new Vector2(patrolStart[0] + Random.Range(-100, 100), patrolStart[2] + Random.Range(-100, 100));
+		float startAngle = Mathf.Acos(targetDir[1] / targetDir.magnitude) * Mathf.Rad2Deg;
+		Quaternion startQuat = Quaternion.Euler(0, startAngle, 0); //set this going on an intercept course with the chosen point
+		Quaternion transQuat = Quaternion.Euler(0, startAngle + 90, 0);
+
+
+		float waypointStagger = 3; //how far apart are our fighters?
+		Vector3 patrolOffset = Vector3.zero;
+
+		//need to come up with some method to name the groups. At some stage we might be spawning multiple patrols out of this
+		string groupTag = "wayGoal_Group_" + Time.time.ToString("f0");
+
+		//so when we're putting enemies down it's in a triangle formation
+		for (int i = 0; i < numFighters; i++)
+		{
+
+			if (i != 0)
+			{
+				if (i % 2 == 0)
+				{ //was that right?
+					patrolOffset = transQuat * Vector3.forward * waypointStagger - startQuat * Vector3.forward * waypointStagger;
+				}
+				else
+				{
+					patrolOffset = transQuat * -Vector3.forward * waypointStagger - startQuat * Vector3.forward * waypointStagger;
+				}
+			}
+			actorWrapper newActor = addFighterActor(team == 0 ? prefabManager.Instance.friendlyPrefabList[0] : prefabManager.Instance.enemyPrefabList[0], team, patrolStart + patrolOffset, startQuat, groupTag);
+			//Assign our AI actions for this fighter
+			((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+		}
+	}
+
 	#endregion
 
 	#region scoreKeeping
@@ -365,7 +405,6 @@ public class LevelController : LevelControllerBase {
 						Destroy (friendlyList[i].radarObject);
 
 					friendlyList.RemoveAt(i); //that way we'll get the correct one
-					
 				}
 			}
 		}
@@ -380,6 +419,13 @@ public class LevelController : LevelControllerBase {
 				}
 			}
 		}
+
+		//For our special situations we might also have to report this through to our MissonConstruction system
+		MissionConstructionBase ourMissonConstructor = gameObject.GetComponent<MissionConstructionBase>();
+		if (ourMissonConstructor)
+        {
+			ourMissonConstructor.RemoveActor(thisActor);
+        }
 
 		if (thisActor == playerAircraft)
         {
@@ -457,6 +503,9 @@ public class LevelController : LevelControllerBase {
 
 		//createMatch(1, 0);
 		//StartCoroutine(DoBomberRunEnemies());
+		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
+		yield return null;
+		playerAircraft.transform.position = getTerrainHeightAtPoint(playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
 	}
 	
 	//This needs another number to gauge the difficulity

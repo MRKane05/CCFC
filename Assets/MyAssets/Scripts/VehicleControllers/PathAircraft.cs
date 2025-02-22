@@ -22,8 +22,13 @@ public class PathAircraft : Actor {
     float nextDropTime = 0;
     public float dropFrequency = 1f;
     public int dropNumber = 5;
+
+    public MissionConstructionBase ourMissionConstructor;
     public enum enBombingState { NULL, TOTARGET, BOMBING, FINISHED }
     public enBombingState bombingState = enBombingState.TOTARGET;
+
+    public enum enMissionState { NULL, NOTCOMPLETE, COMPLETE, FAILED }
+    public enMissionState MissionState = enMissionState.NOTCOMPLETE;
 
     public override void DoStart()
     {
@@ -43,6 +48,19 @@ public class PathAircraft : Actor {
         }
     }
 
+    public void setMissionState(enMissionState newState)
+    {
+        
+        if (newState == enMissionState.NOTCOMPLETE || newState == enMissionState.NULL)
+        {
+            MissionState = newState;
+            //Inform our mission controller of something having happened with us
+        }
+        ((Mission_Bombers)ourMissionConstructor).BomberReturnState(newState);
+        
+
+    }
+
     void Update()
     {
         speed = crusingSpeed;
@@ -54,12 +72,21 @@ public class PathAircraft : Actor {
             if (Vector3.SqrMagnitude(gameObject.transform.position - pathPositions[currentPathPosition]) < 1f)
             {
                 currentPathPosition++;
+                if (currentPathPosition == pathPositions.Count) //We're at our last path position. Remove this actor.
+                {
+                    SoftRemoveActor();  //TODO: We'll want to fade this out or something good-looking like that. But for the moment lets just blink vanish
+                }
             }
         }
+
         if (bIsDead)
         {
             AircraftDeathSpiral();
             //We'll need to keep a ticker on when to do an explosion effect
+            if (Time.time > dieTime)
+            {
+                doExplode(0);
+            }
         } else
         {
             CheckBombingBehavior();
@@ -75,6 +102,8 @@ public class PathAircraft : Actor {
         {
             case enBombingState.TOTARGET:
                 //Quick 2D calculation
+
+                //IDEA: Have the bomber do a sphere check on the ground ahead to see if there's a target there, and if there is drop a volley of 3 bombs
                 float flatDistance = Vector2.SqrMagnitude(new Vector2(gameObject.transform.position.x, gameObject.transform.position.z) - new Vector2(targetDropLocation.x, targetDropLocation.z));
                 if (flatDistance < startDropRadius * startDropRadius)
                 {
@@ -91,6 +120,7 @@ public class PathAircraft : Actor {
                 if (dropNumber <=0)
                 {
                     bombingState = enBombingState.FINISHED;
+                    setMissionState(enMissionState.COMPLETE);   //We've been successful with our bombing run
                 }
                 break;
             case enBombingState.FINISHED:
@@ -139,6 +169,7 @@ public class PathAircraft : Actor {
         transform.rotation = targetRotation * Quaternion.AngleAxis(maxAngleRoll * Mathf.Clamp(turnDot, -maxAngleFactor, maxAngleFactor) / maxAngleFactor, transform.forward);
     }
 
+    float dieTime = 0;
 
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay)
 	{
@@ -148,7 +179,8 @@ public class PathAircraft : Actor {
         if (health <= 0 && !bIsDead)
         {
             bIsDead = true;
-
+            dieTime = Time.time + 5f;   //How long until we expode and get removed?
+            setMissionState(enMissionState.FAILED); //We've been unsuccessful with our bombing run as we've been shot down before it was complete
         }
 
         if (bIsPlayerVehicle)

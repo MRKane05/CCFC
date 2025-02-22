@@ -215,6 +215,14 @@ public class Actor : MonoBehaviour {
 		Destroy(gameObject, d_delay); //destroy aircraft after small "effect" delay
 	}
 
+	//Called when an actor has finished doing whatever it was supposed to do and we want to take it out of the game world
+	public virtual void SoftRemoveActor()
+    {
+		//Explode and delete this in the process
+		((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
+		Destroy(gameObject);
+	}
+
 	public void NPClerp(Vector3 targetLoc, float pullSpeed)
 	{
 

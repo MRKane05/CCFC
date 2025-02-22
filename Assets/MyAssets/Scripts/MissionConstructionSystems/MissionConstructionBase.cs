@@ -66,6 +66,11 @@ public class MissionConstructionBase : MonoBehaviour {
 
     }
 
+	public virtual void RemoveActor(GameObject thisActor)
+    {
+
+	}
+
     flightGroup MakeFlight_Fighters(int team, int number)
     {
         flightGroup newFlight = new flightGroup();

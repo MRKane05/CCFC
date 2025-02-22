@@ -65,6 +65,5 @@ public class LevelControllerBase : MonoBehaviour {
 			Debug.Log("Did not Hit");
 		}
 		return point;   //Assume we didn't find anything so lets go ahead
-
 	}
 }

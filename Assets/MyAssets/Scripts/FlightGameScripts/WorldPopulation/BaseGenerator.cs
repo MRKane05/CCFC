@@ -18,8 +18,15 @@ public class BaseGenerator : MonoBehaviour {
 
 	public bool bGenerateBase = false;
 
+	public DestructableObject[] spawnedBaseObjects;
+
 	// Use this for initialization
-	void Start () {
+	public IEnumerator CreateBase () {
+		yield return null;//We really need to make a trigger after the terrain has finished building
+		if (baseParent)
+		{
+			DestroyImmediate(baseParent);   //Clear our old base
+		}
 		MakeStraightBase(Vector3.zero);
 	}
 
@@ -110,6 +117,17 @@ public class BaseGenerator : MonoBehaviour {
 					}
 				}
 			}
-		}		
-    }
+		}
+
+		//Ok, we should populate our objects for monitoring with the level gameplay
+		spawnedBaseObjects = baseParent.GetComponentsInChildren<DestructableObject>();	
+	}
+
+	public Vector3 getBomberTarget()
+    {
+		//For the moment lets return anything, although I'd like to advance this to try to return targets along a path
+		//We could also have values assigned to different targets and use those to assess mission success
+		return spawnedBaseObjects[Random.Range(0, spawnedBaseObjects.Length)].gameObject.transform.position;
+
+	}
 }

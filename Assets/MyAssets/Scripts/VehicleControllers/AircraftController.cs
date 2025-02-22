@@ -196,7 +196,15 @@ public class AircraftController : Actor {
 	}
 
 	public virtual void doVehicleSetup() {
-		groundCollider = GameObject.Find("Terrain").GetComponent<Collider>(); //this is used for our ground contact
+		
+		if (!groundCollider)
+        {
+			GameObject groundObject = GameObject.Find("Terrain");
+			if (groundObject)
+			{
+				groundCollider = groundObject.GetComponent<Collider>(); //this is used for our ground contact
+			}
+		}
 
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();

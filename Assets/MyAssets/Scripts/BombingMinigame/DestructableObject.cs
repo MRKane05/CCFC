@@ -69,5 +69,10 @@ public class DestructableObject : MonoBehaviour {
             newBurning.transform.SetParent(gameObject.transform);
             Destroy(newBurning, 15f); //Clear our burning, but later
         }
+
+        if (!destroyedObject && !liveObject)
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = false; //Turn this off so it's not visible
+        }
     }
 }
