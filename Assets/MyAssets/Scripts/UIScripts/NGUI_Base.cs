@@ -16,6 +16,7 @@ public class NGUI_Base : MonoBehaviour {
 	public NGUI_ObjectTracker targetDistanceMarker;
 
 	public NGUI_GameMessage ourGameMessage;
+	public NGUI_AIMessage ourPortraitMessage;
 
 	//this will need modified
 	public NGUI_firingTracker targetFiringMarker; //what we should shoot at with our target
@@ -44,6 +45,11 @@ public class NGUI_Base : MonoBehaviour {
 
 	public void setGameMessage(string newMessage) {
 		ourGameMessage.setMessage(newMessage);
+	}
+
+	public void setPortraitMessage(string newName, string newText, Color teamColor)
+    {
+		ourPortraitMessage.setMessage(newName, newText, teamColor);
 	}
 
 	public void assignWaypoint(GameObject thisWaypoint) {

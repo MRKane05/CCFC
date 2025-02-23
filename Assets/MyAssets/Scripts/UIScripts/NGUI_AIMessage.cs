@@ -11,6 +11,8 @@ public class NGUI_AIMessage : NGUI_GameMessage {
 		mesName.text = newName;
 		mesName.color = teamColor;
 		mesText.text = newText;
-		//should we sort out the duration here?
+
+		pingTime = Time.time;
+		attachedPanel.alpha = 1F; //put everything on!
 	}
 }

@@ -85,6 +85,17 @@ public class Mission_Bombers : MissionConstructionBase
         //And the base itself could do with a flight of aircraft to cover it (we need to get guns down for this operation)
         
         ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
+
+        //Ok, we could do with sending the player a message to direct them here
+        if (BombingTeam == enBombingTeam.PLAYER)
+        {
+            //NGUI_Base.Instance.setGameMessage("Protect our bombers!");
+            NGUI_Base.Instance.setPortraitMessage("Commander", "Protect our bombers!", Color.black);
+        } else
+        {
+            //NGUI_Base.Instance.setGameMessage("Enemy bombers incoming! Stop them!");
+            NGUI_Base.Instance.setPortraitMessage("Commander", "Incoming enemy bombers! Stop them!", Color.black);
+        }
     }
 
     //This'll need shifted to somewhere better
@@ -264,7 +275,7 @@ public class Mission_Bombers : MissionConstructionBase
     {
         if (missionClearedBombers >= totalBombers)
         {
-            Debug.LogError("Mission Cleared");
+            //This would be mission complete if we're attacking an emey base, so the trick here would be to add a countdown to say that we're done
         }
     }
 }

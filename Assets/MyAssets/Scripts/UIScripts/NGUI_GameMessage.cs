@@ -10,7 +10,7 @@ public class NGUI_GameMessage : MonoBehaviour {
 	protected float pingTime =-float.MaxValue; //when was this activated?
 
 	//and with this we begin the transfer over to the Unity GUI...
-	CanvasGroup attachedPanel;
+	protected CanvasGroup attachedPanel;
 	//UIPanel attachedPanel;
 	UnityEngine.UI.Text messageLabel;
 	//UILabel messageLabel;
