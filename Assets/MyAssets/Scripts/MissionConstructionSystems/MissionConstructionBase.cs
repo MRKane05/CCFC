@@ -27,7 +27,7 @@ public class flightGroup
 
 //Because we've made many of the elements of the game into mini-games we can really drill down what our missions will be and simplify things further here
 public class MissionConstructionBase : MonoBehaviour {
-
+	bool bWaitingToFinishMision = false;
 
     //We're going to have to start somewhere!
     IEnumerator Start() {
@@ -46,6 +46,21 @@ public class MissionConstructionBase : MonoBehaviour {
     {
 
     }
+
+	public void DelayFinishMission(bool bSuccess, float delayTime)
+    {
+		if (!bWaitingToFinishMision)
+		{
+			bWaitingToFinishMision = true;
+			StartCoroutine(DoDelayFinishMission(delayTime));
+		}
+    }
+
+	IEnumerator DoDelayFinishMission(float delayTime)
+    {
+		yield return new WaitForSeconds(delayTime);
+		((LevelController)LevelControllerBase.Instance).finishMatch(false);
+	}
 
     public virtual void ConstructMission()
     {
@@ -79,6 +94,7 @@ public class MissionConstructionBase : MonoBehaviour {
     }
 
 	#region Actor Construction Functions
+	/*
 	public static Vector2 Vec2Rotate(Vector2 v, float delta)
 	{
 		return new Vector2(
@@ -132,7 +148,7 @@ public class MissionConstructionBase : MonoBehaviour {
 		}
 
 		return newFlight;
-	}
+	}*/
 
 	#endregion
 }

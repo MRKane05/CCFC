@@ -32,6 +32,9 @@ public class Mission_Bombers : MissionConstructionBase
     {
         base.DoStart();
         GenerateMission(enBombingTeam.PLAYER);  //Our kick to setup
+
+        //We also need to figure out where we're placing our player
+        ((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position = ((LevelController)LevelControllerBase.Instance).getTerrainHeightAtPoint(((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
     }
 
     public void GenerateMission(enBombingTeam targetBombingTeam)
@@ -276,6 +279,11 @@ public class Mission_Bombers : MissionConstructionBase
         if (missionClearedBombers >= totalBombers)
         {
             //This would be mission complete if we're attacking an emey base, so the trick here would be to add a countdown to say that we're done
+            if (BombingTeam == enBombingTeam.PLAYER)
+            {
+                NGUI_Base.Instance.setPortraitMessage("Commander", "Bombing run complete!", Color.black);
+                DelayFinishMission(true, 5f);
+            }
         }
     }
 }

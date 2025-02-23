@@ -220,6 +220,59 @@ public class LevelController : LevelControllerBase {
 
 	}
 
+	public static Vector2 Vec2Rotate(Vector2 v, float delta)
+	{
+		return new Vector2(
+			v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
+			v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
+		);
+	}
+	public flightGroup AddFlightGroup(Vector3 dropPoint, float spawnRadius, float formationStagger, float awakeTime, int enemyCount, int team)
+	{
+		flightGroup newFlight = new flightGroup();
+
+		if (gameManager.Instance.bDebugEvents) { Debug.LogError("Triggering fighters Event"); }
+
+		Vector3 startPoint = dropPoint + new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-10, 10), Random.Range(-spawnRadius, spawnRadius)); //this is forward of the player, we're looking toward it I'd guess
+																																							   //This is Random for the moment
+		float startAngle = Random.Range(0f, 6.2831f);
+		Vector2 targetDir = Vec2Rotate(Vector2.right, Random.Range(0, startAngle));
+
+		Quaternion startQuat = Quaternion.Euler(0, startAngle, 0); //set this going on an intercept course with the chosen point
+		Quaternion transQuat = Quaternion.Euler(0, startAngle + 90, 0);
+
+		Vector3 patrolOffset = Vector3.zero;
+
+		//need to come up with some method to name the groups. At some stage we might be spawning multiple patrols out of this
+		string groupTag = "wayGoal_Group_" + Time.time.ToString("f0");
+
+		//so when we're putting enemies down it's in a triangle formation
+		for (int i = 0; i < enemyCount; i++)
+		{
+
+			if (i != 0)
+			{
+				if (i % 2 == 0)
+				{
+					patrolOffset = transQuat * Vector3.forward * formationStagger - startQuat * Vector3.forward * formationStagger;
+				}
+				else
+				{
+					patrolOffset = transQuat * -Vector3.forward * formationStagger - startQuat * Vector3.forward * formationStagger;
+				}
+			}
+
+			//Add this actor to our level controller so it'll show up on radar etc.
+			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.enemyPrefabList[0], team, startPoint + patrolOffset, startQuat, groupTag, null);
+			//Assign our AI actions for this fighter
+			((AI_Fighter)newActor.ourController).setPatrol(awakeTime); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			newFlight.addActor(newActor);
+
+		}
+
+		return newFlight;
+	}
+
 	public void AddFighterFlight(Vector3 generalLocation, float dropRadius, int numFighters, int team)
     {
 		float randomDirection = Random.Range(0F, 360F * Mathf.Deg2Rad);
@@ -503,9 +556,11 @@ public class LevelController : LevelControllerBase {
 
 		//createMatch(1, 0);
 		//StartCoroutine(DoBomberRunEnemies());
+		//StartCoroutine(DoBomberRunEnemies());
 		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
 		yield return null;
-		playerAircraft.transform.position = getTerrainHeightAtPoint(playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
+		//This needs to be handled in the mission construction
+		//playerAircraft.transform.position = getTerrainHeightAtPoint(playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
 	}
 	
 	//This needs another number to gauge the difficulity
