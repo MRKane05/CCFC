@@ -52,7 +52,7 @@ public class AircraftController : Actor {
 	//AI end stuff
 	Quaternion Rotation;
 
-	public Collider groundCollider; //our ground plane that we could be contacting with.
+	//public Collider groundCollider; //our ground plane that we could be contacting with.
 
 	//public float health=100F, maxHealth = 100F;
 	//really this should be at the actor level
@@ -119,11 +119,6 @@ public class AircraftController : Actor {
 	//we're getting a collision called from our base classes, handle accordingly
 	//make sure we're not colliding with a target sphere!
 	public override void doCollision(Collider withThis) {
-		//Debug.LogError("Adding Impact Jolt");
-
-		if (withThis.name == "Terrain")
-			Debug.Log ("Hit Terrain");
-			//return; //cancel this for the moment, we're working on contact stuff
 
 		//Do a jolt from the collision which will be added to the velocity
 		impactJolt = (transform.position-withThis.gameObject.transform.position); //get our impact offset
@@ -140,7 +135,10 @@ public class AircraftController : Actor {
 		impactJolt = resultingJolt.normalized*joltHit;
 
 		//check if this is a ground collider and if it is then put more punch up.
-		if (groundCollider && withThis == groundCollider) {
+		LayerMask groundLayer = LayerMask.NameToLayer("Ground");
+		if (withThis.gameObject.layer == 14)
+		{
+			Debug.LogError("Hit Ground");
 			//need to make sure that this is tangental to the ground.
 			Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
 			
@@ -149,7 +147,7 @@ public class AircraftController : Actor {
 			//float contactOffset = gameObject.collider.bounds.center.y + gameObject.collider.bounds.extents.y;
 			//Debug.Log ("Contact offset: " + gameObject.collider.bounds.min);
 			
-			if (groundCollider.Raycast (ray, out hit, 5)) {
+			if (withThis.Raycast (ray, out hit, 5)) {
 				transform.position = new Vector3(transform.position[0], Mathf.Max (hit.point[1] + AircraftModel.GetComponent<Collider>().bounds.extents.y, transform.position[1]), transform.position[2]);
 				impactJolt = hit.normal*mass; //jolt up at the angle of the terrain
 
@@ -199,7 +197,7 @@ public class AircraftController : Actor {
 	}
 
 	public virtual void doVehicleSetup() {
-		
+		/*
 		if (!groundCollider)
         {
 			GameObject groundObject = GameObject.Find("Terrain");
@@ -208,7 +206,7 @@ public class AircraftController : Actor {
 				groundCollider = groundObject.GetComponent<Collider>(); //this is used for our ground contact
 			}
 		}
-
+		*/
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
 		smokeEffect = gameObject.GetComponentInChildren<Emitter_Smoke>();
@@ -435,8 +433,9 @@ public class AircraftController : Actor {
 		transform.position+=impactJolt*Time.deltaTime; //handle out hit.
 		transform.RotateAround(transform.forward, -impactSpin*Time.deltaTime);
 
+		/*
 		if (groundCollider && bIsPlayerVehicle) //more only suitable for the player as I wouldn't want it updating continiously for the AI
-			checkGroundContacts();
+			checkGroundContacts();*/
 	
 	}
 	
@@ -464,28 +463,32 @@ public class AircraftController : Actor {
 		//some thing different? I suppose it'll have a bounce if we're coming in at an odd angle...
 		//Vector3 terrainLocation = Vector3.zero;
 		
-		Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
+		Ray ray = new Ray(transform.position + Vector3.up * 10f, -Vector3.up); //shoot this ray down to see where we contact
 		
 		RaycastHit hit;
 
-	//float contactOffset = gameObject.collider.bounds.center.y + gameObject.collider.bounds.extents.y;
-	//Debug.Log ("Contact offset: " + gameObject.collider.bounds.min);
+		//float contactOffset = gameObject.collider.bounds.center.y + gameObject.collider.bounds.extents.y;
+		//Debug.Log ("Contact offset: " + gameObject.collider.bounds.min);
 		//not sure about ditching here, but for the moment this should work
+		/*
 		if (groundCollider.Raycast (ray, out hit, 5)) {
 			//don't update the transform position if the normal from the ground is too dissimilar to the
 			//normal from the player aircraft's up vector
 			//Debug.Log ("Dot Normals: " + Vector3.Dot (hit.normal, AircraftModel.transform.up));
 			if (Vector3.Dot (hit.normal, AircraftModel.transform.up) > 0.9F) { //check to see that we're tangential to our ground (as in not a crash)
 				transform.position = new Vector3(transform.position[0], Mathf.Max (hit.point[1] + AircraftModel.GetComponent<Collider>().bounds.extents.y, transform.position[1]), transform.position[2]);
-		
+				Debug.Log("Doing Player Bump Reposition");
 			}
-		}
+		}*/
 		//}
 
 	}
 
 	//returns (unrealistically) our altitude above the current terrain
+	
 	public float checkAltitude() {
+		//This needs to be a raycast down against the ground channel
+		/*
 		if (!groundCollider) { return 100;  }
 		Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
 		
@@ -494,7 +497,7 @@ public class AircraftController : Actor {
 		if (groundCollider.Raycast(ray, out hit, float.MaxValue)) {
 			return hit.distance;
 		}
-
+		*/
 		return -1f; //no update...
 	}
 

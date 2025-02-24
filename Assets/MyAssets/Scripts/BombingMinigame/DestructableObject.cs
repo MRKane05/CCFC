@@ -15,7 +15,7 @@ public class DestructableObject : MonoBehaviour {
     {
         if (!liveObject || !destroyedObject)
         {
-            Debug.Log("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");
+            //Debug.Log("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");
         }
         //Set our necessary states
         if (liveObject && destroyedObject)
