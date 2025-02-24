@@ -6,7 +6,7 @@ public class Actor : MonoBehaviour {
 	public MissionEventObject owner;
 	public bool bIsPlayerVehicle=false;
 	public int team = 0; //0 friendly 1 enemy (for this anyway)
-	protected float speed=6;
+	public float speed=6;
 	public float hitSphere = 1.2F; //what is our hit area?
 	public bool bIsTarget=false; //is the player targeting this?
 	protected bool bFiring, bLastFiring; //Our firing mechs
@@ -102,7 +102,6 @@ public class Actor : MonoBehaviour {
 	}
 	
 	public void UpdateInput(float newPitch, float newRoll, float newYaw, float newThrottle, bool bIsFiring, int iFireState) {
-		//print ("Called Update");
 		pitch=newPitch; //positive is down
 		roll=newRoll; //Positive is left
 		yaw=newYaw;

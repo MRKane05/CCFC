@@ -5,7 +5,7 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 	public GameObject viewCenter, ownerAircraft; //similar to target center.
 	public float lookSpring=3, lookSnap=6;
-	float StartDistance=7; //should actually calculate this off the bounds size of what we're looking at
+	public float StartDistance=7; //should actually calculate this off the bounds size of what we're looking at
 	public float viewElevation=1;
 	private Quaternion lookRotation;
 	// Use this for initialization

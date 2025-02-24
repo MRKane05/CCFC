@@ -277,7 +277,7 @@ public class LevelController : LevelControllerBase {
     {
 		float randomDirection = Random.Range(0F, 360F * Mathf.Deg2Rad);
 		Vector3 patrolStart = generalLocation + new Vector3(Mathf.Sin(randomDirection) * dropRadius, Random.Range(-dropRadius / 4F, dropRadius / 4F), Mathf.Cos(randomDirection) * dropRadius);
-
+		patrolStart = getTerrainHeightAtPoint(patrolStart);
 
 		//need to calc what our directional stuff is for this group
 		Vector2 targetDir = new Vector2(patrolStart[0] + Random.Range(-100, 100), patrolStart[2] + Random.Range(-100, 100));

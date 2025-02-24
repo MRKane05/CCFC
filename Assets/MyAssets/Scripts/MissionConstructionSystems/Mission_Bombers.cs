@@ -28,6 +28,10 @@ public class Mission_Bombers : MissionConstructionBase
 
     public int missionClearedBombers = 0;
 
+
+    //Handlers for spawning enemy fighters over the base
+    int nextMinSpawnCount = 2;	//At what number of planes remaining will we spawn more?
+    float levelStartTime = 0;
     public override void DoStart()
     {
         base.DoStart();
@@ -68,17 +72,17 @@ public class Mission_Bombers : MissionConstructionBase
 
         //IDEA Add in an optional requirement to clear the airspace before bombers will approach
         //So we need to know if we should be protecting the bombers or stopping them. Both will have diffferent implications
-        totalBombers = 1;// Random.Range(3, 11); //Of course this'll require a setting for difficulty to be passed through
+        totalBombers = Random.Range(3, 11); //Of course this'll require a setting for difficulty to be passed through
         missionClearedBombers = 0;
-        Debug.Log("Total Bombers: " + totalBombers);
+        //Debug.Log("Total Bombers: " + totalBombers);
         int numBombers = 0;
-        int numGroups = 1;
-        float currentSpawnIn = Random.Range(30f, 45f);
+        int numGroups = Random.Range(1, totalBombers/3);
+        float currentSpawnIn = 3f * Random.Range(30f, 45f);
         //I really don't like while loops...
         for (int i=0; i<numGroups; i++)
         {
-            currentSpawnIn += 3 * i * Random.Range(15f, 35f);   //Really the spawn in range is speed by time, and it'll also vary depending on this being an escort or defense
-            int bombersInGroup = 1; // Mathf.Clamp(Random.Range(1, 4), 1, totalBombers-1);
+            currentSpawnIn += 3f * i * Random.Range(15f, 35f);   //Really the spawn in range is speed by time, and it'll also vary depending on this being an escort or defense
+            int bombersInGroup = Mathf.Clamp(Random.Range(1, 4), 1, totalBombers);  //This needs to really put down our expected number of bombers...
             numBombers += bombersInGroup;
             AddTargetBombers(ourBaseGenerator.getBomberTarget(), currentSpawnIn, bombersInGroup);
         }
@@ -86,7 +90,6 @@ public class Mission_Bombers : MissionConstructionBase
         //Ok new idea. We need to add bombers in a way that they'll be flying over in waves. The mission is complete if all bombers are downed, or when all payloads are cleared
 
         //And the base itself could do with a flight of aircraft to cover it (we need to get guns down for this operation)
-        
         ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
 
         //Ok, we could do with sending the player a message to direct them here
@@ -99,6 +102,8 @@ public class Mission_Bombers : MissionConstructionBase
             //NGUI_Base.Instance.setGameMessage("Enemy bombers incoming! Stop them!");
             NGUI_Base.Instance.setPortraitMessage("Commander", "Incoming enemy bombers! Stop them!", Color.black);
         }
+
+        levelStartTime = Time.time;
     }
 
     //This'll need shifted to somewhere better
@@ -253,9 +258,17 @@ public class Mission_Bombers : MissionConstructionBase
     public override void DoUpdate()
     {
         base.DoUpdate();
-        
-        //So something we need is to be able to add groups of bombers so that there are ongoing waves. Of course this'll also mean clearing out the other bombers we've got if they're not destroyed
 
+        //So if we're over an enemy base we're going to need to keep spawning in fighters to harass the player and the bombers
+        if (BombingTeam == enBombingTeam.PLAYER)
+        {
+            if (((LevelController)LevelControllerBase.Instance).enemyList.Count < nextMinSpawnCount && Time.time - levelStartTime > 5f) //Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
+            {
+                nextMinSpawnCount = Random.Range(1, 3);
+                //NOTE: We need our base position for this. For the moment lets just assume world zero
+                ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
+            }
+        }
     }
 
     public void BomberReturnState(enMissionState newState)

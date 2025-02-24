@@ -30,10 +30,8 @@ public class GunnerGameModeHandler : MissionConstructionBase {
 		//Check to see if we should keep adding enemies into the level to harass the player
 		if (((LevelController)LevelControllerBase.Instance).enemyList.Count < nextMinSpawnCount && Time.time-levelStartTime > 5f)	//Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
         {
+			nextMinSpawnCount = Random.Range(1, 3);
 			((LevelController)LevelControllerBase.Instance).AddFlightGroup(PlayerController.Instance.ourAircraft.transform.position, 30f, 3f, Random.Range(0f, 1f), Random.Range(2, 4), 1); //Add a fighter group, and have it on the player immediately
-			//AddFlightGroup(PlayerController.Instance.ourAircraft.transform.position, 30f, 3f, Random.Range(0f, 1f), Random.Range(2, 4), 1); //Add a fighter group, and have it on the player immediately
-			//((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
-
 		}
 
 		if (Time.time-levelStartTime > levelDuration && !bNextLevelLoading)

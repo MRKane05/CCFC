@@ -52,7 +52,7 @@ public class LevelControllerBase : MonoBehaviour {
 		RaycastHit hit;
 		LayerMask maskAll = 0x01 << LayerMask.NameToLayer("Ground");	//We only want to cast against the terrain
 		// Does the ray intersect any objects excluding the player layer
-		if (Physics.Raycast(point + Vector3.up * 2000f, -Vector3.up, out hit, Mathf.Infinity, maskAll))
+		if (Physics.Raycast(point + Vector3.up * 5000f, -Vector3.up, out hit, Mathf.Infinity, maskAll))
 
 		{
 			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);

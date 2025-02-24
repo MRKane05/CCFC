@@ -18,7 +18,10 @@ public class AircraftController : Actor {
                                                 //these wil
     #region Aircraft Properties For Player Control
     public float mass = 7;
-	public float MaxAirSpeed = 6;
+	public float OverdriveAirSpeed = 10f;
+	public float MaxAirSpeed = 6f;
+	public float SlowAirSpeed = 2f;
+
 	public float StallSpeed = 1.5F;
 //	public float rollspeed = 1.5F;		//Used by the AI for doing turns
 //	public float pitchspeed = 1.5F;
@@ -26,8 +29,8 @@ public class AircraftController : Actor {
 	public float throttlespeed=0.5F;
 	#endregion
 
-	float throttle =0.75F, gravity=7, thrust=8, thrustPower = 30f, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
-
+	float throttle =0.75F, gravity=7, thrustPower = 30f, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
+	float thrust=8;
 	float enginePitchMin = 0.6f, enginePitchMax = 1.4f;
 	Engine[] engines; //well this is either as simple or as complicated as we want to make it really...
 
@@ -230,30 +233,34 @@ public class AircraftController : Actor {
 			ourMat = AircraftMesh.GetComponent<Renderer>().material; //and make a dupe of it
 	}
 
-	
+	float PlayerSpeedChange(float targetSpeed, bool bDoingBoost)
+	{
+		//Debug.Log("Speed: " + speed + " targetSpeed: " + targetSpeed);
+		//thrust, gravity
+		GravityVector = transform.forward.normalized;
+		float SpeedChange = 0;
+		//This needs to take into account overdrive and drag
+		if (speed > targetSpeed)
+		{ //then we're wanting to go slower.
+			SpeedChange = (-thrust - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+		}
+		else
+		{ //So I suppose this is to accellerate...
+			SpeedChange = (thrust - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+		}
+
+		if (bDoingBoost)
+        {
+			return SpeedChange * 9f;	//Really kick it!
+        }
+
+		return SpeedChange * 4f;	//Just try multiplying it to see if it'll be more responsive
+	}
+
 	float SpeedChange() {
 		//thrust, gravity
 		GravityVector = transform.forward.normalized;
-		//print (GravityVector);
-		
-		//some way of knowing if we need to speed up or slow down?
-		// thrust-(expectedSpeed) ..which will mean we speed up or slow down according
-		//expected speed = MaxSpeed*throttle. if we're below this we need to speed up, otherwise we need to slow down.
-		//if we're going too slow we need to apply the speed of accelleration
-		//check to see if we're going down here...
-		
-		//need to do an engine thing and recovery curve etc?
-		//if we're pointing down we should increase speed reguardless of our throttle.
-		//But up until we hit Maximum.
 
-		//All of this system is very well but I'm inclined to think that it's not quite what I want for an "arcade" control...
-
-		/*
-		if (GravityVector.y < 0) { //then we're going downhill
-			return (thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass; //we'll be increasing regardless	
-		}
-		else{
-		*/
 		//this does mean that we can over power our system...
 		if (speed > MaxAirSpeed*throttle) { //then we're wanting to go slower.
 			return (-thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass;
@@ -261,10 +268,6 @@ public class AircraftController : Actor {
 		else { //So I suppose this is to accellerate...
 			return (thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass;
 		}
-		//}
-
-
-
 		return 0;
 	}
 	
@@ -342,15 +345,40 @@ public class AircraftController : Actor {
 			}
 		}
 
-		//Adjust throttle...
-		throttle = Mathf.Clamp01(throttle+throttleControl*throttlespeed*Time.deltaTime); //for the moment keep it conformed.
-		
-		//This calculates our speed through the air dependend upon our angles etc.
-		speed = Mathf.Clamp(speed + SpeedChange() * Time.deltaTime, 0, MaxAirSpeed*1.2F);
-		//speed += SpeedChange()*Time.deltaTime; //we don't need any variables as they're part of the class.
+		if (isNPC)
+		{
+			//Adjust throttle...
+			throttle = Mathf.Clamp01(throttle + throttleControl * throttlespeed * Time.deltaTime); //for the moment keep it conformed.
+																								   //This calculates our speed through the air dependend upon our angles etc.
+			speed = Mathf.Clamp(speed + SpeedChange() * Time.deltaTime, 0, MaxAirSpeed * 1.2F);
+		} else
+        {
+			float targetSpeed = MaxAirSpeed; //we need something to get the speed of our target
+			
+			if (ourPlayerController.target != null)
+            {
+				float EngageDistance = 10f;
+				if (Vector3.SqrMagnitude(gameObject.transform.position - ourPlayerController.target.transform.position) < EngageDistance * EngageDistance)
+                {
+					Debug.Log("Within engage distance");
+					Actor targetActor = ourPlayerController.target.GetComponent<Actor>();
+					if (targetActor)
+                    {
+						targetSpeed = targetActor.getSpeed();
+                    }
+                }
+            }
 
-		//first try setting engine pitch based off the speed of the aircraft...
-		//Debug.Log ("Throttle: " + throttle);
+			if (throttleControl > 0.5f)
+            {
+				targetSpeed = OverdriveAirSpeed;
+            } else if (throttleControl < -0.5f)
+            {
+				targetSpeed = SlowAirSpeed;
+            }
+			speed = Mathf.Clamp(speed + PlayerSpeedChange(targetSpeed, throttleControl > 0.5f) * Time.deltaTime, 0, OverdriveAirSpeed);	//Why do we have the 1.2f here?
+		}
+		
 
 		for (int i=0; i< engines.Length; i++) {
 			engines[i].setPitch(((speed-StallSpeed)/((MaxAirSpeed-StallSpeed))+throttle)*0.5f); //almost doesn't seem dynamic enough...

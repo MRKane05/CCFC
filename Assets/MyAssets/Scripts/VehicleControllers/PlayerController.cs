@@ -66,7 +66,7 @@ public class PlayerController : ActorController {
 		
 		
 		//Boot up our joysticks
-		
+		/*
 		ourJoySticks = new GameObject[JoyStickConstraints.Length];
 		ourJoyMP = new VirtualJoystick[JoyStickConstraints.Length];
 		for (int i=0; i<JoyStickConstraints.Length; i++) { //go through and assign our sticks!
@@ -76,7 +76,7 @@ public class PlayerController : ActorController {
 			ourJoyMP[i].SetupStick(JoyStickConstraints[i]); //and finally set our stick up so that it's "real"
 			ourJoyMP[i].ourGUIText = JoyMessageTexts[i];
 		}
-		
+		*/
 	
 	}
 	
@@ -87,8 +87,7 @@ public class PlayerController : ActorController {
 		//update our health bar
 		NGUI_Base.Instance.assignHealth(damageProp);
 
-		//remember to jolt the camera
-		
+		//remember to jolt the camera		
 		
 	} //really just a notification class that can be passed up to the AI
 
@@ -159,12 +158,12 @@ public class PlayerController : ActorController {
 		//base function...make sure we've a target if there are targets (auto switch)
 		if (!target) {
 			if (((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
-	((LevelController)LevelControllerBase.Instance).requestTarget(this); //populate our target system
+				((LevelController)LevelControllerBase.Instance).requestTarget(this); //populate our target system
 			}
 		}
 		else { //we've got a target
 			if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count > 1) {
-	((LevelController)LevelControllerBase.Instance).requestTarget(this); //we tagged out our prior fighter, call a new target
+				((LevelController)LevelControllerBase.Instance).requestTarget(this); //we tagged out our prior fighter, call a new target
 			}
 
 			//is getting an error when the enemies run out...
