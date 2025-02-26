@@ -209,7 +209,7 @@ public class AircraftController : Actor {
 		*/
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
-		smokeEffect = gameObject.GetComponentInChildren<Emitter_Smoke>();
+		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
 
 		//thrust should be calculated as the maximum angle the aircraft can climb without loosing altitude...
 		thrust = Mathf.Sin(thrustPower * Mathf.Deg2Rad) * gravity; //although this is also a measure of the "power" of an engine...
@@ -237,20 +237,22 @@ public class AircraftController : Actor {
 		//thrust, gravity
 		GravityVector = transform.forward.normalized;
 		float SpeedChange = 0;
-		//This needs to take into account overdrive and drag
-		if (speed > targetSpeed)
-		{ //then we're wanting to go slower.
-			SpeedChange = (-thrust - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+		if (bDoingBoost)	//Ignore gravity while we're boosting
+		{
+			SpeedChange = speed < OverdriveAirSpeed ? thrust * 3f : -thrust * 3f;
 		}
 		else
-		{ //So I suppose this is to accellerate...
-			SpeedChange = (thrust - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+		{
+			//This needs to take into account overdrive and drag
+			if (speed > targetSpeed)
+			{ //then we're wanting to go slower.
+				SpeedChange = (-thrust*2f - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+			}
+			else
+			{ //So I suppose this is to accellerate...
+				SpeedChange = (thrust - Mathf.Abs(GravityVector.y) * GravityVector.y * gravity) / mass;
+			}
 		}
-
-		if (bDoingBoost)
-        {
-			return SpeedChange * 9f;	//Really kick it!
-        }
 
 		return SpeedChange * 4f;	//Just try multiplying it to see if it'll be more responsive
 	}
@@ -285,19 +287,7 @@ public class AircraftController : Actor {
 				//doExplode(); //whack this.
 				bIsDead=true;
 				applyShotDown();
-				//we can't remove this as it'll mean the player can't shoot it...
-				//((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //but our targeting system needs to know I suppose
-				//Destroy (gameObject); //Just destroy it for now
 			}
-			/*
-			if (health<-maxHealth/2) { //then destroy this aircraft fully for whatever reason
-				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-		((LevelController)LevelControllerBase.Instance).addMurder(); //not a good thing actually, and we're counting it
-
-	((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
-				Destroy (gameObject);
-			}
-			*/
 		}
 		
 		//Need to tell our controller that we're taking damage...
@@ -367,10 +357,7 @@ public class AircraftController : Actor {
                 }
             }
 
-			if (throttleControl > 0.5f)
-            {
-				targetSpeed = OverdriveAirSpeed;
-            } else if (throttleControl < -0.5f)
+			if (throttleControl < -0.5f)
             {
 				targetSpeed = SlowAirSpeed;
             }
@@ -400,27 +387,7 @@ public class AircraftController : Actor {
 		//Debug.Log (transform.localRotation.eulerAngles);
 		//Shoot our aircraft down...
 		if (bIsDead) {
-			//roll commands
-			//transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
-			//pitch commands
-
-			//We want to have this one pointing down...
-			//transform.RotateAroundLocal(transform.right, pitch*pitchspeed*Time.deltaTime);
-			//Make this tend toward "down" as a general direction
-			//Need to graduate this so that the force increases as damage is dealt - that way we can actually fight to keep the aircraft flying
-
-			//back off on the force here so that the AI can ditch
-			/*
-			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, c*Time.deltaTime*02f);
-			else
-				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*02f);
-			*/
-			AircraftDeathSpiral();
-			//yaw commands
-			//transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
-			//throttle details
-			
+			AircraftDeathSpiral();			
 		}
 		
 		impactJolt = Vector3.Lerp(impactJolt, Vector3.zero, Time.deltaTime*joltDecay);
@@ -434,7 +401,7 @@ public class AircraftController : Actor {
 		transform.RotateAround(transform.forward, -impactSpin*Time.deltaTime);
 
 		/*
-		if (groundCollider && bIsPlayerVehicle) //more only suitable for the player as I wouldn't want it updating continiously for the AI
+		if (groundCollider && bIsPlayerVehicle) //The new collisions system should handle this
 			checkGroundContacts();*/
 	
 	}

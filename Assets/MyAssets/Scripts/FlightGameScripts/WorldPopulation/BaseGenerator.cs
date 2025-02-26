@@ -20,6 +20,9 @@ public class BaseGenerator : MonoBehaviour {
 
 	public DestructableObject[] spawnedBaseObjects;
 
+	//because we need some concept of where the center of the base is
+	public Vector3 BaseCenterPoint = Vector3.zero;
+
 	// Use this for initialization
 	public IEnumerator CreateBase () {
 		yield return null;//We really need to make a trigger after the terrain has finished building
@@ -120,7 +123,15 @@ public class BaseGenerator : MonoBehaviour {
 		}
 
 		//Ok, we should populate our objects for monitoring with the level gameplay
-		spawnedBaseObjects = baseParent.GetComponentsInChildren<DestructableObject>();	
+		spawnedBaseObjects = baseParent.GetComponentsInChildren<DestructableObject>();
+
+		//Quick and dirty calculation for our center point. Really we should get a size value too, but I'll worry about that later
+		BaseCenterPoint = Vector3.zero;
+		foreach (DestructableObject thisObject in spawnedBaseObjects)
+        {
+			BaseCenterPoint += thisObject.gameObject.transform.position;
+        }
+		BaseCenterPoint /= (float)spawnedBaseObjects.Length;
 	}
 
 	public Vector3 getBomberTarget()

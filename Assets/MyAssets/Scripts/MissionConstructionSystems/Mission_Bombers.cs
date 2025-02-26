@@ -16,6 +16,8 @@ public class Mission_Bombers : MissionConstructionBase
 
     public List<actorWrapper> activeBombers = new List<actorWrapper>();
 
+    public Range fighterSpawnHeight = new Range(30, 50);
+
     //Ok, so now I've got to figure out how I'd go about adding in bombers flying in formation
     //Really I'd like to have aircraft in diamond formation (even though this wasn't a thing until WW11
     float formationDistance = 20;   //This should become public for tweaking
@@ -28,6 +30,17 @@ public class Mission_Bombers : MissionConstructionBase
 
     public int missionClearedBombers = 0;
 
+    public List<Vector3> bomberGroupLocations = new List<Vector3>();
+
+    float GetBomberHeight()
+    {
+        Vector3 AveragePosition = Vector3.zero;
+        foreach (Vector3 thisPos in bomberGroupLocations)
+        {
+            AveragePosition += thisPos;
+        }
+        return (AveragePosition /= (float)bomberGroupLocations.Count).y;
+    }
 
     //Handlers for spawning enemy fighters over the base
     int nextMinSpawnCount = 2;	//At what number of planes remaining will we spawn more?
@@ -78,6 +91,9 @@ public class Mission_Bombers : MissionConstructionBase
         int numBombers = 0;
         int numGroups = Random.Range(1, totalBombers/3);
         float currentSpawnIn = 3f * Random.Range(30f, 45f);
+
+
+
         //I really don't like while loops...
         for (int i=0; i<numGroups; i++)
         {
@@ -87,28 +103,44 @@ public class Mission_Bombers : MissionConstructionBase
             AddTargetBombers(ourBaseGenerator.getBomberTarget(), currentSpawnIn, bombersInGroup);
         }
 
+
+        //Position our player accordingly
+        if (BombingTeam == enBombingTeam.PLAYER)
+        {
+            //This method is fine if we need to do a fighter clear. It's not fine for spawning in bomber escort
+            /*
+            Vector3 newPlayerPosition = ourBaseGenerator.getBomberTarget() + Quaternion.AngleAxis(generalIncomingAngle, Vector3.up) * Vector3.forward * (currentSpawnIn + 30f);
+            newPlayerPosition = LevelController.Instance.getTerrainHeightAtPoint(newPlayerPosition) + Vector3.up * Random.Range(30f, 60f);
+            */
+
+            ((LevelController)LevelControllerBase.Instance).SetPlayerPosition(bomberGroupLocations[Random.Range(0, bomberGroupLocations.Count)] + Vector3.up * 10f + Quaternion.AngleAxis(generalIncomingAngle, Vector3.up) * Vector3.forward * 30f, generalIncomingAngle);
+
+        }
+
+
         //Ok new idea. We need to add bombers in a way that they'll be flying over in waves. The mission is complete if all bombers are downed, or when all payloads are cleared
 
         //And the base itself could do with a flight of aircraft to cover it (we need to get guns down for this operation)
-        ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
+        ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.BaseCenterPoint), fighterSpawnHeight.GetRandom(), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
 
         //Ok, we could do with sending the player a message to direct them here
         if (BombingTeam == enBombingTeam.PLAYER)
         {
-            //NGUI_Base.Instance.setGameMessage("Protect our bombers!");
             NGUI_Base.Instance.setPortraitMessage("Commander", "Protect our bombers!", Color.black);
         } else
         {
-            //NGUI_Base.Instance.setGameMessage("Enemy bombers incoming! Stop them!");
             NGUI_Base.Instance.setPortraitMessage("Commander", "Incoming enemy bombers! Stop them!", Color.black);
         }
 
         levelStartTime = Time.time;
     }
 
+    Vector3 averagePosition = Vector3.zero;
     //This'll need shifted to somewhere better
     public virtual void AddTargetBombers(Vector3 thisTargetLocation, float spawnInRange, int numBombers)
     {
+        averagePosition = Vector3.zero;
+
         //int addedBombers = 4;   //Start at 1 for our primary bomber
         float CruiseHeight = bomberHeight.GetRandom();
         //So basically we need to spawn some bombers in, and assemble a path for them to fly to the target
@@ -116,6 +148,7 @@ public class Mission_Bombers : MissionConstructionBase
         Vector3 spawnLocation = thisTargetLocation + Quaternion.AngleAxis(incomingAngle, Vector3.up) * Vector3.forward * spawnInRange;
         
         spawnLocation = LevelController.Instance.getTerrainHeightAtPoint(spawnLocation) + Vector3.up * (CruiseHeight + bomberHeightVariation.GetRandom());
+        averagePosition += spawnLocation;
         //So...our points
         int numIncomingPoints = Random.Range(1, 3); //This will control how much our flightpath will vary up to the target point
         List<Vector3> flightPoints = new List<Vector3>();
@@ -185,6 +218,9 @@ public class Mission_Bombers : MissionConstructionBase
         {
             addFormationBomber(new Vector3(0, 0, formationDistance*2f), spawnLocation, startQuat, flightPoints, thisTargetLocation);
         }
+
+        averagePosition /= numBombers;
+        bomberGroupLocations.Add(averagePosition);
     }
 
     void addFormationBomber(Vector3 formationPosition, Vector3 baseSpawnLocation, Quaternion startRotation, List<Vector3> pathPoints, Vector3 baseTargetPosition)
@@ -200,6 +236,7 @@ public class Mission_Bombers : MissionConstructionBase
         GameObject newPoint = new GameObject("Formation Start");
         float angleToNext = 0;
         newPoint.transform.position = baseSpawnLocation + startRotation * formationPosition;
+        averagePosition += baseSpawnLocation + startRotation * formationPosition;
         if (bomberController)
         {
             List<Vector3> offsetPathPoints = new List<Vector3>();
@@ -266,7 +303,7 @@ public class Mission_Bombers : MissionConstructionBase
             {
                 nextMinSpawnCount = Random.Range(1, 3);
                 //NOTE: We need our base position for this. For the moment lets just assume world zero
-                ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.baseParent.transform.position) + Vector3.up * Random.Range(20f, 50f), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
+                ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(ourBaseGenerator.BaseCenterPoint), fighterSpawnHeight.GetRandom(), 20f, Random.Range(2, 4), BombingTeam == enBombingTeam.PLAYER ? 1 : 0); //These are for base defense
             }
         }
     }

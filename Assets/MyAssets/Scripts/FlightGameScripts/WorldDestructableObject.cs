@@ -8,7 +8,7 @@ public class WorldDestructableObject : DestructableObject {
     public override void TakeDamage(float damageAmount)
     {
         Health -= damageAmount;
-        Debug.Log("Health: " + Health + " Damage: " + damageAmount);
+        //Debug.Log("Health: " + Health + " Damage: " + damageAmount);
         if (Health <= 0 && !bDestroyed)
         {
             DoDestroy();

@@ -57,8 +57,6 @@ public class PathAircraft : Actor {
             //Inform our mission controller of something having happened with us
         }
         ((Mission_Bombers)ourMissionConstructor).BomberReturnState(newState);
-        
-
     }
 
     void Update()
@@ -176,6 +174,8 @@ public class PathAircraft : Actor {
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay)
 	{
         base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
+        checkSmokeSystem(health / maxHealth);
+
         //PROBLEM: We need to update the players UI just for this particular type of aircraft (this is going to get screwy when we add more than one, but for the moment it's getting things on the ground)
         float damageProp =health / maxHealth;
         if (health <= 0 && !bIsDead)
@@ -193,6 +193,49 @@ public class PathAircraft : Actor {
             {
                 bIsDead = true;
                 ((LevelController)LevelControllerBase.Instance).finishMatch(true);  //Handle our die state
+            }
+        }
+    }
+
+    int smokeStage = 0;
+    int smokeStages = 0;
+    //because we're dealing with something that now has two engines we've got to distribute the smoke in such a way as to reflect what our health is between the two engines
+    public override void checkSmokeSystem(float newHealthRatio)
+    { //pinged with take Damage
+        Debug.Log("checking smoke system");
+        if (smokeEffects.Length == 0)
+            return; //we've got nothing to smoke
+        smokeStages = smokeEffects.Length * 2 + 1;
+        //Basically I want to have one engine smoke grey, then both, then one black, and then both, and then both on fire when it's going in
+        float smokeStageThreshold = (float)smokeStage / (float)smokeStages;
+        if (1f-newHealthRatio > smokeStageThreshold)
+        {
+            smokeStage++; //increment our stage
+            //Select something to upgrade it...
+            //Will we ever have anything with more than 2 engines?
+            smokeEffects[0].setEmitState(smokeStage > 0, smokeStage >= 3 ? Color.black : Color.grey);
+            smokeEffects[1].setEmitState(smokeStage > 1, smokeStage >= 4 ? Color.black : Color.grey);
+
+            //I really don't want a bunch of if statements, but here we are...
+            GameObject newPop;
+            switch (smokeStage)
+            {               
+                case 1:
+                    newPop = Instantiate(popEffects[0], smokeEffects[0].transform.position, smokeEffects[0].transform.rotation);
+                    Destroy(newPop, 2f);
+                    break;
+                case 2:
+                    newPop = Instantiate(popEffects[0], smokeEffects[1].transform.position, smokeEffects[1].transform.rotation);
+                    Destroy(newPop, 2f);
+                    break;
+                case 3:
+                    newPop = Instantiate(popEffects[1], smokeEffects[0].transform.position, smokeEffects[0].transform.rotation);
+                    Destroy(newPop, 2f);
+                    break;
+                case 4:
+                    newPop = Instantiate(popEffects[1], smokeEffects[1].transform.position, smokeEffects[1].transform.rotation);
+                    Destroy(newPop, 2f);
+                    break;
             }
         }
     }

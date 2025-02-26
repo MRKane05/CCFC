@@ -452,22 +452,20 @@ public class AI_Fighter : ActorController {
 		}
 		//groundCollider should be a global.
 		//PROBLEM: Need to fix the ground collider settings here
-		/*
-		if (ourAircraft.groundCollider) { //check for the possiblity of needing to evade
+		
+		
+		Ray ray = new Ray(ourAircraft.transform.position, Vector3.Lerp(ourAircraft.transform.forward, -Vector3.up, 0.3F)); //shoot this ray down to see where we contact
+		Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
+		RaycastHit hit;
 
-			Ray ray = new Ray(ourAircraft.transform.position, Vector3.Lerp(ourAircraft.transform.forward, -Vector3.up, 0.3F)); //shoot this ray down to see where we contact
-			Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
-			RaycastHit hit;
-
-			if (ourAircraft.groundCollider.Raycast (ray, out hit, 7)) { //not sure about the distance required here...
-				//we want this fighter to turn in the direction most fitting for the evade - it'll be a
-				//rotation around the least path to up...amazing how this is like the origional CC AI.
-				//Debug.Log ("Ground Avoid");
-				ourAircraft.AIUpdateInput(Quaternion.Euler(Vector3.up), aircraftYaw, targetSpeed, bIsFiring);
-				return;
-			}
+		if (Physics.Raycast(ray, 7f, LevelControllerBase.Instance.GroundMask)) {// ourAircraft.groundCollider.Raycast (ray, out hit, 7)) { //not sure about the distance required here...
+			//we want this fighter to turn in the direction most fitting for the evade - it'll be a
+			//rotation around the least path to up...amazing how this is like the origional CC AI.
+			//Debug.Log ("Ground Avoid");
+			ourAircraft.AIUpdateInput(Quaternion.Euler(Vector3.up), aircraftYaw, targetSpeed, bIsFiring);
+			return;
 		}
-		*/
+		
 		//maybe not the best place?
 		bIsFiring = bFireOnTarget(); //so this will return if we should be shooting at our target 
 
@@ -666,7 +664,7 @@ public class AI_Fighter : ActorController {
 		//===========Target Seeking Functions...======================
 		//if (false) {
 		//This needs to be leading the target to be proper
-		if (targetController==null) { //For non-AI stuff we're dealing with our target lead methods...
+		if (targetController==null || target == null) { //For non-AI stuff we're dealing with our target lead methods...
 			transform.LookAt(target.transform.position,Vector3.up); //we can have our GameObject do this as it's a child of the aircraft
 		}
 		else { //we've got a controller so lead it

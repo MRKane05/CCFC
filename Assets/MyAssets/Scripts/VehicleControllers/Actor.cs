@@ -22,7 +22,7 @@ public class Actor : MonoBehaviour {
 	//protected ParticleAnimator ourSmokeAnimator; //used for the...well the animation of the smoke colors!
 
 	protected Emitter_Hit hitEffect; //usually we've got a hit effect or so
-	protected Emitter_Smoke smokeEffect; //because most things will smoke
+	public Emitter_Smoke[] smokeEffects; //because most things will smoke
 
 	public GameObject[] popEffects;
 	public GameObject explosionEffect; //because this'll be different depending on which vehicle we are
@@ -44,7 +44,7 @@ public class Actor : MonoBehaviour {
 
 	void Start() {
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
-		smokeEffect = gameObject.GetComponentInChildren<Emitter_Smoke>();
+		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
 
 		inFadeStart = Time.deltaTime;
 		DoStart();
@@ -113,18 +113,14 @@ public class Actor : MonoBehaviour {
 	protected int popStage = 0;
 
 	public virtual void checkSmokeSystem(float newHealthRatio) { //pinged with take Damage
-		if (!smokeEffect)
+		if (smokeEffects.Length == 0)
 			return; //we've got nothing to smoke
-		/*
-		if (!ourSmokeAnimator) {
-			ourSmokeAnimator = ourSmokeEmitter.gameObject.GetComponent<ParticleAnimator>();
-		}
-		*/
+
 		//so what are our levels for the system?
 		//check our brackets!
 		if (newHealthRatio > 0.33F && newHealthRatio < 0.66F && popStage!=1) {
 
-			smokeEffect.setEmitState(true, Color.gray);
+			smokeEffects[0].setEmitState(true, Color.gray);
 
 			popStage = 1;
 
@@ -134,7 +130,7 @@ public class Actor : MonoBehaviour {
 		}
 		else if (newHealthRatio < 0.33F && popStage != 2) {
 			//ourSmokeEmitter.emit = true; //set this to emit!
-			smokeEffect.setEmitState(true, Color.black);
+			smokeEffects[0].setEmitState(true, Color.black);
 
 			popStage = 2;
 

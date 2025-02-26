@@ -19,8 +19,8 @@ public class Bomber_Bomb : ProjectileBase {
     {
         if (other.gameObject)
         {
-            Terrain thisTerrain = other.gameObject.GetComponent<Terrain>();
-            if (thisTerrain) //Do a quick check to see that we're hitting the groun, and not an aircraft or something like that
+            //Terrain thisTerrain = other.gameObject.GetComponent<Terrain>();
+            if (other.gameObject.layer == 14) //Have we hit something that is on the ground layer?
             {
                 //Do the explosion effect
                 GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);

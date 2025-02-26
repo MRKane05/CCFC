@@ -91,7 +91,7 @@ public class BalloonController : Actor {
 		
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
-		smokeEffect = gameObject.GetComponentInChildren<Emitter_Smoke>();
+		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
 		
 		//thrust should be calculated as the maximum angle the aircraft can climb without loosing 
 		thrust = Mathf.Sin(10*Mathf.Deg2Rad) * gravity;

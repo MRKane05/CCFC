@@ -273,11 +273,11 @@ public class LevelController : LevelControllerBase {
 		return newFlight;
 	}
 
-	public void AddFighterFlight(Vector3 generalLocation, float dropRadius, int numFighters, int team)
+	public void AddFighterFlight(Vector3 generalLocation, float startHeight, float dropRadius, int numFighters, int team)
     {
 		float randomDirection = Random.Range(0F, 360F * Mathf.Deg2Rad);
 		Vector3 patrolStart = generalLocation + new Vector3(Mathf.Sin(randomDirection) * dropRadius, Random.Range(-dropRadius / 4F, dropRadius / 4F), Mathf.Cos(randomDirection) * dropRadius);
-		patrolStart = getTerrainHeightAtPoint(patrolStart);
+		patrolStart = getTerrainHeightAtPoint(patrolStart) + Vector3.up * startHeight;
 
 		//need to calc what our directional stuff is for this group
 		Vector2 targetDir = new Vector2(patrolStart[0] + Random.Range(-100, 100), patrolStart[2] + Random.Range(-100, 100));
@@ -561,6 +561,13 @@ public class LevelController : LevelControllerBase {
 		yield return null;
 		//This needs to be handled in the mission construction
 		//playerAircraft.transform.position = getTerrainHeightAtPoint(playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
+	}
+
+	public void SetPlayerPosition(Vector3 toThis, float playerHeading)
+    {
+		//Going to need to sort out our camera too
+		playerAircraft.transform.position = toThis;
+		playerAircraft.transform.eulerAngles = new Vector3(0, playerHeading + 180f, 0);
 	}
 	
 	//This needs another number to gauge the difficulity
