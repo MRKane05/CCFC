@@ -25,7 +25,8 @@ public class TargetIndicator : MonoBehaviour {
 	// Will want to animate this at some stage to fit the toony feel
 	void Update () {
 		if (ourAnchor.target!=null) {
-			if (!IsVisibleFrom(ourAnchor.target.GetComponent<Renderer>(), Camera.main)) { //can we see this? Then make it dominant
+			Renderer targetRenderer = ourAnchor.target.GetComponent<Renderer>();
+			if (!IsVisibleFrom(targetRenderer, Camera.main) || !targetRenderer) { //can we see this? Then make it dominant
 				if (ourAnchor.target!=null) {//(!ourAnchor.target.renderer.IsVisibleFrom(Camera.main))) { //could do with fading this out when our target is visible in the camera
 					//indicator.SetActive(true);
 					transform.LookAt(ourAnchor.target.transform.position);

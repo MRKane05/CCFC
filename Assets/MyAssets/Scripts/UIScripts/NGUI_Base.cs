@@ -22,7 +22,9 @@ public class NGUI_Base : MonoBehaviour {
 	public NGUI_firingTracker targetFiringMarker; //what we should shoot at with our target
 	public GUI_Speedo speedo;
 	public TargetCamera_View ourTargetCamera;
-	
+
+	AudioSource ourAudio;
+
 	// Use this for initialization
 	IEnumerator Start () {
 		if (instance)
@@ -30,6 +32,7 @@ public class NGUI_Base : MonoBehaviour {
 			Debug.Log("Duplicate attempt to create NGUI_Base");
 			Destroy(this);
 		}
+		ourAudio = gameObject.GetComponent<AudioSource>();
 		
 		instance = this;
 		
@@ -76,24 +79,25 @@ public class NGUI_Base : MonoBehaviour {
 
 	//we want to target our "best" target.
 	#region targeting
-	public void targetBest() {
+	public void targetBest(bool bDirectionMatters) {
 		//This needs to be sent through to the players systems having elected a best target from the levelController
-		((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance); //should callback the controller with the target
+		((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance, bDirectionMatters); //should callback the controller with the target
 
 	}
 
-	public void nextTarget() {
+    public void nextTarget()
+    {
 		if (PlayerController.Instance.target!=null)
-((LevelController)LevelControllerBase.Instance).requestListTarget(1, PlayerController.Instance);
+			((LevelController)LevelControllerBase.Instance).requestListTarget(1, PlayerController.Instance);
 		else
-((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance);
+			((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance, false);
 	}
 
 	public void previousTarget() { //Cycle this stuff backwards
 		if (PlayerController.Instance.target!=null)
-((LevelController)LevelControllerBase.Instance).requestListTarget(-1, PlayerController.Instance);
+			((LevelController)LevelControllerBase.Instance).requestListTarget(-1, PlayerController.Instance);
 		else
-((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance);
+			((LevelController)LevelControllerBase.Instance).requestTarget(PlayerController.Instance, false);
 	}
 
 	public void objectiveTarget() {
@@ -117,6 +121,7 @@ public class NGUI_Base : MonoBehaviour {
 			//Debug.Log (newTarget);
 			targetFiringMarker.trackObject = newTarget;
 			targetDistanceMarker.trackObject = newTarget; //Ok, so this won't be so simple and will have to be forward calculated...
+			ourAudio.PlayOneShot(ourAudio.clip);
 		}
 	}
 

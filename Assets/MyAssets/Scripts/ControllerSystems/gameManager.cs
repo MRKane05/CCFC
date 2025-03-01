@@ -20,6 +20,7 @@ public class gameManager : MonoBehaviour {
 	public enum enGameState { NULL, MENU, LEVELSETUP, LEVELPLAYING, LEVELENDED, PAUSE}	//for VitaHOT I had states on both the LevelController and gameManager, so we're going to try and put everything here
 	public enGameState GameState = enGameState.NULL;
 
+	public int turnNumber = -1;	//Default unpopulated
 	public void setGameState(enGameState newState)
     {
 		GameState = newState;

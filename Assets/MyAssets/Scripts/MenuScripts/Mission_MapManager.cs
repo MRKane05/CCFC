@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
+using UnityEngine;
 using static Mission_MapSection;
 
 //manages all of the stuff to do with the map selection, and is a stupidly over-complicated class because of it
@@ -24,6 +24,7 @@ public class mapTileSaveForm
 [System.Serializable]
 public class saveForm
 {
+	public int turnNumber = 0;
 	public List<mapTileSaveForm> tileStates;
 	public List<conflictTile> conflictTiles;
 	public int friendlyBaseEnt = -1;
@@ -774,6 +775,10 @@ public class Mission_MapManager : MonoBehaviour {
 	{ //go through and put down all our markers
 	  //blank map population function
 
+		if (gameManager.Instance.turnNumber < 0)
+        {
+			gameManager.Instance.turnNumber = thisSaveForm.turnNumber;
+        }
 		//As opposed to making a map, loading a map involves "unwrapping" it
 		for (int ent=0; ent<thisSaveForm.tileStates.Count; ent++)
         {
@@ -841,6 +846,10 @@ public class Mission_MapManager : MonoBehaviour {
 	public void saveMapState()
     {
 		saveForm ourSaveForm = new saveForm();
+		if (gameManager.Instance.turnNumber >= 0)
+		{
+			ourSaveForm.turnNumber = gameManager.Instance.turnNumber;
+		}
 		ourSaveForm.tileStates = new List<mapTileSaveForm>();
 
 		for (int i=0; i<mapArray.Count; i++)
@@ -878,14 +887,7 @@ public class Mission_MapManager : MonoBehaviour {
 	}*/
 
 	public void loadMapState()
-    {   /*
-		saveForm ourSaveForm = new saveForm();
-		Debug.Log("Loading Map State");
-		if (System.IO.File.Exists(Application.persistentDataPath + "/mapTileState.json"))
-		{
-			string fileData = System.IO.File.ReadAllText(Application.persistentDataPath + "/mapTileState.json");
-			ourSaveForm = JsonUtility.FromJson<saveForm>(fileData);
-		}*/
+    {   
 		if (SaveUtility.Instance.CheckSaveFile("mapTileState.json"))
 		{
 			string saveText = SaveUtility.Instance.LoadTXTFile("mapTileState.json");
@@ -902,17 +904,9 @@ public class Mission_MapManager : MonoBehaviour {
 	//This is where our gameManager will send a callback following a mission concluding. We'll evaluate our tile and see what's changed
 	public void LevelCompleted(int tileNumber, bool bWon)
     {
-		//We need a delay until acknowledgement or some sort of camera focus thing here so that we know what our outcome is
-		//if we win this tile it becomes friendly territory
-		/*
-		SetTileTeam(tileNumber, bWon ? friendlyTeam : enemyTeam);
-		runMapTints(true);
-		//After this turn we need to go around our events and see if any of them have changed or need updating
-		*/
+		gameManager.Instance.turnNumber++; //Increment our turn number now that we've completed a mission. This'll also shuffle our activities
 		flownTile = tileNumber;
-		//endTurn();	//Make sure we count down our turn here too
 		StartCoroutine(ShowEndMapResults(tileNumber, bWon));
-		//saveMapState(); //For the moment this can go here
 	}
     #endregion
 }

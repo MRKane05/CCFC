@@ -122,14 +122,16 @@ public class PlayerController : ActorController {
 		if (newTarget) {
 			//this is a great place to send a call through to "frame" our necessary target
 			//Or could do it on the radar itself...
+			if (target != newTarget)
+			{
+				//we'll need to rig up the different parts. Not totally sure how it'll all mesh together.
+				target = newTarget;
+				targetController = newTargetController;
+				targetController.bIsTarget = true; //make this into our target
 
-			//we'll need to rig up the different parts. Not totally sure how it'll all mesh together.
-			target = newTarget;
-			targetController = newTargetController;
-			targetController.bIsTarget=true; //make this into our target
-
-			//Debug.Log ("Got Target Callback");
-			NGUI_Base.Instance.setTarget(newTarget);
+				//Debug.Log ("Got Target Callback");
+				NGUI_Base.Instance.setTarget(newTarget);
+			}
 		}
 		else { //set this to the waypoint or whatever it's meant to be.
 			target = null;
@@ -158,12 +160,12 @@ public class PlayerController : ActorController {
 		//base function...make sure we've a target if there are targets (auto switch)
 		if (!target) {
 			if (((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
-				((LevelController)LevelControllerBase.Instance).requestTarget(this); //populate our target system
+				((LevelController)LevelControllerBase.Instance).requestTarget(this, true); //populate our target system
 			}
 		}
 		else { //we've got a target
 			if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count > 1) {
-				((LevelController)LevelControllerBase.Instance).requestTarget(this); //we tagged out our prior fighter, call a new target
+				((LevelController)LevelControllerBase.Instance).requestTarget(this, true); //we tagged out our prior fighter, call a new target
 			}
 
 			//is getting an error when the enemies run out...
@@ -208,34 +210,50 @@ public class PlayerController : ActorController {
 		//I want to add a little higher function to the game in the form of slowing time to help with the players aiming
 		if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder")) {
 			Time.timeScale = 0.5f;
-        } else
-        {
+		} else
+		{
 			Time.timeScale = 1f;
-        }
+		}
 
 		//Basic targetting systems
-		if (Input.GetKeyDown(KeyCode.T) || Input.GetButtonDown("Triangle")) {   //Try to target the enemy right in front of us
+		if (Input.GetKeyDown(KeyCode.T) || Input.GetButtonDown("Triangle")) {   //Try to target the enemy right in front of us. This is just a keypress
 			GameObject bestEnemy = null;
 			float bestAngle = 180f;
 			Actor bestActor = null;
 			foreach (actorWrapper thisEnemy in ((LevelController)LevelControllerBase.Instance).enemyList)
-            {
+			{
 				float targetAngle = Vector3.Angle(Camera.main.transform.forward, thisEnemy.vehicle.transform.position - gameObject.transform.position);
-				Debug.Log(targetAngle);
+				//Debug.Log(targetAngle);
 				if (targetAngle < bestAngle)
-                {
+				{
 					bestAngle = targetAngle;
 					bestEnemy = thisEnemy.vehicle;
 					bestActor = thisEnemy.actor;
-                }
-            }
+				}
+			}
 			//And after all of that
 			if (bestAngle < 15) //Maybe over generous
-            {
+			{
 				targetCallback(bestActor, bestEnemy, 1);
 			}
+		}
+		//And a handler for our button being held down
+		if (Input.GetKey(KeyCode.T) || Input.GetButton("Triangle"))
+		{
+			targetButtonHoldTime += Time.unscaledDeltaTime;
+			if (targetButtonHoldTime > 0.5f)	//We want to autoselect a new target
+            {
+				((LevelController)LevelControllerBase.Instance).requestTarget(this, false);	//Direction doesn't matter for this
+				targetButtonHoldTime = -3f;	//So that we don't keep retriggering
+			}
+		}
+		if (Input.GetKeyUp(KeyCode.T) || Input.GetButtonUp("Triangle"))
+        {
+			targetButtonHoldTime = 0;	//Debounce this button
         }
 	}
+    float targetButtonHoldTime = 0;
+
 
 	float rollReturnSensitivity = 0.1f;
 	bool bControlsUp = false;

@@ -40,7 +40,7 @@ Shader "CCFC/Particles/Atmosphere" {
 				struct v2f {
 					float4 vertex : POSITION;
 					fixed4 color : COLOR;
-					float4 texcoord : TEXCOORD0;
+					float2 texcoord : TEXCOORD0;
 					//float2 texcoord1 : TEXCOORD1;
 				};
 
@@ -52,8 +52,8 @@ Shader "CCFC/Particles/Atmosphere" {
 					o.vertex = UnityObjectToClipPos(v.vertex);
 					o.color = v.color;
 					o.texcoord.xy = TRANSFORM_TEX(v.texcoord,_MainTex);
-					o.texcoord.zw = o.texcoord.xy;
-					o.texcoord += _TexOffset;
+					//o.texcoord.zw = o.texcoord.xy;
+					//o.texcoord += _TexOffset;
 					//o.texcoord1 = TRANSFORM_TEX(v.texcoord, _MainTex) + _TexAnim*_Time.yy;
 					_TexOffset = _TexOffset + _TexAnim*_Time.yyyy;
 					
@@ -64,8 +64,8 @@ Shader "CCFC/Particles/Atmosphere" {
 				{
 
 					half4 prev = i.color * tex2D(_MainTex, i.texcoord);
-					//prev *= tex2D(_TexMap, i.texcoord.xy + _TexOffset.xy).a +  tex2D(_TexMap, i.texcoord.zw + _TexOffset.zw).a;
-					prev *= tex2D(_TexMap, i.texcoord.xy).a + tex2D(_TexMap, i.texcoord.zw).a;
+					prev *= tex2D(_TexMap, i.texcoord.xy + _TexOffset.xy).a +  tex2D(_TexMap, i.texcoord.xy + _TexOffset.zw).a;
+					//prev *= tex2D(_TexMap, i.texcoord.xy).a + tex2D(_TexMap, i.texcoord.zw).a;
 					prev.rgb *= prev.a;
 					return prev;
 				}

@@ -24,8 +24,10 @@ public class TargetCamera_View : MonoBehaviour {
 		//our tracking script:
 		if (selectedTarget) {
 			transform.LookAt(selectedTarget.transform.position);
+			float viewDistance = selectedTarget.GetComponent<Actor>().targetViewDistance;
 			//finally our fov stuff
-			GetComponent<Camera>().fieldOfView = fovFactor/(selectedTarget.transform.position - transform.position).magnitude;
+			//GetComponent<Camera>().fieldOfView = fovFactor/(selectedTarget.transform.position - transform.position).magnitude;
+			gameObject.transform.position = selectedTarget.transform.position - transform.forward * viewDistance;
 		}
 	}
 }

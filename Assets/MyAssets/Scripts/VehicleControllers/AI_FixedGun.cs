@@ -49,7 +49,7 @@ public class AI_FixedGun : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (targetObject == null)
+		if (targetObject == null || Vector3.SqrMagnitude(transform.position-targetObject.transform.position) > range*range)	//PROBLEM: of course this range checks means that we could hammer our target system...
 		{
 			targetNext = Time.time + targetTrackTime;	//Apply a timer for how long we'll track a target
 			target = ((LevelController)LevelControllerBase.Instance).requestRangedTarget(team, range, gameObject.transform.position);   //Of course if there are no targets this could really chew up process
@@ -66,6 +66,10 @@ public class AI_FixedGun : MonoBehaviour {
 
 	public virtual void TrackTarget()
     {
+		if (Vector3.SqrMagnitude(transform.position - targetObject.transform.position) > range * range)
+        {
+			return; //Don't shoot at this
+        }
 		//This could be complicated. For the moment it won't be
 		//transform.LookAt(target.transform, Vector3.up);
 		Quaternion lookAtAngle = Quaternion.LookRotation(target.actor.gameObject.transform.position - gameObject.transform.position, gameObject.transform.up);

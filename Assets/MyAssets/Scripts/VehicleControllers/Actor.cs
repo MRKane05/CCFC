@@ -4,6 +4,10 @@ using System.Collections;
 //The base class for anything that's...well shootable
 public class Actor : MonoBehaviour {
 	public MissionEventObject owner;
+	//A little bit of target handling stuff :)
+	public float targetViewDistance = 3f;
+	public int targetValue = 1; //Higher number means a higher priority target
+
 	public bool bIsPlayerVehicle=false;
 	public int team = 0; //0 friendly 1 enemy (for this anyway)
 	public float speed=6;

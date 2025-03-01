@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class flightGroup
 {
+
     //public int eventTriggerCount = 0; //If the number of vehicles in this flight goes below zero it'll trigger an event (such as getting new fighters)
 
     //So for this we're going to have a flight of aircraft
@@ -28,6 +29,21 @@ public class flightGroup
 //Because we've made many of the elements of the game into mini-games we can really drill down what our missions will be and simplify things further here
 public class MissionConstructionBase : MonoBehaviour {
 	bool bWaitingToFinishMision = false;
+
+    private static MissionConstructionBase instance = null;
+    public static MissionConstructionBase Instance { get { return instance; } }
+
+    void Awake()
+    {
+        if (instance)
+        {
+            Debug.Log("Duplicate attempt to create MissionConstructor");
+            Destroy(this);
+            return;
+        }
+
+        instance = this;
+    }
 
     //We're going to have to start somewhere!
     IEnumerator Start() {

@@ -147,12 +147,12 @@ public class AI_Fighter : ActorController {
 
 	void handleTargets() { //to be used to see what we should be doing target wise.
 		if ((!target || targetController.bIsDead) && pattern!="FOLLOW") {
-			levelLink.requestTarget(this);
+			levelLink.requestTarget(this, false);
 		}
 
 		//will need to extend this a little for misbehaving players (killing pilots)
 		if (targetController!=null && targetController.bIsDead) {//cycle on if we've shot this down
-			levelLink.requestTarget(this);
+			levelLink.requestTarget(this, false);
 		}
 	}
 	
@@ -491,9 +491,7 @@ public class AI_Fighter : ActorController {
 		//so our calls will come through when we change state etc.
 		//lets try something simple here
 		//Debug.Log ("Checking Situation");
-		((LevelController)LevelControllerBase.Instance).requestTarget(this);
-
-
+		((LevelController)LevelControllerBase.Instance).requestTarget(this, false);
 	}
 
 	//This function will forcibly change state if we're set to break. Prevents huffing while evading and with other things like Patrol
@@ -501,7 +499,7 @@ public class AI_Fighter : ActorController {
 
 		//We have a flight check system when we're following
 		if (pattern=="FOLLOW" && (Time.time - patternTime > patternDuration)) {
-			levelLink.requestTarget(this);
+			levelLink.requestTarget(this, false);
 			patternTime = Time.time;
 			patternDuration=1f; //one second intervals (for the alert wingman)
 		}

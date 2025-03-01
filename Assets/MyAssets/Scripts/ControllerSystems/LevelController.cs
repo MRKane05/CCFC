@@ -8,7 +8,7 @@ public class actorWrapper {
 	public GameObject vehicle;
 	public Actor actor;
 	public ActorController ourController; //good for known reference, but we almost need a type checking here
-	public int targetValue; //this is to be used for various different things 
+	public int targetValue = 1; //this is to be used for various different things 
 	public int team; //We shouldn't need this, but anyway.
 	public GameObject radarObject; //should be assigned by the radar system
 	public RadarItem radarLink;
@@ -201,12 +201,70 @@ public class LevelController : LevelControllerBase {
 		return wings;
 	}
 
+	public virtual void AddWingmen()
+	{
+		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 5f + Vector3.right * 5f, Quaternion.identity, "PLAYER", 1);
+		addWingman(0, prefabManager.Instance.getFriendlyFighter(0F, 1F), PlayerController.Instance.ourAircraft.transform.position + Vector3.back * 5f - Vector3.right * 5f, Quaternion.identity, "PLAYER", 0);
+	}
+
+	public actorWrapper addWingman(int thisTeam, GameObject thisPrefab, Vector3 thisPosition, Quaternion thisRotation, string groupTag, int formationPosition)
+	{
+
+		GameObject newTarget = Instantiate(thisPrefab, thisPosition, thisRotation) as GameObject;
+
+		actorWrapper newActor;
+
+		//Assign our stuff
+		newActor = new actorWrapper();
+		newActor.vehicle = newTarget;
+		newActor.actor = newTarget.GetComponent<Actor>(); //Was aircraft controller but we don't need to be that high up the stack really
+														  //newActor.vehicle = newActor.actor.getModel();
+		newActor.targetValue = newActor.actor.targetValue;
+		newActor.team = thisTeam;
+
+		//not totally sure this is the best option
+		newActor.ourController = newTarget.GetComponentInChildren<ActorController>(); //might cause issues with AI guns...
+																					  //Optional link pulled from the AircraftController perhaps?
+
+		newActor.ourController.team = thisTeam;
+		newActor.actor.setTeam(thisTeam);
+		//Need to assign the variables to the aircraft controller
+
+		//Handle our radar stuff
+		newActor.radarObject = Instantiate(newActor.actor.ourRadarPrefab) as GameObject; //Put down our radar object
+		newActor.radarObject.transform.SetParent(((LevelController)LevelControllerBase.Instance).targetRadar.gameObject.transform); //child it to this.
+		newActor.radarObject.transform.localScale = Vector3.one;
+		newActor.radarLink = newActor.radarObject.GetComponent<RadarItem>();
+
+
+		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // ((LevelController)LevelControllerBase.Instance).getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
+																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
+		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
+
+		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft; //follow this
+		((AI_Fighter)newActor.ourController).flightGroup = groupTag;
+
+		//Now we need to figure out which list we add it to
+		if (thisTeam == 0)
+		{
+			((LevelController)LevelControllerBase.Instance).friendlyList.Add(newActor);
+		}
+		else if (thisTeam == 1)
+		{
+			((LevelController)LevelControllerBase.Instance).enemyList.Add(newActor);
+			newActor.actor.gradeSkill(0.5f);
+
+		}
+
+		//return newTarget; //for those of us who need the vehicle
+		return newActor;
+	}
+
 	//called when we've hit an enemy trigger of sorts
 	//Will have other details like: where they're coming from
 	public actorWrapper addFighterActor(GameObject thisFighter, int thisTeam, Vector3 thisLocation, Quaternion thisRotation, string groupTag, MissionEventObject thisOwner) {
 		//Do something to spawn some enemies around our player
 		//If this is an ambush:
-
 		return addActor(thisTeam, thisFighter, thisLocation, thisRotation, groupTag, thisOwner);
 	
 	}
@@ -361,14 +419,14 @@ public class LevelController : LevelControllerBase {
 		int target = -1;
 		if (onTeam == 1)
         {
-			target = GetBestTarget(selfPosition, Vector3.zero, friendlyList);
+			target = GetBestTarget(selfPosition, Vector3.zero, friendlyList, true);
 			if (target != -1)
 				return friendlyList[target];
 			else
 				return null;
         } else
         {
-			target = GetBestTarget(selfPosition, Vector3.zero, enemyList);
+			target = GetBestTarget(selfPosition, Vector3.zero, enemyList, true);
 			if (target != -1)
 				return enemyList[target];
 			else
@@ -378,19 +436,20 @@ public class LevelController : LevelControllerBase {
         return null; //We nave no viable target
     }
 	
+
 	//The fighters can use this to call for another target
-	public void requestTarget(ActorController ourController) {
+	public void requestTarget(ActorController ourController, bool bDirectionMatters) {
 		//For the moment just assign it something.
 		int target=-1;
 		if (ourController.team==0) { //we're friendly, and a small tweak for testing...
-			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, enemyList);
+			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, enemyList, bDirectionMatters);
 			if (target!=-1)
 				ourController.targetCallback(enemyList[target].actor, enemyList[target].vehicle, 1); //list this target and attack it!
 			else
 				ourController.targetCallback(null, null, -1);
 		}
 		else if (ourController.team==1) { //we're friendly
-			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, friendlyList);
+			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, friendlyList, bDirectionMatters);
 			if (target!=-1)
 				ourController.targetCallback(friendlyList[target].actor, friendlyList[target].vehicle, 1); //list this target and attack it!
 			else
@@ -417,7 +476,7 @@ public class LevelController : LevelControllerBase {
 	}
 
 	//can also be used by the player I suppose. For now this will work.
-	int GetBestTarget(Vector3 thisPosition, Vector3 thisForward, List<actorWrapper> listTargets) {
+	int GetBestTarget(Vector3 thisPosition, Vector3 thisForward, List<actorWrapper> listTargets, bool bDirectionMatters) {
 		int bestTarget = -1;
 		float bestPropensity = float.MaxValue, thisTargetPropensity=0; //we use an inverse system
 
@@ -426,10 +485,16 @@ public class LevelController : LevelControllerBase {
 				thisTargetPropensity = 0; //annul this before recalculating
 				//first step: how far away from us is it?
 				thisTargetPropensity += (thisPosition-listTargets[i].actor.gameObject.transform.position).magnitude;
-			
+
 				//So now consider our direction to the target (is this the correct way around?)
 				//Graduate a bit. Down by a quater so that it won't be at a 180m range for an override
-				thisTargetPropensity += (Vector3.Angle(thisForward, (listTargets[i].actor.gameObject.transform.position-thisPosition)))/4F;
+				if (bDirectionMatters)
+				{
+					thisTargetPropensity += (Vector3.Angle(thisForward, (listTargets[i].actor.gameObject.transform.position - thisPosition))) / 4F;
+				}
+
+				//What is the value of this target?
+				thisTargetPropensity -= listTargets[i].targetValue * 15f;	//Multiplier assuming that the rest of the system is kind of measured in degrees
 
 				//Do we want to do something with the health of the target?
 
@@ -450,6 +515,9 @@ public class LevelController : LevelControllerBase {
 		return bestTarget;
 	}
 
+	public MissionConstructionBase ourMissonConstructor;
+	public GameObject bombingMissionConstructor;
+
 	public void removeSelf(GameObject thisActor, int thisTeam) {
 		if (thisTeam == 0) { //Pull us out of the list
 			for (int i=0; i<friendlyList.Count; i++) { //Need another method here
@@ -458,6 +526,7 @@ public class LevelController : LevelControllerBase {
 						Destroy (friendlyList[i].radarObject);
 
 					friendlyList.RemoveAt(i); //that way we'll get the correct one
+
 				}
 			}
 		}
@@ -474,7 +543,6 @@ public class LevelController : LevelControllerBase {
 		}
 
 		//For our special situations we might also have to report this through to our MissonConstruction system
-		MissionConstructionBase ourMissonConstructor = gameObject.GetComponent<MissionConstructionBase>();
 		if (ourMissonConstructor)
         {
 			ourMissonConstructor.RemoveActor(thisActor);
@@ -486,6 +554,20 @@ public class LevelController : LevelControllerBase {
 			finishMatch(true);
 		}
 	}
+
+	public int getRemainingEnemyFighters()
+    {
+		int remainingFighters = 0;
+		foreach (actorWrapper thisActor in enemyList)
+        {
+			//If we've got a controller then this is a fighter, if not it's a PathAircraft
+			if (thisActor.ourController)
+            {
+				remainingFighters++;
+            }
+        }
+		return remainingFighters;
+    }
 
 	//For the moment
 	//We need to do the fighter class stuff somehows
@@ -500,6 +582,7 @@ public class LevelController : LevelControllerBase {
 		newActor.vehicle = newTarget;
 		newActor.actor = newTarget.GetComponent<Actor>(); //Was aircraft controller but we don't need to be that high up the stack really
 														  //newActor.vehicle = newActor.actor.getModel();
+		newActor.targetValue = newActor.actor.targetValue;
 		newActor.team = thisTeam;
 		newActor.actor.owner = thisOwner;
 		//not totally sure this is the best option
@@ -535,7 +618,6 @@ public class LevelController : LevelControllerBase {
 		else if (thisTeam==1) {
 			enemyList.Add(newActor);
 			newActor.actor.gradeSkill(enemyFactor);
-
 		}
 
 		//return newTarget; //for those of us who need the vehicle
@@ -551,12 +633,11 @@ public class LevelController : LevelControllerBase {
         {
 			yield return null;
         }
-		//For the moment:
-		//StartCoroutine(StartMatch(3, 0));
 
-		//createMatch(1, 0);
-		//StartCoroutine(DoBomberRunEnemies());
-		//StartCoroutine(DoBomberRunEnemies());
+		//We need to make a MissionConstructor and run everything here accordingly
+		GameObject newConstructor = Instantiate(bombingMissionConstructor) as GameObject;
+		ourMissonConstructor = newConstructor.GetComponent<MissionConstructionBase>();
+
 		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
 		yield return null;
 		//This needs to be handled in the mission construction
@@ -566,7 +647,7 @@ public class LevelController : LevelControllerBase {
 	public void SetPlayerPosition(Vector3 toThis, float playerHeading)
     {
 		//Going to need to sort out our camera too
-		playerAircraft.transform.position = toThis;
+		//playerAircraft.transform.position = toThis;
 		playerAircraft.transform.eulerAngles = new Vector3(0, playerHeading + 180f, 0);
 	}
 	
@@ -632,44 +713,6 @@ public class LevelController : LevelControllerBase {
 		}
 		*/
 		
-	}
-
-	void checkLevelClear() {
-		if (endMethod == enEndMethod.ALL) { //Down all enemies, clear all waypoints, reach final waypoint
-			if (bWaypointsComplete && enemyList.Count == 0 && bEndGoalComplete) {
-				//Debug.Log ("Level Complete");
-			}
-		}
-	}
-
-	//used to check and see if we should be turning waypoints on or off. Naturally they're all sequencial
-	void monitorWaypoints() {
-		bWaypointsComplete = true; //trigger this off if one isn't condition true.
-
-
-		//our distances. Shame there's not a fast flat magnitude function as I don't want to be making heaps of Vector2s all the time...
-		float playerSquare = (endGoal2D - new Vector2(PlayerController.Instance.ourAircraft.transform.position[0], PlayerController.Instance.ourAircraft.transform.position[2])).sqrMagnitude;
-
-		if (playerSquare < 60) {
-			bEndGoalComplete = true;
-		} else {
-			bEndGoalComplete = false;
-		}
-
-		//these should be in order of no particular order actually...
-		foreach (waypointWrapper thisWaypoint in waypoints) {
-			if (thisWaypoint.wayScript.waypointState != waypoint.enWaypointState.Done) {
-				bWaypointsComplete=false;
-			}
-
-			if (playerSquare < thisWaypoint.sqrCheckDistance && thisWaypoint.wayScript.waypointState == waypoint.enWaypointState.Uncalled) { //this waypoint should be triggered
-				//thisWaypoint.wayScript.waypointState = waypoint.enWaypointState.Done;
-
-				thisWaypoint.wayScript.callWaypoint(playerSquare); //call this waypoint into action!
-
-				Debug.Log ("triggered waypoint: " + thisWaypoint.sqrCheckDistance);
-			}
-		}
 	}
 
 	//called when a waypoint thinks that it's complete, allowing us to move on or similar.

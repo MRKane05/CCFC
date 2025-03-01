@@ -41,7 +41,7 @@ public class Mission_MapSection : MonoBehaviour {
 
 	public enMissionType getMissionType()
 	{
-		int missionTypeSelection = segmentNumber % 5;
+		int missionTypeSelection = (segmentNumber + gameManager.Instance.turnNumber * 3) % 10;
 
 		if (missionTypeSelection == 0) {
 			return enMissionType.BOMBING;
