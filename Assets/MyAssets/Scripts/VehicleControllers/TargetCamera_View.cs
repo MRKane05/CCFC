@@ -8,6 +8,12 @@ public class TargetCamera_View : MonoBehaviour {
 	public GameObject selectedTarget;
 	public float fovFactor = 1;
 	float targetLerp=0; //pan to this target
+	Camera ourCamera;
+
+	void Awake()
+    {
+		ourCamera = gameObject.GetComponent<Camera>();
+    }
 
 	public void setTarget(GameObject thisTarget) {
 		selectedTarget = thisTarget; //this is what we want to follow
@@ -28,6 +34,8 @@ public class TargetCamera_View : MonoBehaviour {
 			//finally our fov stuff
 			//GetComponent<Camera>().fieldOfView = fovFactor/(selectedTarget.transform.position - transform.position).magnitude;
 			gameObject.transform.position = selectedTarget.transform.position - transform.forward * viewDistance;
+			ourCamera.farClipPlane = viewDistance * 2.5f;
+
 		}
 	}
 }

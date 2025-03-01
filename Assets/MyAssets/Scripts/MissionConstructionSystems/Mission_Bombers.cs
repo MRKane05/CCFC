@@ -59,7 +59,7 @@ public class Mission_Bombers : MissionConstructionBase
 
     public void GenerateMission(enBombingTeam targetBombingTeam)
     {
-        BombingTeam = enBombingTeam.ENEMY;// Random.value > 0.5f ? enBombingTeam.ENEMY : enBombingTeam.PLAYER;
+        BombingTeam = targetBombingTeam;// Random.value > 0.5f ? enBombingTeam.ENEMY : enBombingTeam.PLAYER;
 
         generalIncomingAngle = Random.Range(0, 360);
 
