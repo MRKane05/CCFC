@@ -48,6 +48,7 @@ public class gameManager : MonoBehaviour {
 	public bool bCanSelectMission = true;
 	public int selectedTile = -1;
 	public enMissionType missionType = enMissionType.FLIGHT;
+	public float missionDifficulty = 5; //Out of 10? I dunno
 	#endregion
 	// Use this for initialization
 	void Awake () {
@@ -123,9 +124,10 @@ public class gameManager : MonoBehaviour {
 	}
 	
 	IEnumerator loadMission() {
+
 		//load our level
 		UIMusicHandler.Instance.SetMusicTrack(false);   //Set our combat track playing
-		if (missionType == enMissionType.FLIGHT)
+		if (missionType == enMissionType.FLIGHT || missionType == enMissionType.BASEDEFENCE || missionType == enMissionType.BASEATTACK || missionType == enMissionType.SKIRMISH)
 		{
 			yield return StartCoroutine(loadScene("Level"));
 		} else if (missionType == enMissionType.TURRET)

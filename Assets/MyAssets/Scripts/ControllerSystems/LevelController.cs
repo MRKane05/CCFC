@@ -635,8 +635,15 @@ public class LevelController : LevelControllerBase {
         }
 
 		//We need to make a MissionConstructor and run everything here accordingly
-		GameObject newConstructor = Instantiate(bombingMissionConstructor) as GameObject;
-		ourMissonConstructor = newConstructor.GetComponent<MissionConstructionBase>();
+		if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE || gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEATTACK)
+		{
+			GameObject newConstructor = Instantiate(bombingMissionConstructor) as GameObject;
+			ourMissonConstructor = newConstructor.GetComponent<Mission_Bombers>();
+
+			//Grab our constructor and send through the necessary information to generate a mission
+			Mission_Bombers MissionGenerator = newConstructor.GetComponent<Mission_Bombers>();
+			MissionGenerator.GenerateMission(gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE, gameManager.Instance.missionDifficulty);
+		}
 
 		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
 		yield return null;

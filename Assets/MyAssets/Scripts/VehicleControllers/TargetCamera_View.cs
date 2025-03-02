@@ -35,7 +35,6 @@ public class TargetCamera_View : MonoBehaviour {
 			//GetComponent<Camera>().fieldOfView = fovFactor/(selectedTarget.transform.position - transform.position).magnitude;
 			gameObject.transform.position = selectedTarget.transform.position - transform.forward * viewDistance;
 			ourCamera.farClipPlane = viewDistance * 2.5f;
-
 		}
 	}
 }

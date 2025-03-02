@@ -51,20 +51,19 @@ public class Mission_Bombers : MissionConstructionBase
     public override void DoStart()
     {
         base.DoStart();
-        GenerateMission(enBombingTeam.ENEMY);  //Our kick to setup
+        //GenerateMission(false, 5);  //Our kick to setup
 
         //We also need to figure out where we're placing our player
-        ((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position = ((LevelController)LevelControllerBase.Instance).getTerrainHeightAtPoint(((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
+        //((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position = ((LevelController)LevelControllerBase.Instance).getTerrainHeightAtPoint(((LevelController)LevelControllerBase.Instance).playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
     }
 
-    public void GenerateMission(enBombingTeam targetBombingTeam)
+    public void GenerateMission(bool bBaseDefence, float difficulty)
     {
-        BombingTeam = targetBombingTeam;// Random.value > 0.5f ? enBombingTeam.ENEMY : enBombingTeam.PLAYER;
+        BombingTeam = bBaseDefence ? enBombingTeam.ENEMY : enBombingTeam.PLAYER;
 
         generalIncomingAngle = Random.Range(0, 360);
 
         StartCoroutine(DoMissionSetup());
-        
     }
 
     public IEnumerator DoMissionSetup()
