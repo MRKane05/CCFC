@@ -148,7 +148,7 @@ public class LevelController : LevelControllerBase {
 
 	//if one aircraft wants to send a message to all fighters in the flight group (for whatever reason)
 	public void notifyWithTag(int thisTeam, string thisMessage, string thisTag) {
-		Debug.Log("Aircraft Sent Message. Team: " + thisTeam + " Message: " + thisMessage + " Tag: " + thisTag);
+		//Debug.Log("Aircraft Sent Message. Team: " + thisTeam + " Message: " + thisMessage + " Tag: " + thisTag);
 		if (thisTag=="NONE")
 			return; //this is a null call
 

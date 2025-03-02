@@ -63,7 +63,7 @@ public class PathAircraft : Actor {
     {
         speed = crusingSpeed;
         transform.position += transform.forward * Time.deltaTime * speed;   //Simply move this vehicle forward
-        /*
+        
         if (pathPositions.Count > 0 && currentPathPosition < pathPositions.Count && !bIsDead)
         {
             TurnToFace(pathPositions[currentPathPosition]);
@@ -76,7 +76,7 @@ public class PathAircraft : Actor {
                     SoftRemoveActor();  //TODO: We'll want to fade this out or something good-looking like that. But for the moment lets just blink vanish
                 }
             }
-        }*/
+        }
 
         if (bIsDead)
         {
@@ -202,7 +202,7 @@ public class PathAircraft : Actor {
     //because we're dealing with something that now has two engines we've got to distribute the smoke in such a way as to reflect what our health is between the two engines
     public override void checkSmokeSystem(float newHealthRatio)
     { //pinged with take Damage
-        Debug.Log("checking smoke system");
+        //Debug.Log("checking smoke system");
         if (smokeEffects.Length == 0)
             return; //we've got nothing to smoke
         smokeStages = smokeEffects.Length * 2 + 1;

@@ -33,7 +33,7 @@ public class Bomber_Bomb : ProjectileBase {
                     DestructableObject thisObject = hitCollider.gameObject.GetComponent<DestructableObject>();
                     if (thisObject)
                     {
-                        Debug.Log("Taking Damage: " + damage);
+                        //Debug.Log("Taking Damage: " + damage);
                         thisObject.TakeDamage(damage);  //This should really be changed according to the distance to the collision point?
                     }
                 }

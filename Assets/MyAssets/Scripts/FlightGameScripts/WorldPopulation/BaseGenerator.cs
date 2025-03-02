@@ -54,14 +54,14 @@ public class BaseGenerator : MonoBehaviour {
 		if (Physics.Raycast(point + Vector3.up * 2000f, -Vector3.up, out hit, Mathf.Infinity, maskAll))
 
 		{
-			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-			Debug.Log("Did Hit");
+			//Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+			//Debug.Log("Did Hit");
 			return hit.point;
 		}
 		else
 		{
-			Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
-			Debug.Log("Did not Hit");
+			//Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
+			//Debug.Log("Did not Hit");
 		}
 		return point;   //Assume we didn't find anything so lets go ahead
 

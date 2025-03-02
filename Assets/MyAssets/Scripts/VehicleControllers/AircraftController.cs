@@ -348,7 +348,7 @@ public class AircraftController : Actor {
 				float EngageDistance = 10f;
 				if (Vector3.SqrMagnitude(gameObject.transform.position - ourPlayerController.target.transform.position) < EngageDistance * EngageDistance)
                 {
-					Debug.Log("Within engage distance");
+					//Debug.Log("Within engage distance");
 					Actor targetActor = ourPlayerController.target.GetComponent<Actor>();
 					if (targetActor)
                     {

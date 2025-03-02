@@ -156,20 +156,20 @@ public class Mission_Bombers : MissionConstructionBase
         //So...our points
         int numIncomingPoints = Random.Range(1, 3); //This will control how much our flightpath will vary up to the target point
         List<Vector3> flightPoints = new List<Vector3>();
-        Debug.Log("incomingPoints: " + numIncomingPoints);
+        //Debug.Log("incomingPoints: " + numIncomingPoints);
         GameObject newGameObject = new GameObject("Start");
         newGameObject.transform.position = spawnLocation;
         for (int i=0; i<numIncomingPoints; i++)
         {
             //So basically we've got a range that we've got to divide into parts here
             float distFraction = (float)(numIncomingPoints - i) / (float)(numIncomingPoints + 1);
-            Debug.Log("Dist Fraction: " + distFraction);
+            //Debug.Log("Dist Fraction: " + distFraction);
             float newDistPoint = spawnInRange * distFraction;
             incomingAngle += rotationVariance.GetRandom();
             Vector3 nextPoint = thisTargetLocation + Quaternion.AngleAxis(incomingAngle, Vector3.up) * Vector3.forward * spawnInRange * distFraction;
             nextPoint = LevelController.Instance.getTerrainHeightAtPoint(nextPoint) + Vector3.up * (CruiseHeight + bomberHeightVariation.GetRandom());
-            newGameObject = new GameObject("i:" + i.ToString());
-            newGameObject.transform.position = nextPoint;
+            //newGameObject = new GameObject("i:" + i.ToString());
+            //newGameObject.transform.position = nextPoint;
             flightPoints.Add(nextPoint);
             //Pick rotations for our incoming paths
         }
@@ -332,11 +332,21 @@ public class Mission_Bombers : MissionConstructionBase
         {
             case enMissionState.COMPLETE:
                 Bombers_Successful++;
+                NGUI_Base.Instance.setPortraitMessage("Pilot", "Bomber attacking target", Color.black);
                 break;
             case enMissionState.FAILED:
+                if (BombingTeam == enBombingTeam.PLAYER)
+                {
+                    NGUI_Base.Instance.setPortraitMessage("Commander", "Great job! Bomber Downed!", Color.black);
+                } else
+                {
+                    NGUI_Base.Instance.setPortraitMessage("Commander", "Bomber downed! Don't let this happen!", Color.black);
+                }
                 Bombers_Unsuccessful++;
                 break;
         }
+
+        Debug.Log("Bombers Successful: " + Bombers_Successful + " Downed: " + Bombers_Downed + " Total: " + totalBombers);
         missionClearedBombers++;
         CheckMissionComplete();
 

@@ -66,7 +66,7 @@ public class AI_Fighter : ActorController {
 	//sent through whenever an AI needs to send out a message to other AI - could also be used for team situations.
 	public override void getNotification(string thisMessage, string thisTag) {
 		//we could do with a small delay here...
-		Debug.Log (gameObject.name + " Got Message: " + thisMessage);
+		//Debug.Log (gameObject.name + " Got Message: " + thisMessage);
 
 		//we should have been tag filtered already.
 		if (thisMessage == "PATROLBREAK") { //we've been called to break our patrol pattern (probably by another fighter being attacked
@@ -192,7 +192,7 @@ public class AI_Fighter : ActorController {
 				}				
 			}
 			else if (pattern == "EVADE") { //lets drop into an evasive
-				Debug.Log("Evade damage Change");
+				//Debug.Log("Evade damage Change");
 				pattern = "DOEVASIVE";
 				patternStage = "PICK";
 				patternDuration = escapeDuration.GetRandom();
@@ -200,7 +200,7 @@ public class AI_Fighter : ActorController {
 				damageTaken = 0;
 			}
 			else if (pattern == "DOEVASIVE") { //this is getting despirate!
-				Debug.Log("Evasive damage Change");
+				//Debug.Log("Evasive damage Change");
 				//Do...something!
 				//This gus has a serious bone to pick with us. Probably should make it our target
 				if (lastDamager) {
