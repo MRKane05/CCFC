@@ -517,6 +517,7 @@ public class LevelController : LevelControllerBase {
 
 	public MissionConstructionBase ourMissonConstructor;
 	public GameObject bombingMissionConstructor;
+	public GameObject skirmishMissionContstructor;
 
 	public void removeSelf(GameObject thisActor, int thisTeam) {
 		if (thisTeam == 0) { //Pull us out of the list
@@ -634,6 +635,7 @@ public class LevelController : LevelControllerBase {
 			yield return null;
         }
 
+		//As a FYI I did consider making this as a switch and case, but wanted to include variables in everything. I'm sure that'll bite me in the ass somehow
 		//We need to make a MissionConstructor and run everything here accordingly
 		if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE || gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEATTACK)
 		{
@@ -643,7 +645,15 @@ public class LevelController : LevelControllerBase {
 			//Grab our constructor and send through the necessary information to generate a mission
 			Mission_Bombers MissionGenerator = newConstructor.GetComponent<Mission_Bombers>();
 			MissionGenerator.GenerateMission(gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE, gameManager.Instance.missionDifficulty);
-		}
+		} 
+		else if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.SKIRMISH)
+        {
+			GameObject newConstructor = Instantiate(skirmishMissionContstructor) as GameObject;
+			ourMissonConstructor = newConstructor.GetComponent<Mission_Skirmish>();
+
+			Mission_Skirmish MissionGenerator = newConstructor.GetComponent<Mission_Skirmish>();
+			MissionGenerator.GenerateMission(gameManager.Instance.missionDifficulty);
+        }
 
 		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
 		yield return null;

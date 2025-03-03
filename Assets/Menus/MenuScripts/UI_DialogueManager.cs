@@ -73,7 +73,7 @@ public class UI_DialogueManager : MonoBehaviour {
 			TextAsset newDialogue = (TextAsset)newDialogueObject;
 			string newTxt = newDialogue.text;
 			string[] lines = newTxt.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.None); //Regex.Split(newTxt, "\n|\r|\r\n");
-			Debug.Log("Lines: " + lines.Length);
+			//Debug.Log("Lines: " + lines.Length);
 			parseDialogueFile(lines);
 		}
 	}
@@ -136,7 +136,7 @@ public class UI_DialogueManager : MonoBehaviour {
 				//Lets get all the characters that we should have in our section
 				string trimmedLine = thisLine.Remove(0, leftCharCodon.Length); //Remove our codon from the start
 				trimmedLine = trimmedLine.Trim();
-				Debug.Log(trimmedLine);
+				//Debug.Log(trimmedLine);
 				string[] left_Characters = trimmedLine.Split(new char[] { ' ' });	//Seperate at spaces
 				foreach (string newLeftCharacter in left_Characters)
                 {
@@ -155,7 +155,7 @@ public class UI_DialogueManager : MonoBehaviour {
 				//Lets get all the characters that we should have in our section
 				string trimmedLine = thisLine.Remove(0, rightCharCodon.Length); //Remove our codon from the start
 				trimmedLine = trimmedLine.Trim();
-				Debug.Log(trimmedLine);
+				//Debug.Log(trimmedLine);
 				string[] right_Characters = trimmedLine.Split(new char[] { ' ' });   //Seperate at spaces
 				foreach (string newRightCharacter in right_Characters)
 				{
