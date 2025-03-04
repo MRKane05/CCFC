@@ -50,8 +50,14 @@ public class gameManager : MonoBehaviour {
 	public enMissionType missionType = enMissionType.FLIGHT;
 	public float missionDifficulty = 5; //Out of 10? I dunno
 	#endregion
-	// Use this for initialization
-	void Awake () {
+
+	#region Communication Text Sections
+	//This is about the worst way to do this
+	public string panelTitle = "";
+	public string panelContent = "";
+    #endregion
+    // Use this for initialization
+    void Awake () {
 		if (instance)
 		{
 			Debug.Log("Duplicate attempt to create gameManager");

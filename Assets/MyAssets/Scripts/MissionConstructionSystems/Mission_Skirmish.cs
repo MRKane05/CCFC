@@ -20,6 +20,7 @@ public class Mission_Skirmish : MissionConstructionBase {
     {
         //In this we'd set the target number of enemy we'd be fighting against, and also the amount of support we're expected to have
         levelStartTime = Time.time;
+        targetEnemy = Random.Range(3, 15);
         ((LevelController)LevelControllerBase.Instance).AddWingmen();
     }
 

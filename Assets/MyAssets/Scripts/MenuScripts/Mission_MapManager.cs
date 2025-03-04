@@ -596,6 +596,7 @@ public class Mission_MapManager : MonoBehaviour {
 			gameManager.Instance.selectedTile = thisTile;
 			if (UIMenuHandler.Instance)
 			{
+				UIMenuHandler.Instance.setSelectScreenPromptText(missionType);
 				UIMenuHandler.Instance.LoadMenuSceneAdditively("MissionSelectPanel", null, null);	//We need some way of telling our player what this is going to be...
 			}
 		} else

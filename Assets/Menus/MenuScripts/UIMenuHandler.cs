@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Mission_MapSection;
 
 [System.Serializable]
 public class loadedScene
@@ -106,6 +107,37 @@ public class UIMenuHandler : MonoBehaviour
     {
         //there'll be no menu stuff here, it's simply doing a load
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+    }
+
+    public void setSelectScreenPromptText(enMissionType missionType)
+    {
+        switch (missionType)
+        {
+            case enMissionType.TURRET:
+                gameManager.Instance.panelTitle = "Tailgunner";
+                gameManager.Instance.panelContent = "Defend your bomber against enemy attacks while you fly to do a bombing run. Mission will fail if your bomber is shot down.";
+                break;
+            case enMissionType.BOMBING:
+                gameManager.Instance.panelTitle = "Bombing Run";
+                gameManager.Instance.panelContent = "Avoid anti aircraft fire and destroy all the buildings you can see. Mission will fail if you are destroyed or too many enemy buildings remain.";
+                break;
+            case enMissionType.STRAFING:
+                gameManager.Instance.panelTitle = "Strafing Run";
+                gameManager.Instance.panelContent = "Strafe and destroy enemy vehicles while avoiding anti aircraft fire. Mission will fail if you are destroyed or insufficient vehicles remain.";
+                break;
+            case enMissionType.BASEDEFENCE:
+                gameManager.Instance.panelTitle = "Base Defence";
+                gameManager.Instance.panelContent = "Defend friendly base against enemy bombers. Mission wil fail if too many bombs are dropped.";
+                break;
+            case enMissionType.BASEATTACK:
+                gameManager.Instance.panelTitle = "Base Attack";
+                gameManager.Instance.panelContent = "Escort enemy bombers as they conduct bombing runs on the enemy base. Mission will fail if too many bombers are shot down before they complete their run.";
+                break;
+            case enMissionType.SKIRMISH:
+                gameManager.Instance.panelTitle = "Skirmish";
+                gameManager.Instance.panelContent = "Vye for air superiority against waves of enemy aircraft.";
+                break;
+        }
     }
 
     // Function to load a scene additively and store its reference

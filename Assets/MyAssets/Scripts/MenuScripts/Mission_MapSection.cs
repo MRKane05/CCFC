@@ -58,9 +58,9 @@ public class Mission_MapSection : MonoBehaviour {
         {
 			return enMissionType.BASEDEFENCE;
         }
-		
+				
 
-		return enMissionType.BASEATTACK;
+		return enMissionType.SKIRMISH;
     }
 
 	public void setKeyArea(bool bEnabled)
