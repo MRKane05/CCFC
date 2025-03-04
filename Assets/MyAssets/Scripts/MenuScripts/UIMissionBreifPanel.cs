@@ -1,16 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class UIMissionBreifPanel : MonoBehaviour {
+public class UIMissionBreifPanel : MonoBehaviour
+{
+	public TextMeshProUGUI title;
+	public TextMeshProUGUI description;
 
 	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	IEnumerator Start()
+	{
+		while (!gameManager.Instance)
+        {
+			yield return null;
+        }
+
+		title.text = gameManager.Instance.panelTitle;
+		description.text = gameManager.Instance.panelContent;
 	}
 }

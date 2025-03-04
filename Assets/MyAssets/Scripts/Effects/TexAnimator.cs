@@ -13,6 +13,9 @@ public class TexAnimator : MonoBehaviour {
 	// Update is called once per frame
 	void LateUpdate () {
 		animOffset += new Vector4(Mathf.Repeat (animSpeed[0]*Time.deltaTime, 1f), Mathf.Repeat (animSpeed[1]*Time.deltaTime, 1f), Mathf.Repeat (animSpeed[2]*Time.deltaTime, 1f), Mathf.Repeat (animSpeed[3]*Time.deltaTime, 1f));
-		thisMat.SetVector(channelName, animOffset);
+		if (thisMat)
+		{
+			thisMat.SetVector(channelName, animOffset);
+		}
 	}
 }
