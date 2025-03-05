@@ -1,0 +1,9 @@
+Hint: forward/back on the right still controls overdrive/slow. You will automatically match target speed when within a good engagement distance
+Hint: tapping triangle will select the target closest to your reticule, holding triangle down will select the best target for the mission
+Hint: you can roll manually using left/right on the right thumbstick, while forward/back controls speed
+Hint: left sholder slows time! right sholder fires
+Hint: tapping d-pad up brings up the debug log. It can be dismissed by tapping d-up again, and is useful for telling MRKane if you find a bug!
+Hint: there are bugs! Cherish your favorite because it won't be around forever!
+Hint: sometimes the game will tell you the wrong things, at the wrong time. Basically this means that I haven't got around to completing that particular part
+Hint: unsurprisingly most of this game is placeholder! I'm making it ugly and good, before I make it pretty
+Hint: for $1 per month you can join the Patreon, https://www.patreon.com/MRKane005,  and get involved, get the latest builds, and get on the exclusive Discord channel!

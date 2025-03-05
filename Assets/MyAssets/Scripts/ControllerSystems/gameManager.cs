@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using TMPro;
 using static Mission_MapSection;
+using System.IO;
 
 [System.Serializable]
 public class LevelResults
@@ -40,6 +41,7 @@ public class gameManager : MonoBehaviour {
 	public Slider LoadingSlider;
 	public TextMeshProUGUI loadingScreenTitle;
 	public TextMeshProUGUI loadingScreenDescription;
+	public TextMeshProUGUI loadingScreenHint;
 	#endregion
 
 	#region Universal Debug Flags
@@ -116,6 +118,7 @@ public class gameManager : MonoBehaviour {
     {
 		loadingScreenTitle.text = panelTitle;
 		loadingScreenDescription.text = panelContent;
+		loadingScreenHint.text = getHintString();
 
 		//This extra block of code handles the loading bar and loading screen
 		AsyncOperation async = Application.LoadLevelAsync(SceneName); //PROBLEM: Need better level loading logic here
@@ -206,4 +209,21 @@ public class gameManager : MonoBehaviour {
     {
 		bNeedsNewSave = true;
     }
+
+	string getHintString()
+	{
+		string[] splitFile = new string[] { "\r\n", "\r", "\n" };
+		char[] splitLine = new char[] { ',' };
+		// name
+		string full_path = string.Format("{0}/{1}", Application.streamingAssetsPath, "\\LoadingScreenHints.txt");
+		StreamReader reader = new StreamReader(full_path);
+		string LoadingHintsText = reader.ReadToEnd().Trim();
+		reader.Close();
+
+		//TextAsset LoadingHintsFile = Resources.Load("LoadingScreenHints") as TextAsset;
+		//Debug.Log("LoadingScreenFileText: " + LoadingHintsText);
+		string[] NameLines = LoadingHintsText.Split(splitFile, System.StringSplitOptions.None);
+		//Debug.Log("Name Lines Length: " + NameLines.Length);
+		return NameLines[(int)Random.Range(0, NameLines.Length)];
+	}
 }
