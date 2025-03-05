@@ -11,8 +11,8 @@ public class UIMusicHandler : MonoBehaviour {
 	{
 		if (instance)
 		{
-			Debug.Log("Somehow there's a duplicate UIMusicHandler in the scene");
-			Debug.Log(gameObject.name);
+			//Debug.Log("Removing duplicate UIMusicHandler");
+			//Debug.Log(gameObject.name);
 			Destroy(gameObject);    //Remove ourselves from the scene
 		}
 		else

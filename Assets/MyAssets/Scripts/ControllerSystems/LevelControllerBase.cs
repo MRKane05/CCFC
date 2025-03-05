@@ -35,16 +35,10 @@ public class LevelControllerBase : MonoBehaviour {
 	{
 		yield return new WaitForSeconds(3f);    //Give a little pause after it's complete
 												//We want to load our panel scene here and pause so that the player can bask in the warm glow of seeing a mission complete scene
-		if (!bPlayerDestroyed)
-		{
-			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_Win"); //We're assuming that the player won...
-			yield return async;
-		}
-		else
-		{
-			AsyncOperation async = Application.LoadLevelAsync("LevelComplete_ShotDown"); //We're assuming that the player won...
-			yield return async;
-		}
+		
+		AsyncOperation async = Application.LoadLevelAsync("MissionOverPanel"); //We're assuming that the player won...
+		yield return async;
+
 		Time.timeScale = 0f;    //Going to need to turn this back on somewhere...
 								//What we could actually start doing now is loading our other scene in the background...I'm not sure just how that'll work however, so for the moment fuck it, lets get it working!
 	}

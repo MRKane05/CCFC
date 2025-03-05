@@ -551,7 +551,8 @@ public class LevelController : LevelControllerBase {
 
 		if (thisActor == playerAircraft)
         {
-			Debug.LogError("Player Shot Down");
+			gameManager.Instance.panelTitle = "Shot Down";
+			gameManager.Instance.panelContent = "You were shot down before completing objectives!";
 			finishMatch(true);
 		}
 	}

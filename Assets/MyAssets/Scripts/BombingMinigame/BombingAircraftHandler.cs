@@ -87,6 +87,8 @@ public class BombingAircraftHandler : MonoBehaviour {
 
 		if (PlayerHealth <= 0)
         {
+			gameManager.Instance.panelTitle = "Shot Down";
+			gameManager.Instance.panelContent = "You were shot down before your bomber could complete the mission!";
 			((LevelControllerBomberMinigame)LevelControllerBase.Instance).finishMatch(true);	//Do our fail state
         }
 		//PROBLEM: This needs to play a sound and apply some sort of visual effect so that the player knows we're taking damage

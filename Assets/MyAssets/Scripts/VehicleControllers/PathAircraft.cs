@@ -192,7 +192,9 @@ public class PathAircraft : Actor {
             if (health <= 0)
             {
                 bIsDead = true;
-                ((LevelController)LevelControllerBase.Instance).finishMatch(true);  //Handle our die state
+                gameManager.Instance.panelTitle = "Failure";
+                gameManager.Instance.panelContent = "The bomber you were on was shot down!";
+                ((LevelController)LevelControllerBase.Instance).finishMatch(false);  //Handle our die state
             }
         }
     }

@@ -27,6 +27,15 @@ public class LevelControllerBomberMinigame : LevelControllerBase {
 		if (groundObject.transform.position.z < GroundEndPoint && bLevelRunning)
         {
 			bLevelRunning = false;
+			if (levelTargets.Count >= targetsSuccess)
+			{
+				gameManager.Instance.panelTitle = "Success";
+				gameManager.Instance.panelContent = "You destroyed sufficient targets!";
+			} else
+            {
+				gameManager.Instance.panelTitle = "Failure";
+				gameManager.Instance.panelContent = "You did not destroy sufficient targets!";
+			}
 			finishMatch(levelTargets.Count >= targetsSuccess); //because true is a fail
         }
     }

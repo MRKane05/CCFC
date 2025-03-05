@@ -185,6 +185,8 @@ public class StrafingAircraftHandler : MonoBehaviour {
 
 		if (PlayerHealth <= 0)
         {
+			gameManager.Instance.panelTitle = "Failure";
+			gameManager.Instance.panelContent = "You were shot down during the strafing run!";
 			((LevelControllerBomberMinigame)LevelControllerBase.Instance).finishMatch(true);	//Do our fail state
         }
 		//PROBLEM: This needs to play a sound and apply some sort of visual effect so that the player knows we're taking damage

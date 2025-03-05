@@ -16,8 +16,8 @@ public class SaveUtility : MonoBehaviour {
 	{
 		if (instance)
 		{
-			Debug.Log("Duplicate attempt to create SaveUtility");
-			Debug.Log(gameObject.name);
+			//Debug.Log("Duplicate attempt to create SaveUtility");
+			//Debug.Log(gameObject.name);
 			Destroy(this);	//This might get mopped up by the game manager, but that doesn't matter
 			return; //cancel this
 		}

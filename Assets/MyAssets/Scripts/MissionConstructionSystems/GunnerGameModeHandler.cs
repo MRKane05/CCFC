@@ -36,7 +36,9 @@ public class GunnerGameModeHandler : MissionConstructionBase {
 
 		if (Time.time-levelStartTime > levelDuration && !bNextLevelLoading)
         {
-			bNextLevelLoading = true;	//PROBLEM: I really need a better way to handle this because this is very hacky
+			bNextLevelLoading = true;   //PROBLEM: I really need a better way to handle this because this is very hacky
+			gameManager.Instance.panelTitle = "Success";
+			gameManager.Instance.panelContent = "You defended the bomber you were on until it completed its mission!";
 			((LevelController)LevelControllerBase.Instance).finishMatch(false);
         }
     }

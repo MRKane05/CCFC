@@ -38,6 +38,8 @@ public class gameManager : MonoBehaviour {
 	public TextMeshProUGUI loadingScreenMessage;
     public GameObject LoadingScreenBase;
 	public Slider LoadingSlider;
+	public TextMeshProUGUI loadingScreenTitle;
+	public TextMeshProUGUI loadingScreenDescription;
 	#endregion
 
 	#region Universal Debug Flags
@@ -102,6 +104,9 @@ public class gameManager : MonoBehaviour {
 
 	public void SetLoadingScreen(string loadingMessage, float amount, bool bIsVisible)
     {
+		loadingScreenTitle.text = panelTitle;
+		loadingScreenDescription.text = panelContent;
+
 		LoadingScreenBase.SetActive(bIsVisible);
 		loadingScreenMessage.text = loadingMessage;
 		LoadingSlider.value = amount;
@@ -109,6 +114,9 @@ public class gameManager : MonoBehaviour {
 
 	public IEnumerator loadScene(string SceneName)
     {
+		loadingScreenTitle.text = panelTitle;
+		loadingScreenDescription.text = panelContent;
+
 		//This extra block of code handles the loading bar and loading screen
 		AsyncOperation async = Application.LoadLevelAsync(SceneName); //PROBLEM: Need better level loading logic here
 		loadingScreenMessage.text = "Loading...";
