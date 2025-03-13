@@ -332,10 +332,17 @@ public class Mission_Bombers : MissionConstructionBase
         {
             case enMissionState.COMPLETE:
                 Bombers_Successful++;
-                NGUI_Base.Instance.setPortraitMessage("Pilot", "Bomber attacking target", Color.black);
+                if (BombingTeam == enBombingTeam.PLAYER)
+                {
+                    NGUI_Base.Instance.setPortraitMessage("Pilot", "Bomber attacking target", Color.black);
+                } else
+                {
+                    NGUI_Base.Instance.setPortraitMessage("Commander", "They're bombing! Stop them from getting this far!", Color.black);
+
+                }
                 break;
             case enMissionState.FAILED:
-                if (BombingTeam == enBombingTeam.PLAYER)
+                if (BombingTeam == enBombingTeam.ENEMY)
                 {
                     NGUI_Base.Instance.setPortraitMessage("Commander", "Great job! Bomber Downed!", Color.black);
                 } else
@@ -382,18 +389,31 @@ public class Mission_Bombers : MissionConstructionBase
                 //Lets try a negative approach here
                 if (Bombers_Successful > Mathf.FloorToInt(totalBombers * 0.25f))
                 {
-                    NGUI_Base.Instance.setPortraitMessage("Commander", "Base defence unsuccessful! Mission failure!", Color.black);
-                    DelayFinishMission(false, 5f);
+                    if (BombingTeam == enBombingTeam.ENEMY)
+                    {
+                        NGUI_Base.Instance.setPortraitMessage("Commander", "Base defence unsuccessful! Mission failure!", Color.black);
+                        DelayFinishMission(false, 5f);
+                    }
+                    else
+                    {
+
+                        NGUI_Base.Instance.setPortraitMessage("Commander", "Bomber escort successful. Return home.", Color.black);
+                        DelayFinishMission(false, 5f);
+                    }
                 } else
                 {
-                    if (Bombers_Unsuccessful + Bombers_Downed == totalBombers && !bHasNotifiedMopUp)  //See in theory this'll trigger every time we down a fighter
+                    if (BombingTeam == enBombingTeam.ENEMY)
                     {
-                        bHasNotifiedMopUp = true;
-                        NGUI_Base.Instance.setPortraitMessage("Commander", "Mop up remaining enemy fighters!", Color.black);
-                    } else if (((LevelController)LevelControllerBase.Instance).enemyList.Count == 0)
-                    {
-                        NGUI_Base.Instance.setPortraitMessage("Commander", "Well done! All enemy forces neutralized!", Color.black);
-                        DelayFinishMission(true, 5f);
+                        if (Bombers_Unsuccessful + Bombers_Downed == totalBombers && !bHasNotifiedMopUp)  //See in theory this'll trigger every time we down a fighter
+                        {
+                            bHasNotifiedMopUp = true;
+                            NGUI_Base.Instance.setPortraitMessage("Commander", "Mop up remaining enemy fighters!", Color.black);
+                        }
+                        else if (((LevelController)LevelControllerBase.Instance).enemyList.Count == 0)
+                        {
+                            NGUI_Base.Instance.setPortraitMessage("Commander", "Well done! All enemy forces neutralized!", Color.black);
+                            DelayFinishMission(true, 5f);
+                        }
                     }
                 }
 

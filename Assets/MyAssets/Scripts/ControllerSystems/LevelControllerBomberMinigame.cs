@@ -36,7 +36,7 @@ public class LevelControllerBomberMinigame : LevelControllerBase {
 				gameManager.Instance.panelTitle = "Failure";
 				gameManager.Instance.panelContent = "You did not destroy sufficient targets!";
 			}
-			finishMatch(levelTargets.Count >= targetsSuccess); //because true is a fail
+			finishMatch(!(levelTargets.Count >= targetsSuccess)); //because true is a fail
         }
     }
 }

@@ -145,6 +145,9 @@ public class PanelHandler : MonoBehaviour {
         if (UIMenuHandler.Instance)
         {
             UIMenuHandler.Instance.UnloadMenu(gameObject);
+        } else
+        {
+            Debug.LogError("Could not remove menu: " + gameObject.name + " as there was no UIMenuHandler Instance");
         }
     }
 
@@ -185,23 +188,6 @@ public class PanelHandler : MonoBehaviour {
                 break;
         }
         
-
-        //Old panel functionality
-        /*
-        if (returnPanel)
-        {
-            returnPanel.SetActive(true);
-            PanelHandler returnHandler = returnPanel.GetComponent<PanelHandler>();
-            if (returnHandler) //When exactly is "OnEnable" called?
-            {
-                returnHandler.floatingStartButton = returnButton;
-            }
-        }
-        else if (returnButton)
-        {
-            UIHelpers.SetSelectedButton(returnButton);
-        }
-        */
         gameObject.SetActive(false); //Turn this panel off
     }
 

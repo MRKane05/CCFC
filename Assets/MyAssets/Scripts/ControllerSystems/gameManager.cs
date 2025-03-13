@@ -18,7 +18,7 @@ public class gameManager : MonoBehaviour {
 	private static gameManager instance = null;
 	public static gameManager Instance {get {return instance;}}
 	
-	public enum enGameState { NULL, MENU, LEVELSETUP, LEVELPLAYING, LEVELENDED, PAUSE}	//for VitaHOT I had states on both the LevelController and gameManager, so we're going to try and put everything here
+	public enum enGameState { NULL, MENU, LEVELSETUP, LEVELPLAYING, LEVELENDED, PAUSE }	//for VitaHOT I had states on both the LevelController and gameManager, so we're going to try and put everything here
 	public enGameState GameState = enGameState.NULL;
 
 	public int turnNumber = -1;	//Default unpopulated
@@ -226,4 +226,19 @@ public class gameManager : MonoBehaviour {
 		//Debug.Log("Name Lines Length: " + NameLines.Length);
 		return NameLines[(int)Random.Range(0, NameLines.Length)];
 	}
+
+	GameObject pauseMenu;
+
+	void Update()
+    {
+        #region Pause Menu Functionality
+		if ((Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Start")) && GameState != enGameState.PAUSE)
+        {
+			if (UIMenuHandler.Instance)
+			{
+				UIMenuHandler.Instance.LoadMenuSceneAdditively("Menu_Pause", null, null);
+			}
+		}
+        #endregion
+    }
 }
