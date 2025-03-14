@@ -232,10 +232,11 @@ public class gameManager : MonoBehaviour {
 	void Update()
     {
         #region Pause Menu Functionality
-		if ((Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Start")) && GameState != enGameState.PAUSE)
+		if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetButtonDown("Start")) && GameState != enGameState.MENU)
         {
 			if (UIMenuHandler.Instance)
 			{
+				Debug.Log("Loading Pause Menu");
 				UIMenuHandler.Instance.LoadMenuSceneAdditively("Menu_Pause", null, null);
 			}
 		}

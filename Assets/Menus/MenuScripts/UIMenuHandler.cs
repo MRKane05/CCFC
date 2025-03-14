@@ -80,26 +80,10 @@ public class UIMenuHandler : MonoBehaviour
         if (menuScene.isLoaded)
         {
             SceneManager.UnloadSceneAsync(menuScene.name);
-            //foreach (loadedScene thisScene in loadedScenes)
-            for (int i = loadedScenes.Count; i > 0; i--)
-            {
-                if (loadedScenes[i].scene.name == menuScene.name)
-                {
-                    //we need to remove this from our list. This should be fine as is as I hope we don't get doubles
-                    removeEntries.Add(i);
-                }
-            }
-            if (removeEntries.Count > 0)
-            {
-                foreach(int i in removeEntries)
-                {
-                    loadedScenes.RemoveAt(i);   //Will this backfire?
-                }
-            }
         }
         else
         {
-            Debug.LogWarning("Menu scene is not loaded, cannot unload.");
+            Debug.LogError("Menu scene is not loaded, cannot unload.");
         }
     }
 
@@ -161,10 +145,17 @@ public class UIMenuHandler : MonoBehaviour
         // Once loaded, store the scene reference
         lastLoadedScene = SceneManager.GetSceneByName(sceneName);
         loadedScene newScene = new loadedScene(lastLoadedScene, caller, callingButton);
-        //Debug.Log($"Scene '{newScene.scene.name}' loaded and reference stored.");
-        //Debug.Log("new Scene: " + newScene);
+
         if (caller != null)
         {
+            /*
+            int waitTicks = 1000;
+            Debug.Log("Doing Scene Loaded Callback");
+            for (int i = 0; i < waitTicks; i++)
+            {
+                yield return null;  //Need to wait long enough for the other scene to be fully loaded in front of this one
+            }
+            */
             caller.LoadMenuSceneCallback(newScene, true);
         }
     }

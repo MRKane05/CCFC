@@ -103,7 +103,7 @@ public class PanelHandler : MonoBehaviour {
     public virtual void LoadMenuScene(string sceneName)
     {
         Debug.Log("Loading Scene: " + sceneName);
-        //SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
         if (UIMenuHandler.Instance)
         {
             Debug.Log("Additively loading scene: " + sceneName);
@@ -162,7 +162,8 @@ public class PanelHandler : MonoBehaviour {
                 gameObject.SetActive(false); //simply disable this menu;
                 break;
             case enInteractionType.LOADED:
-                RemoveSelfAndContents();
+                //RemoveSelfAndContents();
+                //So that we don't get a flash we'll get this on the callback
                 break;
             default:
                 RemoveSelfAndContents();
@@ -182,7 +183,7 @@ public class PanelHandler : MonoBehaviour {
                 break;
             case enInteractionType.LOADED:
                 //We need to load a scene for this "return"
-                UIMenuHandler.Instance.LoadMenuSceneAdditively(returnPanel_Scene, null, null);  //Do a dumb load to our other scene
+                UIMenuHandler.Instance.LoadMenuSceneAdditively(returnPanel_Scene, this, null);  //Do a dumb load to our other scene
                 break;
             default:
                 break;
