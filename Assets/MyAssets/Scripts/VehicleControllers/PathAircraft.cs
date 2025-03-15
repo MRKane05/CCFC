@@ -203,13 +203,14 @@ public class PathAircraft : Actor {
     int smokeStages = 0;
     //because we're dealing with something that now has two engines we've got to distribute the smoke in such a way as to reflect what our health is between the two engines
     public override void checkSmokeSystem(float newHealthRatio)
-    { //pinged with take Damage
-        //Debug.Log("checking smoke system");
+    { 
+        //PROBLEM: The smoke here isn't working correctly with the turret sections of the game
         if (smokeEffects.Length == 0)
             return; //we've got nothing to smoke
         smokeStages = smokeEffects.Length * 2 + 1;
         //Basically I want to have one engine smoke grey, then both, then one black, and then both, and then both on fire when it's going in
         float smokeStageThreshold = (float)smokeStage / (float)smokeStages;
+        Debug.Log("Smoke Stage Threshold: " + smokeStageThreshold);
         if (1f-newHealthRatio > smokeStageThreshold)
         {
             smokeStage++; //increment our stage

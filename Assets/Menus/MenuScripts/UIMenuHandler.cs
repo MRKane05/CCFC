@@ -146,33 +146,11 @@ public class UIMenuHandler : MonoBehaviour
         lastLoadedScene = SceneManager.GetSceneByName(sceneName);
         loadedScene newScene = new loadedScene(lastLoadedScene, caller, callingButton);
 
+        //PROBLEM: We're getting a flash here while switching menus. I'm not sure how to resolve this within the limitations of Unity and what it's giving me
+
         if (caller != null)
         {
-            /*
-            int waitTicks = 1000;
-            Debug.Log("Doing Scene Loaded Callback");
-            for (int i = 0; i < waitTicks; i++)
-            {
-                yield return null;  //Need to wait long enough for the other scene to be fully loaded in front of this one
-            }
-            */
             caller.LoadMenuSceneCallback(newScene, true);
         }
     }
-
-    // Function to unload the stored scene
-    /*
-    public void UnloadLoadedMenuScene()
-    {
-        if (loadedScene.IsValid())
-        {
-            SceneManager.UnloadSceneAsync(loadedScene);
-            Debug.Log($"Scene '{loadedScene.name}' unloaded.");
-        }
-        else
-        {
-            Debug.LogWarning("No valid scene to unload.");
-        }
-    }
-    */
 }

@@ -207,14 +207,20 @@ public class PlayerController : ActorController {
 		handleVitaControls(); 
 #endif
 
+		/*
 		//I want to add a little higher function to the game in the form of slowing time to help with the players aiming
-		if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder")) {
-			Time.timeScale = 0.5f;
-		} else
+		if (gameManager.Instance.GameState != gameManager.enGameState.MENU)	//Don't let this system override our pause for the menu
 		{
-			Time.timeScale = 1f;
+			if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder"))
+			{
+				Time.timeScale = 0.5f;
+			}
+			else
+			{
+				Time.timeScale = 1f;
+			}
 		}
-
+		*/
 		//Basic targetting systems
 		if (Input.GetKeyDown(KeyCode.T) || Input.GetButtonDown("Triangle")) {   //Try to target the enemy right in front of us. This is just a keypress
 			GameObject bestEnemy = null;

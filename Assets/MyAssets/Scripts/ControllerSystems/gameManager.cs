@@ -178,11 +178,7 @@ public class gameManager : MonoBehaviour {
 	IEnumerator doConcludeMission(int targetTile)
 	{
 		Time.timeScale = 1f;
-		/*
-		//load our level
-		AsyncOperation async = Application.LoadLevelAsync("MissionSelection"); //PROBLEM: Need better level loading logic here
-		yield return async;
-		*/
+
 		UIMusicHandler.Instance.SetMusicTrack(true); //Set our menu music playing
 		yield return StartCoroutine(loadScene("MissionSelection"));
 		Debug.Log("Loading complete");
@@ -229,7 +225,7 @@ public class gameManager : MonoBehaviour {
 
 	GameObject pauseMenu;
 
-	void Update()
+	void LateUpdate()
     {
         #region Pause Menu Functionality
 		if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetButtonDown("Start")) && GameState != enGameState.MENU)
@@ -237,6 +233,7 @@ public class gameManager : MonoBehaviour {
 			if (UIMenuHandler.Instance)
 			{
 				Debug.Log("Loading Pause Menu");
+				Time.timeScale = 0.00001f;	//Set our pause timescale. I'm not sure if this is effective elsewhere
 				UIMenuHandler.Instance.LoadMenuSceneAdditively("Menu_Pause", null, null);
 			}
 		}
