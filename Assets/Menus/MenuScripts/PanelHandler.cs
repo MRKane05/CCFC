@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 
 //A script that'll handle panel behaviour with a focus on better supporting touch controls
@@ -17,23 +18,15 @@ public class PanelHandler : MonoBehaviour {
     public enInteractionType returnPanelType = enInteractionType.NONE;
     public GameObject startButton;
     protected GameObject returnPanel;
-    /*
-    [Space]
-    [Header("Linked Funcionality")]
-    public GameObject returnPanel;
-    public GameObject returnButton;
-    public GameObject startButton;   //This is all fine but we're looking at moving into scene loading as a pattern now
-    public GameObject floatingStartButton;  //Will be set as part of the return function. Maybe
-    */
-    /*
-    public GameController.enGameControllerState panelGameState = GameController.enGameControllerState.MENU;
-    public GameController.enGameControllerState necessaryCloseState = GameController.enGameControllerState.NULL;    //We can only close the menu if we're in this state
-    public GameController.enGameControllerState optionalReturnState = GameController.enGameControllerState.NULL;
-    */
+    public TextMeshProUGUI buttonDescriptionText;
+
     public virtual void Init()
     {
         IsInitialised = true;
     }
+
+    public UIButtonFunction[] UIButtons;
+
 
     public IEnumerator Start()
     {
@@ -49,6 +42,13 @@ public class PanelHandler : MonoBehaviour {
         if (startButton)
         {
             DoEnable(startButton.name);
+        }
+
+        //Go through and collect our buttons that could have text associated with them, and notify these that we're the thing they should be doing panel about
+        UIButtons = gameObject.GetComponentsInChildren<UIButtonFunction>();
+        foreach (UIButtonFunction thisButton in UIButtons)
+        {
+            thisButton.setPanelHandler(this);
         }
     }
 
@@ -221,5 +221,10 @@ public class PanelHandler : MonoBehaviour {
     {
         //PROBLEM: We don't have a GameController to call against yet
         gameManager.Instance.Invoke(functionName, 0f);
+    }
+
+    public void setDescriptionText(string newText)
+    {
+        buttonDescriptionText.text = newText;
     }
 }

@@ -7,7 +7,13 @@ using UnityEngine.UI;
 //A helper script that'll take different sounds and send commands through to the system to play/do different things
 public class UIButtonFunction : MonoBehaviour, ISelectHandler
 {
-    //public bool bNeedsSelected = false;
+    PanelHandler ourPanelHandler;
+    public string buttonDescription;
+
+    public void setPanelHandler(PanelHandler newPanelHandler)
+    {
+        ourPanelHandler = newPanelHandler;
+    }
 
     public virtual void OnClick()
     {
@@ -22,6 +28,11 @@ public class UIButtonFunction : MonoBehaviour, ISelectHandler
         if (UIInteractionSound.Instance)
         {
             UIInteractionSound.Instance.PlaySelect();
+        }
+        if (ourPanelHandler)
+        {
+            Debug.Log("Setting Panel Text");
+            ourPanelHandler.setDescriptionText(buttonDescription);
         }
     }
 }

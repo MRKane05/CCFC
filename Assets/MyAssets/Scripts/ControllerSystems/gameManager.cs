@@ -228,6 +228,7 @@ public class gameManager : MonoBehaviour {
 	void LateUpdate()
     {
         #region Pause Menu Functionality
+		//This needs to be on late update to prevent interference with the player speed control stuff
 		if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetButtonDown("Start")) && GameState != enGameState.MENU)
         {
 			if (UIMenuHandler.Instance)

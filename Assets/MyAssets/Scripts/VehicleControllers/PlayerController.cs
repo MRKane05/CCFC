@@ -207,7 +207,7 @@ public class PlayerController : ActorController {
 		handleVitaControls(); 
 #endif
 
-		/*
+		
 		//I want to add a little higher function to the game in the form of slowing time to help with the players aiming
 		if (gameManager.Instance.GameState != gameManager.enGameState.MENU)	//Don't let this system override our pause for the menu
 		{
@@ -220,7 +220,7 @@ public class PlayerController : ActorController {
 				Time.timeScale = 1f;
 			}
 		}
-		*/
+		
 		//Basic targetting systems
 		if (Input.GetKeyDown(KeyCode.T) || Input.GetButtonDown("Triangle")) {   //Try to target the enemy right in front of us. This is just a keypress
 			GameObject bestEnemy = null;
