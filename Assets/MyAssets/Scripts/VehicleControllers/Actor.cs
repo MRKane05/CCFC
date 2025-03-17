@@ -104,11 +104,64 @@ public class Actor : MonoBehaviour {
 		targetRotation = newTargetRotation;
 		roll = newRoll;
 	}
-	
+
+	public float getControlCurveValue(float value, float powFactor)
+    {
+		return Mathf.Sign(value) * Mathf.Pow(Mathf.Abs(value), powFactor);
+    }
+
+	float controllerStiffness = 5f; //The higher the number the harder the input action
+	float controllerPowValue = 2f;	//I guess...
+	//Logically our stiffness for control input should be applied here...
 	public void UpdateInput(float newPitch, float newRoll, float newYaw, float newThrottle, bool bIsFiring, int iFireState) {
-		pitch=newPitch; //positive is down
-		roll=newRoll; //Positive is left
-		yaw=newYaw;
+		//Little code block for tweaking the softness/pitch values
+		if (Input.GetButtonDown("Dright"))
+        {
+			controllerStiffness += 5f;
+			if (controllerStiffness > 30f)
+            {
+				controllerStiffness = 5f;
+				//A debug of sorts would be awesome here
+				Debug.Log("Control Stiffness: " + controllerStiffness);
+            }
+        }
+
+		if (Input.GetButtonDown("Dleft"))
+		{
+			controllerPowValue += 0.5f;
+			if (controllerPowValue > 5f)
+			{
+				controllerPowValue = 1f;
+				//A debug of sorts would be awesome here
+				Debug.Log("Control Power Value: " + controllerPowValue);
+			}
+		}
+
+
+
+
+		if (!bIsPlayerVehicle)
+		{
+			pitch = newPitch; //positive is down
+			roll = newRoll; //Positive is left
+			yaw = newYaw;
+		} else
+        {
+			//Apply a controller curve to the pitch itself
+			newPitch = getControlCurveValue(newPitch, controllerPowValue);
+			//Apply our soften factor here
+			float pitchLerp = Mathf.Abs(pitch) > Mathf.Abs(newPitch) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
+			pitch = Mathf.Lerp(pitch, newPitch, Time.deltaTime * pitchLerp);
+
+			newRoll = getControlCurveValue(newRoll, controllerPowValue);
+			float rollLerp = Mathf.Abs(roll) > Mathf.Abs(newRoll) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
+			roll = Mathf.Lerp(roll, newRoll, Time.deltaTime * rollLerp);
+
+			newYaw = getControlCurveValue(newYaw, controllerPowValue);
+			float yawLerp = Mathf.Abs(yaw) > Mathf.Abs(newYaw) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
+			yaw = Mathf.Lerp(yaw, newYaw, Time.deltaTime * yawLerp);
+		}
+
 		throttleControl=newThrottle;
 		bFiring=bIsFiring;
 		FireState = iFireState;

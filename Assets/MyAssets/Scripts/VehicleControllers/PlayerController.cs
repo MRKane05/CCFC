@@ -38,7 +38,7 @@ public class PlayerController : ActorController {
 	public float mAltitude;
 
 	//Player input preferences
-	public int yAxisBias = -1;
+	public int yAxisBias = -1;	//Used for flipping Y axis
 
 
 	void Start () {
@@ -280,6 +280,9 @@ public class PlayerController : ActorController {
 			bFiring = false;
 
 		//ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+
+		Vector2 SteeringInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical") * yAxisBias);
+		float SteeringInputMagnitude = SteeringInput.magnitude;
 
 		if (Mathf.Abs(Input.GetAxis("Left Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Left Stick Horizontal")) < rollReturnSensitivity
 			&& Mathf.Abs(Input.GetAxis("Right Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Right Stick Horizontal")) < rollReturnSensitivity)
