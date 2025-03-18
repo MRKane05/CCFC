@@ -234,6 +234,7 @@ public class gameManager : MonoBehaviour {
 			if (UIMenuHandler.Instance)
 			{
 				Debug.Log("Loading Pause Menu");
+				GameState = enGameState.PAUSE;
 				Time.timeScale = 0.00001f;	//Set our pause timescale. I'm not sure if this is effective elsewhere
 				UIMenuHandler.Instance.LoadMenuSceneAdditively("Menu_Pause", null, null);
 			}

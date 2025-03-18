@@ -13,7 +13,7 @@ public class ValueListenerExample : MonoBehaviour {
 		UISettingsHandler.Instance.OnSettingsChanged.AddListener(UpdateInternalSettings);
 	}
 	
-	void UpdateInternalSettings(int value)
+	void UpdateInternalSettings()
     {
 		Debug.Log("Checking settings changed");
 	}

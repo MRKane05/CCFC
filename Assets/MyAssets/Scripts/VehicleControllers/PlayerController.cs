@@ -37,8 +37,6 @@ public class PlayerController : ActorController {
 	
 	public float mAltitude;
 
-	//Player input preferences
-	public int yAxisBias = -1;	//Used for flipping Y axis
 
 
 	void Start () {
@@ -186,21 +184,6 @@ public class PlayerController : ActorController {
 			//mAltitude = ourAircraft.checkAltitude();
 		}
 
-
-
-		/*
-		//case we've got the controller shot out
-		if (targetController) {
-			if (targetController.bIsDead && ((LevelController)LevelControllerBase.Instance).enemyList.Count > 0) {
-	((LevelController)LevelControllerBase.Instance).requestTarget(this); //call something if we've lost this target (to discourage players from drilling something out)
-			}
-			else { //send through that we're discarding our targets
-				target = null;
-				targetController.bIsTarget = false; //regardless of it being destroyed tell it that it's off the hook
-				targetController = null;
-			}
-		}
-		*/
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
 		handleInputControls();
 #else
@@ -209,15 +192,28 @@ public class PlayerController : ActorController {
 
 		
 		//I want to add a little higher function to the game in the form of slowing time to help with the players aiming
-		if (gameManager.Instance.GameState != gameManager.enGameState.MENU)	//Don't let this system override our pause for the menu
+		if (gameManager.Instance.GameState == gameManager.enGameState.LEVELPLAYING)	//Don't let this system override our pause for the menu
 		{
-			if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder"))
+			if (ourAircraft.bTriggerControlRight)	//Again: I'm not above terrible programming to get something working - Kano!
 			{
-				Time.timeScale = 0.5f;
-			}
-			else
-			{
-				Time.timeScale = 1f;
+				if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Left Shoulder"))
+				{
+					Time.timeScale = 0.5f;
+				}
+				else
+				{
+					Time.timeScale = 1f;
+				}
+			} else
+            {
+				if (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Right Shoulder"))
+				{
+					Time.timeScale = 0.5f;
+				}
+				else
+				{
+					Time.timeScale = 1f;
+				}
 			}
 		}
 		
@@ -258,41 +254,64 @@ public class PlayerController : ActorController {
 			targetButtonHoldTime = 0;	//Debounce this button
         }
 	}
-    float targetButtonHoldTime = 0;
 
+    float targetButtonHoldTime = 0;
 
 	float rollReturnSensitivity = 0.1f;
 	bool bControlsUp = false;
 	void handleVitaControls()
 	{
+        #region Shooting Controls
+        if (ourAircraft.bTriggerControlRight) //Um...fuckit
+		{
+			//Why did we do this again?
+			if (Input.GetButtonDown("Right Shoulder"))
+				FireState = 1;
+			else if (Input.GetButton("Right Shoulder"))
+				FireState = 2;
+			else
+				FireState = 0;
 
-		//Why did we do this again?
-		if (Input.GetButtonDown("Right Shoulder"))
-			FireState = 1;
-		else if (Input.GetButton("Right Shoulder"))
-			FireState = 2;
-		else
-			FireState = 0;
+			if (Input.GetButton("Right Shoulder"))
+				bFiring = true;
+			else
+				bFiring = false;
+		} else
+        {
+			//Why did we do this again?
+			if (Input.GetButtonDown("Left Shoulder"))
+				FireState = 1;
+			else if (Input.GetButton("Left Shoulder"))
+				FireState = 2;
+			else
+				FireState = 0;
 
-		if (Input.GetButton("Right Shoulder"))
-			bFiring = true;
-		else
-			bFiring = false;
+			if (Input.GetButton("Left Shoulder"))
+				bFiring = true;
+			else
+				bFiring = false;
+		}
+        #endregion
 
-		//ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+        //ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 
-		Vector2 SteeringInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical") * yAxisBias);
-		float SteeringInputMagnitude = SteeringInput.magnitude;
+        Vector2 LeftInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical"));
+		float LeftInputMagnitude = LeftInput.magnitude;
+		Vector2 RightInput = new Vector2(Input.GetAxis("Right Stick Horizontal"), Input.GetAxis("Right Stick Vertical"));
+		float RightInputMagnitude = RightInput.magnitude;
 
-		if (Mathf.Abs(Input.GetAxis("Left Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Left Stick Horizontal")) < rollReturnSensitivity
-			&& Mathf.Abs(Input.GetAxis("Right Stick Vertical")) < rollReturnSensitivity && Mathf.Abs(Input.GetAxis("Right Stick Horizontal")) < rollReturnSensitivity)
+		//PROBLEM: Need to put in a ton of handler stuff for handedness, triggers etc.
+
+		if (LeftInputMagnitude < rollReturnSensitivity && RightInputMagnitude < rollReturnSensitivity)
 		{
 			if (!bControlsUp)
 			{
 				bControlsUp = true;
 				RollReturnTime = Time.time + RollReturnWait;
-				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1] * YControl), ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-				ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+
+				//DirectUpdateInput
+				ourAircraft.DirectUpdateInput(LeftInput, RightInput, bFiring, FireState);
+				//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 			}
 			else if (Time.time > RollReturnTime)    //Roll our aircraft back to level flight
 			{
@@ -306,13 +325,13 @@ public class PlayerController : ActorController {
 				//editor input hack
 				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch), ControlSensitivityCurve.Evaluate(roll), InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), throttleControl, bFiring, FireState);
 				ourAircraft.UpdateInput(0, 0, InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
-
 			}
 		}
 		else
 		{ //annol input for the controls.
 			bControlsUp = false;
-			ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+			ourAircraft.DirectUpdateInput(LeftInput, RightInput, bFiring, FireState);
+			//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 		}
 	}
 

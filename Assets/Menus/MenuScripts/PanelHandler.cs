@@ -225,6 +225,17 @@ public class PanelHandler : MonoBehaviour {
 
     public void setDescriptionText(string newText)
     {
-        buttonDescriptionText.text = newText;
+        if (buttonDescriptionText)
+        {
+            buttonDescriptionText.text = newText;
+        }
+    }
+
+    public void ConfirmSettingsChanged()
+    {
+        if (UISettingsHandler.Instance)
+        {
+            UISettingsHandler.Instance.ConfirmChanges();
+        }
     }
 }

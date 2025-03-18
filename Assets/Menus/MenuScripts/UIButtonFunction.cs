@@ -31,7 +31,7 @@ public class UIButtonFunction : MonoBehaviour, ISelectHandler
         }
         if (ourPanelHandler)
         {
-            Debug.Log("Setting Panel Text");
+            //Debug.Log("Setting Panel Text");
             ourPanelHandler.setDescriptionText(buttonDescription);
         }
     }

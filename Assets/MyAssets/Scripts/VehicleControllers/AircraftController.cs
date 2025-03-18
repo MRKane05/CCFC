@@ -192,7 +192,9 @@ public class AircraftController : Actor {
 	}
 
 	// Use this for initialization, but it wipes out what we did at the base level...
-	void Start() {
+	public override void DoStart()
+	{
+		base.DoStart();
 		doVehicleSetup();
 	}
 
@@ -497,5 +499,18 @@ public class AircraftController : Actor {
 
 	public override GameObject getModel() {
 		return AircraftModel; //it really is that simple
+	}
+
+	public override void DoUpdateInternalSettings()
+	{
+		//Mainly because I'll want to override for different vehicles
+		float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("flight_look_softness");
+		controllerSoftness = Mathf.Lerp(30f, 300f, controllerSoftnessValue);
+
+		yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? 1 : -1;
+
+		bStickControlRight = UISettingsHandler.Instance.getSettingInt("flight_control_handedness") == 0;
+
+		bTriggerControlRight = UISettingsHandler.Instance.getSettingInt("flight_trigger_handedness") == 0;
 	}
 }

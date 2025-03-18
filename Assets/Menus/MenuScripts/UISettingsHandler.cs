@@ -13,7 +13,7 @@ public class UISettingsHandler : MonoBehaviour {
     Dictionary<string, float> settings_Float = new Dictionary<string, float>();
 
     [System.Serializable]
-    public class SettingsChangedEvent : UnityEvent<int>
+    public class SettingsChangedEvent : UnityEvent
     {
     }
 
@@ -38,7 +38,7 @@ public class UISettingsHandler : MonoBehaviour {
     //to all scripts needing updates pertaining to settings AND also to save the player preferences
     public void ConfirmChanges()
     {
-        OnSettingsChanged.Invoke(0);
+        OnSettingsChanged.Invoke();
         PlayerPrefs.Save();
     }
 

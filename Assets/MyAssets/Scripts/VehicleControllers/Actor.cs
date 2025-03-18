@@ -42,16 +42,38 @@ public class Actor : MonoBehaviour {
 	public float pitchspeed = 1.5F;
 	public float yawspeed = 1.5F;       //Used by the AI for doing turns
 
+
+	//Some internal player settings stuff
+	protected float controllerSoftness = 50f; //The higher the number the harder the input action
+	protected float controllerPowValue = 2f;  //I guess...
+	protected float yAxisBias = -1;
+	protected bool bStickControlRight = true;
+
+	[HideInInspector]
+	public bool bTriggerControlRight = true;
+
+
 	public float inFade {
 		get { return Mathf.Clamp01((Time.time-inFadeStart)/inFadeTime); }
 	}
 
-	void Start() {
+	IEnumerator Start() {
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
 		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
 
 		inFadeStart = Time.deltaTime;
 		DoStart();
+
+		yield return null;
+		if (bIsPlayerVehicle)
+		{
+			while (UISettingsHandler.Instance == null)
+			{
+				yield return null;
+			}
+			UISettingsHandler.Instance.OnSettingsChanged.AddListener(UpdateInternalSettings);
+			DoUpdateInternalSettings();	//make sure we get our settings on start
+		}
 	}
 
 	public virtual void DoStart()
@@ -110,35 +132,22 @@ public class Actor : MonoBehaviour {
 		return Mathf.Sign(value) * Mathf.Pow(Mathf.Abs(value), powFactor);
     }
 
-	float controllerStiffness = 5f; //The higher the number the harder the input action
-	float controllerPowValue = 2f;	//I guess...
+
+	public void DirectUpdateInput(Vector2 leftStickAxis, Vector2 rightStickAxis, bool bIsFiring, int iFireState)
+	{
+		//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+		if (bStickControlRight)
+		{
+			UpdateInput(leftStickAxis.y, leftStickAxis.x, rightStickAxis.x, -rightStickAxis.y, bIsFiring, iFireState);
+		}
+		else
+		{
+			UpdateInput(rightStickAxis.y, rightStickAxis.x, leftStickAxis.x, -leftStickAxis.y, bIsFiring, iFireState);
+		}
+	}
+
 	//Logically our stiffness for control input should be applied here...
 	public void UpdateInput(float newPitch, float newRoll, float newYaw, float newThrottle, bool bIsFiring, int iFireState) {
-		//Little code block for tweaking the softness/pitch values
-		if (Input.GetButtonDown("Dright"))
-        {
-			controllerStiffness += 5f;
-			if (controllerStiffness > 30f)
-            {
-				controllerStiffness = 5f;
-				//A debug of sorts would be awesome here
-				Debug.Log("Control Stiffness: " + controllerStiffness);
-            }
-        }
-
-		if (Input.GetButtonDown("Dleft"))
-		{
-			controllerPowValue += 0.5f;
-			if (controllerPowValue > 5f)
-			{
-				controllerPowValue = 1f;
-				//A debug of sorts would be awesome here
-				Debug.Log("Control Power Value: " + controllerPowValue);
-			}
-		}
-
-
-
 
 		if (!bIsPlayerVehicle)
 		{
@@ -148,17 +157,17 @@ public class Actor : MonoBehaviour {
 		} else
         {
 			//Apply a controller curve to the pitch itself
-			newPitch = getControlCurveValue(newPitch, controllerPowValue);
+			newPitch = getControlCurveValue(newPitch * yAxisBias, controllerPowValue);
 			//Apply our soften factor here
-			float pitchLerp = Mathf.Abs(pitch) > Mathf.Abs(newPitch) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
-			pitch = Mathf.Lerp(pitch, newPitch, Time.deltaTime * pitchLerp);
+			//float pitchLerp = Mathf.Abs(pitch) > Mathf.Abs(newPitch) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
+			pitch = Mathf.Lerp(pitch, newPitch, Mathf.Clamp01(Time.deltaTime * controllerSoftness));
 
 			newRoll = getControlCurveValue(newRoll, controllerPowValue);
-			float rollLerp = Mathf.Abs(roll) > Mathf.Abs(newRoll) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
+			float rollLerp = Mathf.Abs(roll) > Mathf.Abs(newRoll) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
 			roll = Mathf.Lerp(roll, newRoll, Time.deltaTime * rollLerp);
 
 			newYaw = getControlCurveValue(newYaw, controllerPowValue);
-			float yawLerp = Mathf.Abs(yaw) > Mathf.Abs(newYaw) ? controllerStiffness * 2f : controllerStiffness;    //This is so that our engage is softer than our disengage
+			float yawLerp = Mathf.Abs(yaw) > Mathf.Abs(newYaw) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
 			yaw = Mathf.Lerp(yaw, newYaw, Time.deltaTime * yawLerp);
 		}
 
@@ -300,4 +309,26 @@ public class Actor : MonoBehaviour {
 		else
 			transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 2f);
 	}
+
+
+    #region Settings Handlers
+    void OnDestroy()
+	{
+		if (bIsPlayerVehicle)
+		{
+			UISettingsHandler.Instance.OnSettingsChanged.RemoveListener(UpdateInternalSettings);
+		}
+	}
+
+	void UpdateInternalSettings()
+	{
+		DoUpdateInternalSettings();
+	}
+
+	public virtual void DoUpdateInternalSettings()
+    {
+		
+    }
+
+	#endregion
 }
