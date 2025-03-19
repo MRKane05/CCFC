@@ -133,7 +133,7 @@ public class Actor : MonoBehaviour {
     }
 
 
-	public void DirectUpdateInput(Vector2 leftStickAxis, Vector2 rightStickAxis, bool bIsFiring, int iFireState)
+	public virtual void DirectUpdateInput(Vector2 leftStickAxis, Vector2 rightStickAxis, bool bIsFiring, int iFireState)
 	{
 		//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 		if (bStickControlRight)

@@ -64,4 +64,17 @@ public class TurretController : Actor {
 		transform.localEulerAngles = new Vector3(ClampAngle(transform.localEulerAngles.x, -60, 30), Mathf.Clamp(transform.localEulerAngles.y, 10, 230f), transform.localEulerAngles.z);
 
 	}
+
+	public override void DoUpdateInternalSettings()
+	{
+		//Mainly because I'll want to override for different vehicles
+		float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("turret_look_softness");
+		controllerSoftness = Mathf.Lerp(100f, 10f, controllerSoftnessValue);
+
+		yAxisBias = UISettingsHandler.Instance.getSettingInt("turret_look_inversion") == 0 ? -1 : 1;
+
+		bStickControlRight = UISettingsHandler.Instance.getSettingInt("turret_control_handedness") == 0;
+
+		bTriggerControlRight = UISettingsHandler.Instance.getSettingInt("turret_trigger_handedness") == 0;
+	}
 }
