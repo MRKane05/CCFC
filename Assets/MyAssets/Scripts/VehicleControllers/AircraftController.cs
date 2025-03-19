@@ -505,9 +505,9 @@ public class AircraftController : Actor {
 	{
 		//Mainly because I'll want to override for different vehicles
 		float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("flight_look_softness");
-		controllerSoftness = Mathf.Lerp(30f, 300f, controllerSoftnessValue);
+		controllerSoftness = Mathf.Lerp(100f, 10f, controllerSoftnessValue);
 
-		yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? 1 : -1;
+		yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? -1 : 1;
 
 		bStickControlRight = UISettingsHandler.Instance.getSettingInt("flight_control_handedness") == 0;
 

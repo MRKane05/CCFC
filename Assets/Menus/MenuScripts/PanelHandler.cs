@@ -173,6 +173,7 @@ public class PanelHandler : MonoBehaviour {
         switch (returnPanelType)
         {
             case enInteractionType.NONE:
+                RemoveSelfAndContents();
                 break;
             case enInteractionType.BASE:
                 if (returnPanel_Scene.Length > 3)   //In theory we've got a scene to load, or something to look for here
@@ -189,7 +190,7 @@ public class PanelHandler : MonoBehaviour {
                 break;
         }
         
-        gameObject.SetActive(false); //Turn this panel off
+        //gameObject.SetActive(false); //Turn this panel off
     }
 
     void Update()

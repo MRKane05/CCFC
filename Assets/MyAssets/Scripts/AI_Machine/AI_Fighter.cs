@@ -455,7 +455,7 @@ public class AI_Fighter : ActorController {
 		
 		
 		Ray ray = new Ray(ourAircraft.transform.position, Vector3.Lerp(ourAircraft.transform.forward, -Vector3.up, 0.3F)); //shoot this ray down to see where we contact
-		Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
+		//Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
 		RaycastHit hit;
 
 		if (Physics.Raycast(ray, 7f, LevelControllerBase.Instance.GroundMask)) {// ourAircraft.groundCollider.Raycast (ray, out hit, 7)) { //not sure about the distance required here...

@@ -163,12 +163,12 @@ public class Actor : MonoBehaviour {
 			pitch = Mathf.Lerp(pitch, newPitch, Mathf.Clamp01(Time.deltaTime * controllerSoftness));
 
 			newRoll = getControlCurveValue(newRoll, controllerPowValue);
-			float rollLerp = Mathf.Abs(roll) > Mathf.Abs(newRoll) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
-			roll = Mathf.Lerp(roll, newRoll, Time.deltaTime * rollLerp);
+			//float rollLerp = Mathf.Abs(roll) > Mathf.Abs(newRoll) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
+			roll = Mathf.Lerp(roll, newRoll, Time.deltaTime * controllerSoftness);
 
 			newYaw = getControlCurveValue(newYaw, controllerPowValue);
-			float yawLerp = Mathf.Abs(yaw) > Mathf.Abs(newYaw) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
-			yaw = Mathf.Lerp(yaw, newYaw, Time.deltaTime * yawLerp);
+			//float yawLerp = Mathf.Abs(yaw) > Mathf.Abs(newYaw) ? controllerSoftness : controllerSoftness * 2f;    //This is so that our engage is softer than our disengage
+			yaw = Mathf.Lerp(yaw, newYaw, Time.deltaTime * controllerSoftness);
 		}
 
 		throttleControl=newThrottle;
