@@ -8,11 +8,20 @@ using TMPro;
 
 //A script that'll handle panel behaviour with a focus on better supporting touch controls
 public class PanelHandler : MonoBehaviour {
-    public enum enInteractionType { NONE, BASE, LOADED, RESIDENT }
+
+    //Panel return types:
+    //Base is a base panel that remains within the scene
+    //Loaded loads a panel
+    //For the life of me I can't remember what Resident does
+    //BaseHide keeps the base panel but hides it
+    //Cached uses cached information for returning from a different panel
+
+    public enum enInteractionType { NONE, BASE, LOADED, RESIDENT, BASEHIDE, CACHED }
     public enInteractionType enPanelType = enInteractionType.NONE;  //This'll also be handed as our panel scene types
     public bool IsInitialised { get; protected set; }
     [Space]
     public bool bCanBeDismissed = true;
+    public bool bShouldCache = false;
     public string returnPanel_Scene = "";   //When the user presses close what panel scene do we fall back to?
     public string returnPanel_Button = "";  //What button will we open when we return from this panel?
     public enInteractionType returnPanelType = enInteractionType.NONE;
@@ -129,6 +138,8 @@ public class PanelHandler : MonoBehaviour {
                 RemoveSelfAndContents();
                 break;
             case enInteractionType.BASE:
+                break;
+            case enInteractionType.BASEHIDE:
                 gameObject.SetActive(false); //simply disable this menu;
                 break;
             case enInteractionType.LOADED:
@@ -159,6 +170,9 @@ public class PanelHandler : MonoBehaviour {
                 RemoveSelfAndContents();
                 break;
             case enInteractionType.BASE:
+                //We shouldn't actually have to disble this menu...
+                break;
+            case enInteractionType.BASEHIDE:
                 gameObject.SetActive(false); //simply disable this menu;
                 break;
             case enInteractionType.LOADED:
@@ -185,6 +199,19 @@ public class PanelHandler : MonoBehaviour {
             case enInteractionType.LOADED:
                 //We need to load a scene for this "return"
                 UIMenuHandler.Instance.LoadMenuSceneAdditively(returnPanel_Scene, this, null);  //Do a dumb load to our other scene
+                break;
+            case enInteractionType.CACHED:
+                if (UIMenuHandler.Instance.cachedReturnPanel_Scene.Length > 3 && bShouldCache)
+                {
+                    UIMenuHandler.Instance.LoadMenuSceneAdditively(UIMenuHandler.Instance.cachedReturnPanel_Scene, this, null);
+                    if (UIMenuHandler.Instance.cachedReturnPanel_Button.Length > 3) {
+                        returnPanel_Button = UIMenuHandler.Instance.cachedReturnPanel_Button; //This could go horribly wrong if incorectlys setup
+                    }
+                }
+                else
+                {
+                    UIMenuHandler.Instance.LoadMenuSceneAdditively(returnPanel_Scene, this, null);  //Do a dumb load to our other scene
+                }
                 break;
             default:
                 break;

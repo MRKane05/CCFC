@@ -471,6 +471,10 @@ public class AircraftController : Actor {
 	}
 
 	void PlayerUpdate() {
+		pitch = Mathf.Lerp(pitch, targetPitch, Time.deltaTime * controlResponce);
+		roll = Mathf.Lerp(roll, targetRoll, Time.deltaTime * controlResponce);
+		yaw = Mathf.Lerp(yaw, targetYaw, Time.deltaTime * controlResponce);
+
 		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
 			//roll commands
 			transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
@@ -504,8 +508,8 @@ public class AircraftController : Actor {
 	public override void DoUpdateInternalSettings()
 	{
 		//Mainly because I'll want to override for different vehicles
-		float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("flight_look_softness");
-		controllerSoftness = Mathf.Lerp(100f, 10f, controllerSoftnessValue);
+		//float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("flight_look_softness");
+		//controllerSoftness = Mathf.Lerp(70f, 10f, controllerSoftnessValue);
 
 		yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? -1 : 1;
 

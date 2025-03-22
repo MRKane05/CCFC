@@ -13,15 +13,17 @@ public class TurretController : Actor {
 
 	GameObject ourCameraObject;
 
-	public float crusingSpeed = 3;		//It's important that this is the same as the aircraft we're riding on as the AI uses the player object as a reference
-	//public float rollspeed = 1.5F;      //Used by the AI for doing turns
-	//public float pitchspeed = 1.5F;
-	//public float yawspeed = 1.5F;       //Used by the AI for doing turns
+	public float crusingSpeed = 3;      //It's important that this is the same as the aircraft we're riding on as the AI uses the player object as a reference
+										//public float rollspeed = 1.5F;      //Used by the AI for doing turns
+										//public float pitchspeed = 1.5F;
+										//public float yawspeed = 1.5F;       //Used by the AI for doing turns
 
-	
+
 
 	// Use this for initialization
-	void Start () {
+	public override void DoStart()
+	{
+		base.DoStart();
 		doTurretSetup();
 		speed = crusingSpeed;
 	}
@@ -56,21 +58,24 @@ public class TurretController : Actor {
 
 	void PlayerUpdate()
 	{
+		pitch = Mathf.Lerp(pitch, targetPitch, Time.deltaTime * controlResponce);
+		roll = Mathf.Lerp(roll, targetRoll, Time.deltaTime * controlResponce);
+		yaw = Mathf.Lerp(yaw, targetYaw, Time.deltaTime * controlResponce);
+
 
 		transform.RotateAround(transform.parent.transform.up, roll * rollspeed * Time.deltaTime);
 		transform.RotateAround(ourCameraObject.transform.right, pitch * pitchspeed * Time.deltaTime);
 
 		//Problematically we're dealing with that 360 problem again
 		transform.localEulerAngles = new Vector3(ClampAngle(transform.localEulerAngles.x, -60, 30), Mathf.Clamp(transform.localEulerAngles.y, 10, 230f), transform.localEulerAngles.z);
-
 	}
 
 	public override void DoUpdateInternalSettings()
 	{
 		//Mainly because I'll want to override for different vehicles
-		float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("turret_look_softness");
-		controllerSoftness = Mathf.Lerp(100f, 10f, controllerSoftnessValue);
-
+		//float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("turret_look_softness");
+		//controllerSoftness = Mathf.Lerp(70f, 10f, controllerSoftnessValue);
+		//Debug.Log("Controller Softness: " + controllerSoftness);
 		yAxisBias = UISettingsHandler.Instance.getSettingInt("turret_look_inversion") == 0 ? -1 : 1;
 
 		bStickControlRight = UISettingsHandler.Instance.getSettingInt("turret_control_handedness") == 0;

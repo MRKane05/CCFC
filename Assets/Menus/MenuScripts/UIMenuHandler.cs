@@ -36,6 +36,9 @@ public class UIMenuHandler : MonoBehaviour
     private static UIMenuHandler instance = null;
     public static UIMenuHandler Instance { get { return instance; } }
 
+    public string cachedReturnPanel_Scene = "";
+    public string cachedReturnPanel_Button = "";
+
     void Awake()
     {
         if (instance)
@@ -145,6 +148,30 @@ public class UIMenuHandler : MonoBehaviour
         // Once loaded, store the scene reference
         lastLoadedScene = SceneManager.GetSceneByName(sceneName);
         loadedScene newScene = new loadedScene(lastLoadedScene, caller, callingButton);
+
+        //Get our panel information and pass on bits and pieces as necessary
+        GameObject[] sceneGameObjects = lastLoadedScene.GetRootGameObjects();   //Our PanelHandler will be on one of these
+        foreach (GameObject thisObject in sceneGameObjects)
+        {
+            PanelHandler attachedPanelHandler = thisObject.GetComponent<PanelHandler>();
+            if (attachedPanelHandler)
+            {
+                if (attachedPanelHandler.returnPanelType == PanelHandler.enInteractionType.CACHED)  //We want to callback to the panel that loaded us
+                {
+                    //This only works once...
+                    if (caller)
+                    {
+                        cachedReturnPanel_Scene = caller.gameObject.scene.name;
+                    }
+
+                    if (callingButton)
+                    {
+                        cachedReturnPanel_Scene = callingButton.scene.name;
+                        cachedReturnPanel_Button = callingButton.name;
+                    }
+                }
+            }
+        }
 
         //PROBLEM: We're getting a flash here while switching menus. I'm not sure how to resolve this within the limitations of Unity and what it's giving me
 

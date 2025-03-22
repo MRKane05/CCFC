@@ -33,6 +33,9 @@ public class MissionConstructionBase : MonoBehaviour {
     private static MissionConstructionBase instance = null;
     public static MissionConstructionBase Instance { get { return instance; } }
 
+    public enum enMissionPlayState { NULL, START, PLAYING, FINISHED }
+    public enMissionPlayState MissionPlayState = enMissionPlayState.START;
+
     void Awake()
     {
         if (instance)
@@ -60,7 +63,7 @@ public class MissionConstructionBase : MonoBehaviour {
 
     public virtual void DoStart()
     {
-
+        MissionPlayState = enMissionPlayState.PLAYING;
     }
 
 	public void DelayFinishMission(bool bSuccess, float delayTime)

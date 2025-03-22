@@ -210,7 +210,7 @@ public class PathAircraft : Actor {
         smokeStages = smokeEffects.Length * 2 + 1;
         //Basically I want to have one engine smoke grey, then both, then one black, and then both, and then both on fire when it's going in
         float smokeStageThreshold = (float)smokeStage / (float)smokeStages;
-        Debug.Log("Smoke Stage Threshold: " + smokeStageThreshold);
+        //Debug.Log("Smoke Stage Threshold: " + smokeStageThreshold);
         if (1f-newHealthRatio > smokeStageThreshold)
         {
             smokeStage++; //increment our stage

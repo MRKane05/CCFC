@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.PSVita;
 
 public class PlayerController : ActorController {
 	
@@ -300,7 +301,17 @@ public class PlayerController : ActorController {
 		Vector2 RightInput = new Vector2(Input.GetAxis("Right Stick Horizontal"), Input.GetAxis("Right Stick Vertical"));
 		float RightInputMagnitude = RightInput.magnitude;
 
-		//PROBLEM: Need to put in a ton of handler stuff for handedness, triggers etc.
+		//See about adding in gyro settings here
+		Vector3 gyroGravDir = Input.gyro.gravity;
+		//So in theory if we're leaning to one side our Dot.Camera.Right will be either positive or negative
+
+		bool bLeftMagnitudeLower = (proxyLeftStick.sqrMagnitude > LeftInput.sqrMagnitude);
+		bool bRightMagnitudeLower = (proxyRightStick.sqrMagnitude > RightInput.sqrMagnitude);
+
+		//proxyLeftStick = Vector2.Lerp(proxyLeftStick, LeftInput, Time.deltaTime * (bLeftMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
+		//proxyRightStick = Vector2.Lerp(proxyRightStick, RightInput, Time.deltaTime * (bRightMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
+		proxyLeftStick = LeftInput;
+		proxyRightStick = RightInput;
 
 		if (LeftInputMagnitude < rollReturnSensitivity && RightInputMagnitude < rollReturnSensitivity)
 		{
@@ -310,7 +321,7 @@ public class PlayerController : ActorController {
 				RollReturnTime = Time.time + RollReturnWait;
 
 				//DirectUpdateInput
-				ourAircraft.DirectUpdateInput(LeftInput, RightInput, bFiring, FireState);
+				ourAircraft.DirectUpdateInput(proxyLeftStick, proxyRightStick, bFiring, FireState);
 				//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 			}
 			else if (Time.time > RollReturnTime)    //Roll our aircraft back to level flight
@@ -324,16 +335,21 @@ public class PlayerController : ActorController {
 
 				//editor input hack
 				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch), ControlSensitivityCurve.Evaluate(roll), InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), throttleControl, bFiring, FireState);
-				ourAircraft.UpdateInput(0, 0, InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+				//ourAircraft.UpdateInput(0, 0, InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
+				ourAircraft.DirectUpdateInput(Vector2.zero, new Vector2(InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2] - ourAircraft.transform.eulerAngles[2], 360)), -Input.GetAxis("Right Stick Vertical")), bFiring, FireState);
 			}
 		}
 		else
 		{ //annol input for the controls.
 			bControlsUp = false;
-			ourAircraft.DirectUpdateInput(LeftInput, RightInput, bFiring, FireState);
+			ourAircraft.DirectUpdateInput(proxyLeftStick, proxyRightStick, bFiring, FireState);
 			//ourAircraft.UpdateInput(Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 		}
 	}
+	//Used for the control lerping systems
+	Vector2 proxyLeftStick = Vector2.zero;
+	Vector2 proxyRightStick = Vector2.zero;
+
 
 	void handleInputControls() { 
 
@@ -356,6 +372,7 @@ public class PlayerController : ActorController {
 		float roll=0;
 		float pitch=0;
 		float yaw=0;
+
 		if (Input.GetKey(KeyCode.LeftArrow)) {
 			roll=-1;
 		}
@@ -384,15 +401,29 @@ public class PlayerController : ActorController {
 		else if (Input.GetKey(KeyCode.C)) {
 			throttleControl=-1;
 		}
-		
-		
+
+		//Need to assemble a Vec2 to proxy our system
+		Vector2 newProxyLeftStick = new Vector2(roll, -pitch);
+		Vector2 newProxyRightStick = new Vector2(yaw, throttleControl);
+
+		bool bLeftMagnitudeLower = (proxyLeftStick.sqrMagnitude > newProxyLeftStick.sqrMagnitude);
+		bool bRightMagnitudeLower = (proxyRightStick.sqrMagnitude > newProxyRightStick.sqrMagnitude);
+
+		//proxyLeftStick = Vector2.Lerp(proxyLeftStick, newProxyLeftStick, Time.deltaTime * (bLeftMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
+		//proxyRightStick = Vector2.Lerp(proxyRightStick, newProxyRightStick, Time.deltaTime * (bRightMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
+
+		proxyLeftStick = newProxyLeftStick;
+		proxyRightStick = newProxyRightStick;
+
 		//print (ourAircraft.transform.localEulerAngles);
 		if (bControlArcade) { //then lookout for a "return" option
+			/*
 			if (Input.touchCount>0) {
 				RollReturnTime = Time.time + RollReturnWait;
 				ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-			}
-			else if (Time.time > RollReturnTime) {
+			} else */
+			
+			if (Time.time > RollReturnTime) {
 				//a Transform.LookAt does the trick!
 				returnAngles.SetLookRotation(gunSightObject.transform.position, Vector3.up);
 
@@ -401,8 +432,8 @@ public class PlayerController : ActorController {
 				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
 
 				//editor input hack
-				ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch),ControlSensitivityCurve.Evaluate(roll),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), throttleControl, bFiring, FireState);
-
+				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch),ControlSensitivityCurve.Evaluate(roll),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), throttleControl, bFiring, FireState);
+				ourAircraft.DirectUpdateInput(proxyLeftStick, proxyRightStick, bFiring, FireState);
 			}
 			else { //annol input for the controls.
 				ourAircraft.UpdateInput(0,0,0,0,bFiring,FireState);
@@ -410,8 +441,9 @@ public class PlayerController : ActorController {
 		}
 		
 		//I've pretty much decided that this won't be happening and I'll stick to the arcade method of control
+		/*
 		if (!bControlArcade){ //update this accordingly.
 			ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-		}
+		}*/
 	}
 }
