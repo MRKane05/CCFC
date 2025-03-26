@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.PSVita;
+using TMPro;
 
 public class PlayerController : ActorController {
 	
@@ -254,7 +255,21 @@ public class PlayerController : ActorController {
         {
 			targetButtonHoldTime = 0;	//Debounce this button
         }
+
 	}
+
+	float eulerLoop(float thisNumber)
+    {
+		if (thisNumber > 180f)
+        {
+			return thisNumber - 360f;
+        }
+		return thisNumber;
+    }
+
+	Quaternion gyroReference = Quaternion.identity;
+
+	public TextMeshProUGUI gyroFeed;
 
     float targetButtonHoldTime = 0;
 
@@ -297,8 +312,25 @@ public class PlayerController : ActorController {
         //ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
 
         Vector2 LeftInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical"));
-		float LeftInputMagnitude = LeftInput.magnitude;
+		
 		Vector2 RightInput = new Vector2(Input.GetAxis("Right Stick Horizontal"), Input.GetAxis("Right Stick Vertical"));
+
+		//Spit out our orientation
+		Vector2 GyroAdditional = Vector2.zero;
+
+		float GyroSensitivity = 35f;
+		if (gyroFeed)
+		{
+			GyroAdditional = gyroController.Instance.getDeviceRollRitch(); //new Vector2(additionalRoll, additionalPitch);
+			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x / GyroSensitivity, -1f, 1f),
+				Mathf.Clamp(GyroAdditional.y / GyroSensitivity, -1f, 1f));
+		}
+
+		//Lazy addition for the moment
+		LeftInput += GyroAdditional;
+
+
+		float LeftInputMagnitude = LeftInput.magnitude;
 		float RightInputMagnitude = RightInput.magnitude;
 
 		//See about adding in gyro settings here
@@ -312,6 +344,15 @@ public class PlayerController : ActorController {
 		//proxyRightStick = Vector2.Lerp(proxyRightStick, RightInput, Time.deltaTime * (bRightMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
 		proxyLeftStick = LeftInput;
 		proxyRightStick = RightInput;
+
+		//Lets tap into our gyro systems and see what they're going to spit out for us
+		/*
+		if (Input.GetMouseButton(0))
+		{
+			SensorFusion.Recenter();
+			//We also need to recenter our offset...
+			gyroReference = SensorFusion.GetOrientation();
+		}*/
 
 		if (LeftInputMagnitude < rollReturnSensitivity && RightInputMagnitude < rollReturnSensitivity)
 		{
