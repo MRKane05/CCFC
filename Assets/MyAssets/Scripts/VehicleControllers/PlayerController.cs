@@ -321,9 +321,11 @@ public class PlayerController : ActorController {
 
 		if (gyroFeed && bGyroEnabled)
 		{
-			GyroAdditional = gyroController.Instance.getDeviceRollRitch(); //new Vector2(additionalRoll, additionalPitch);
+			GyroAdditional = gyroController.Instance.GyroRollPitch();  //gyroController.Instance.getDeviceRollRitch(); //new Vector2(additionalRoll, additionalPitch);
 			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x / gyroScaleLimit, -1f, 1f),
 				Mathf.Clamp(GyroAdditional.y / gyroScaleLimit, -1f, 1f) * gyroYControl);
+
+			
 		}
 
 		//Lazy addition for the moment

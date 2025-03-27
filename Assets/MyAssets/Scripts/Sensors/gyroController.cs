@@ -47,7 +47,20 @@ public class gyroController : MonoBehaviour {
 
 	public Quaternion GyroRaw()
     {
-		return Input.gyro.attitude * Quaternion.Inverse(refernceQuat);
+		return Input.gyro.attitude * refernceQuat;
+    }
+
+	public Vector2 GyroRollPitch()
+    {
+		//X: pitch starts at 0, positive is tilting back
+		//Y: twist console. Right is positive
+		//Z: "tilt" console. right is positive
+		Vector3 gyroAngles = (Input.gyro.attitude * refernceQuat).eulerAngles;
+		float pitch = wrapAngle(gyroAngles.x);
+		float roll = wrapAngle(gyroAngles.y + gyroAngles.z);
+
+		logText.text = (Input.gyro.attitude * refernceQuat).eulerAngles.ToString();
+		return new Vector2(roll, pitch);
     }
 
     // Update is called once per frame
@@ -79,6 +92,15 @@ public class gyroController : MonoBehaviour {
 		return angle;
     }
 
+	float wrapAngle(float angle)
+    {
+		if (angle > 180)
+        {
+			return angle - 360f;
+        }
+		return angle;
+    }
+
 	float shiftConvertAnglePosition(float angle)
     {
 		//So the result of this math is that the numbers are -Pi*0.5f when resting, which is actually usable I think. It just needs a shift
@@ -93,6 +115,8 @@ public class gyroController : MonoBehaviour {
 		Quaternion rotate = Quaternion.FromToRotation(new Vector3(0.0f, 0.0f, -1.0f), Input.acceleration);
 		Matrix4x4 matrix = Matrix4x4.TRS(Vector3.zero, rotate, new Vector3(1.0f, 1.0f, 1.0f));
 		this.baseMatrix = matrix.inverse;
+
+		refernceQuat = Quaternion.Inverse(Input.gyro.attitude);
 	}
 
 
