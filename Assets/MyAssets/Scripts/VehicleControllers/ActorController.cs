@@ -25,8 +25,33 @@ public class ActorController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		DoStart();
+		//we want to plug into our settings update systems
+		UISettingsHandler.Instance.OnSettingsChanged.AddListener(UpdateInternalSettings);
+		DoUpdateInternalSettings(); //make sure we get our settings on start
 	}
+
+    #region Settings Watchers
+    void UpdateInternalSettings()
+	{
+		DoUpdateInternalSettings();
+	}
+
+	public virtual void DoUpdateInternalSettings()
+	{
+
+	}
+
+	void OnDestroy()
+	{
+		UISettingsHandler.Instance.OnSettingsChanged.RemoveListener(UpdateInternalSettings);
+	}
+    #endregion
+
+    public virtual void DoStart()
+    {
+
+    }
 	
 	void Awake() {
 		levelLink = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelController>();	
@@ -40,12 +65,6 @@ public class ActorController : MonoBehaviour {
 	public virtual void setPatrol(float awakeTime) { }
 	#endregion
 
-	//Cleanup our stuff from the links etc
-	void OnDestroy() { 
-		//Clean out our information from levelLink
-		//levelLink.removeSelf(gameObject, team);
-	}
-	
 	// Update is called once per frame
 	void Update () {
 	

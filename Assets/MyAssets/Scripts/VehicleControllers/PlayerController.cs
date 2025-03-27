@@ -39,9 +39,26 @@ public class PlayerController : ActorController {
 	
 	public float mAltitude;
 
+	//Gyro persistant values
+	bool bGyroEnabled = false;
+	float gyroYControl = 1f;
+	float gyroStrengthMultiplier = 1f;
+	float gyroScaleLimit = 30f;
 
+	public override void DoUpdateInternalSettings()
+	{
+		bGyroEnabled = UISettingsHandler.Instance.getSettingInt("flight_gyro_enable") == 1;
+		//flight_gyro_enable 0 : 1 off, enabled
+		gyroYControl = UISettingsHandler.Instance.getSettingInt("flight_gyro_inversion") == 0 ? -1 : 1;
+		//flight_gyro_inversion 0 : 1 normal flight, inverted
+		gyroStrengthMultiplier = Mathf.Lerp(0.1f, 1f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_strength"));
+		//flight_gyro_strength how much the gyro affects steering (0-1)
+		gyroScaleLimit = Mathf.Lerp(10f, 40f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_sensitivity"));
+		//flight_gyro_sensitivity how much we have to tilt the gyro to get a full lock (0-1)
 
-	void Start () {
+	}
+
+	void Awake () {	//Because this is important lets get it happening sooner rather than later
 		if (instance)
 		{
 			Debug.Log("Duplicate attempt to create PlayerController");
@@ -63,21 +80,7 @@ public class PlayerController : ActorController {
 		if (bLeftieFlip) {
 			
 		}
-		
-		
-		//Boot up our joysticks
-		/*
-		ourJoySticks = new GameObject[JoyStickConstraints.Length];
-		ourJoyMP = new VirtualJoystick[JoyStickConstraints.Length];
-		for (int i=0; i<JoyStickConstraints.Length; i++) { //go through and assign our sticks!
-			ourJoySticks[i] = Instantiate(JoyStickPrefab, transform.position, transform.rotation) as GameObject;
-			ourJoyMP[i] = ourJoySticks[i].GetComponent<VirtualJoystick>();
-			ourJoyMP[i].transform.parent = transform;
-			ourJoyMP[i].SetupStick(JoyStickConstraints[i]); //and finally set our stick up so that it's "real"
-			ourJoyMP[i].ourGUIText = JoyMessageTexts[i];
-		}
-		*/
-	
+
 	}
 	
 	//This is called after health damage is taken
@@ -309,25 +312,22 @@ public class PlayerController : ActorController {
 		}
         #endregion
 
-        //ourAircraft.UpdateInput(yAxisBias * Input.GetAxis("Left Stick Vertical"), Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Right Stick Horizontal"), -Input.GetAxis("Right Stick Vertical"), bFiring, FireState);
-
-        Vector2 LeftInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical"));
-		
+		Vector2 LeftInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical"));		
 		Vector2 RightInput = new Vector2(Input.GetAxis("Right Stick Horizontal"), Input.GetAxis("Right Stick Vertical"));
+
 
 		//Spit out our orientation
 		Vector2 GyroAdditional = Vector2.zero;
 
-		float GyroSensitivity = 35f;
-		if (gyroFeed)
+		if (gyroFeed && bGyroEnabled)
 		{
 			GyroAdditional = gyroController.Instance.getDeviceRollRitch(); //new Vector2(additionalRoll, additionalPitch);
-			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x / GyroSensitivity, -1f, 1f),
-				Mathf.Clamp(GyroAdditional.y / GyroSensitivity, -1f, 1f));
+			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x / gyroScaleLimit, -1f, 1f),
+				Mathf.Clamp(GyroAdditional.y / gyroScaleLimit, -1f, 1f) * gyroYControl);
 		}
 
 		//Lazy addition for the moment
-		LeftInput += GyroAdditional;
+		LeftInput += GyroAdditional * gyroStrengthMultiplier;
 
 
 		float LeftInputMagnitude = LeftInput.magnitude;
@@ -337,22 +337,8 @@ public class PlayerController : ActorController {
 		Vector3 gyroGravDir = Input.gyro.gravity;
 		//So in theory if we're leaning to one side our Dot.Camera.Right will be either positive or negative
 
-		bool bLeftMagnitudeLower = (proxyLeftStick.sqrMagnitude > LeftInput.sqrMagnitude);
-		bool bRightMagnitudeLower = (proxyRightStick.sqrMagnitude > RightInput.sqrMagnitude);
-
-		//proxyLeftStick = Vector2.Lerp(proxyLeftStick, LeftInput, Time.deltaTime * (bLeftMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
-		//proxyRightStick = Vector2.Lerp(proxyRightStick, RightInput, Time.deltaTime * (bRightMagnitudeLower ? 1.25f : 1f) * ourAircraft.controllerSoftness);
 		proxyLeftStick = LeftInput;
 		proxyRightStick = RightInput;
-
-		//Lets tap into our gyro systems and see what they're going to spit out for us
-		/*
-		if (Input.GetMouseButton(0))
-		{
-			SensorFusion.Recenter();
-			//We also need to recenter our offset...
-			gyroReference = SensorFusion.GetOrientation();
-		}*/
 
 		if (LeftInputMagnitude < rollReturnSensitivity && RightInputMagnitude < rollReturnSensitivity)
 		{

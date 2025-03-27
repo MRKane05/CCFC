@@ -62,10 +62,9 @@ public class gyroController : MonoBehaviour {
 	public Vector2 getDeviceRollRitch()
     {
 		Vector3 accelerometerVector = AdjustedAccelerometer;
-
-		float devicePitch = -loopAnglePosition(Mathf.Atan2(accelerometerVector.y, -accelerometerVector.z));
+				
 		float deviceRoll = loopAnglePosition(Mathf.Atan2(accelerometerVector.x, -accelerometerVector.z));
-		
+		float devicePitch = -loopAnglePosition(Mathf.Atan2(accelerometerVector.y, -accelerometerVector.z));
 		//logText.text = accelerometerVector.ToString() + "\n" + deviceRoll.ToString() + ", " + devicePitch.ToString();
 		return new Vector2(deviceRoll, devicePitch);
     }
