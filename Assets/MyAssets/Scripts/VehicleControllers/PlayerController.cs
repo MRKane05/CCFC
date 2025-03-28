@@ -8,7 +8,7 @@ public class PlayerController : ActorController {
 	//This needs to be instanced to make things easier
 	private static PlayerController instance = null;
 	public static PlayerController Instance {get {return instance;}}
-	
+
 	public GameObject JoyStickPrefab;
 	public GUIText[] JoyMessageTexts;
 	//controls how the system responds to touch and turn information
@@ -44,17 +44,36 @@ public class PlayerController : ActorController {
 	float gyroYControl = 1f;
 	float gyroStrengthMultiplier = 1f;
 	float gyroScaleLimit = 30f;
+	float gyroYMultiplier = 1.5f;
+
+	public enum enPlayerControllerSettings { NULL, AIRCRAFT, GUNNER }
+	public enPlayerControllerSettings PlayerControlSettings = enPlayerControllerSettings.AIRCRAFT;
 
 	public override void DoUpdateInternalSettings()
 	{
-		bGyroEnabled = UISettingsHandler.Instance.getSettingInt("flight_gyro_enable") == 1;
-		//flight_gyro_enable 0 : 1 off, enabled
-		gyroYControl = UISettingsHandler.Instance.getSettingInt("flight_gyro_inversion") == 0 ? -1 : 1;
-		//flight_gyro_inversion 0 : 1 normal flight, inverted
-		gyroStrengthMultiplier = Mathf.Lerp(0.1f, 1f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_strength"));
-		//flight_gyro_strength how much the gyro affects steering (0-1)
-		gyroScaleLimit = Mathf.Lerp(10f, 40f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_sensitivity"));
-		//flight_gyro_sensitivity how much we have to tilt the gyro to get a full lock (0-1)
+		if (PlayerControlSettings == enPlayerControllerSettings.AIRCRAFT)
+		{
+			bGyroEnabled = UISettingsHandler.Instance.getSettingInt("flight_gyro_enable") == 1;
+			//flight_gyro_enable 0 : 1 off, enabled
+			gyroYControl = UISettingsHandler.Instance.getSettingInt("flight_gyro_inversion") == 0 ? -1 : 1;
+			//flight_gyro_inversion 0 : 1 normal flight, inverted
+			gyroStrengthMultiplier = Mathf.Lerp(0.1f, 1f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_strength"));
+			//flight_gyro_strength how much the gyro affects steering (0-1)
+			gyroScaleLimit = Mathf.Lerp(10f, 40f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_sensitivity"));
+			//flight_gyro_sensitivity how much we have to tilt the gyro to get a full lock (0-1)
+			gyroYMultiplier = Mathf.Lerp(0.75f, 2.5f, UISettingsHandler.Instance.getSettingFloat("flight_gyro_y_sensitivity"));
+		} else if (PlayerControlSettings == enPlayerControllerSettings.GUNNER)
+        {
+			bGyroEnabled = UISettingsHandler.Instance.getSettingInt("turret_gyro_enable") == 1;
+			//flight_gyro_enable 0 : 1 off, enabled
+			gyroYControl = UISettingsHandler.Instance.getSettingInt("turret_gyro_inversion") == 0 ? -1 : 1;
+			//flight_gyro_inversion 0 : 1 normal flight, inverted
+			gyroStrengthMultiplier = Mathf.Lerp(0.1f, 1f, UISettingsHandler.Instance.getSettingFloat("turret_gyro_strength"));
+			//flight_gyro_strength how much the gyro affects steering (0-1)
+			gyroScaleLimit = Mathf.Lerp(10f, 40f, UISettingsHandler.Instance.getSettingFloat("turret_gyro_sensitivity"));
+			//flight_gyro_sensitivity how much we have to tilt the gyro to get a full lock (0-1)
+			gyroYMultiplier = Mathf.Lerp(0.75f, 2.5f, UISettingsHandler.Instance.getSettingFloat("turret_gyro_y_sensitivity"));
+		}
 
 	}
 
@@ -322,10 +341,8 @@ public class PlayerController : ActorController {
 		if (gyroFeed && bGyroEnabled)
 		{
 			GyroAdditional = gyroController.Instance.GyroRollPitch();  //gyroController.Instance.getDeviceRollRitch(); //new Vector2(additionalRoll, additionalPitch);
-			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x / gyroScaleLimit, -1f, 1f),
+			GyroAdditional = new Vector2(Mathf.Clamp(GyroAdditional.x * gyroYMultiplier / gyroScaleLimit, -1f, 1f),	//Slight boost to this axis as the other is a dual input. This might need to be configurable
 				Mathf.Clamp(GyroAdditional.y / gyroScaleLimit, -1f, 1f) * gyroYControl);
-
-			
 		}
 
 		//Lazy addition for the moment
