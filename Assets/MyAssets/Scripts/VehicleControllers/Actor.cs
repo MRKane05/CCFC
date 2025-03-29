@@ -50,7 +50,8 @@ public class Actor : MonoBehaviour {
 	//public float controllerSoftness = 50f; //The higher the number the harder the input action
 	protected float controllerPowValue = 4f;  //I guess...
 	protected float yAxisBias = -1;
-	protected bool bStickControlRight = true;
+	[HideInInspector]
+	public bool bStickControlRight = true;
 
 	[HideInInspector]
 	public bool bTriggerControlRight = true;

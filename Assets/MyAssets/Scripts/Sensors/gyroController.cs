@@ -57,9 +57,12 @@ public class gyroController : MonoBehaviour {
 		//Z: "tilt" console. right is positive
 		Vector3 gyroAngles = (Input.gyro.attitude * refernceQuat).eulerAngles;
 		float pitch = wrapAngle(gyroAngles.x);
-		float roll = wrapAngle(gyroAngles.y + gyroAngles.z);
+		float roll = wrapAngle(gyroAngles.y) + wrapAngle(gyroAngles.z);
 
-		logText.text = (Input.gyro.attitude * refernceQuat).eulerAngles.ToString();
+		if (logText)
+		{
+			logText.text = (Input.gyro.attitude * refernceQuat).eulerAngles.ToString();
+		}
 		return new Vector2(roll, pitch);
     }
 
