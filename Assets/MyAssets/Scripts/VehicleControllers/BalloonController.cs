@@ -33,7 +33,7 @@ public class BalloonController : Actor {
 	//AI end stuff
 	Quaternion Rotation;
 	
-	public Collider groundCollider; //our ground plane that we could be contacting with.
+	//public Collider groundCollider; //our ground plane that we could be contacting with.
 	
 	//public float health=100F, maxHealth = 100F;
 	//really this should be at the actor level
@@ -87,7 +87,7 @@ public class BalloonController : Actor {
 	// Use this for initialization, but it wipes out what we did at the base level...
 	void Start() {	//This could go onto the base actor class
 		
-		groundCollider = GameObject.Find ("Terrain").GetComponent<Collider>(); //this is used for our ground contact
+		//groundCollider = GameObject.Find ("Terrain").GetComponent<Collider>(); //this is used for our ground contact
 		
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();

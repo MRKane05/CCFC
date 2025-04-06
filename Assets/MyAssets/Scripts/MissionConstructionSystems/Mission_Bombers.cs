@@ -26,7 +26,7 @@ public class Mission_Bombers : MissionConstructionBase
 
     BaseGenerator ourBaseGenerator;
 
-    public int totalBombers = 0;    //Will be set at start of mission
+    //public int totalBombers = 0;    //Will be set at start of mission
 
     public int missionClearedBombers = 0;
     public int Bombers_Successful = 0;
@@ -37,12 +37,12 @@ public class Mission_Bombers : MissionConstructionBase
 
     float GetBomberHeight()
     {
-        Vector3 AveragePosition = Vector3.zero;
+        Vector3 SetAveragePosition = Vector3.zero;
         foreach (Vector3 thisPos in bomberGroupLocations)
         {
-            AveragePosition += thisPos;
+            SetAveragePosition += thisPos;
         }
-        return (AveragePosition /= (float)bomberGroupLocations.Count).y;
+        return (SetAveragePosition /= (float)bomberGroupLocations.Count).y;
     }
 
     //Handlers for spawning enemy fighters over the base
@@ -140,7 +140,7 @@ public class Mission_Bombers : MissionConstructionBase
         levelStartTime = Time.time;
     }
 
-    Vector3 averagePosition = Vector3.zero;
+    //Vector3 averagePosition = Vector3.zero;
     //This'll need shifted to somewhere better
     public virtual void AddTargetBombers(Vector3 thisTargetLocation, float spawnInRange, int numBombers)
     {
@@ -217,15 +217,15 @@ public class Mission_Bombers : MissionConstructionBase
         //Really not sure what the best way to add bombers in formation is here
         if (numBombers > 1) //We have 1st position
         {
-            addFormationBomber(new Vector3(formationDistance, 0, formationDistance), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation);
+            activeBombers.Add(addFormationBomber(new Vector3(formationDistance, 0, formationDistance), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation));
         } 
         if (numBombers > 2)
         {
-            addFormationBomber(new Vector3(-formationDistance, 0, formationDistance), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation);
+            activeBombers.Add(addFormationBomber(new Vector3(-formationDistance, 0, formationDistance), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation));
         }
         if (numBombers > 3)
         {
-            addFormationBomber(new Vector3(0, 0, formationDistance*2f), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation);
+            activeBombers.Add(addFormationBomber(new Vector3(0, 0, formationDistance*2f), newTeam, spawnLocation, startQuat, flightPoints, thisTargetLocation));
         }
 
         averagePosition /= numBombers;
@@ -237,57 +237,6 @@ public class Mission_Bombers : MissionConstructionBase
         }
 
         bomberGroupLocations.Add(averagePosition);
-    }
-
-    void addFormationBomber(Vector3 formationPosition, int newTeam, Vector3 baseSpawnLocation, Quaternion startRotation, List<Vector3> pathPoints, Vector3 baseTargetPosition)
-    {
-        //IDEA: We should make these bombers opportunistic
-        string groupTag = "bomber_Group_" + Time.time.ToString("f0");
-        GameObject targetBomber = newTeam == 0 ? prefabManager.Instance.friendlyBombers[0] : prefabManager.Instance.enemyBombers[0];
-        actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(targetBomber, newTeam, baseSpawnLocation + startRotation * Quaternion.AngleAxis(180, Vector3.up) * formationPosition, startRotation, groupTag, null);
-        totalBombers++;
-        activeBombers.Add(newActor);
-        //Have to get the controller for this vehicle and set the flight points in it
-        PathAircraft bomberController = newActor.vehicle.GetComponent<PathAircraft>();
-        bomberController.ourMissionConstructor = this;  //So that we've got a callback link for sending important information through
-
-        //GameObject newPoint = new GameObject("Formation Start");
-        float angleToNext = 0;
-        //newPoint.transform.position = baseSpawnLocation + startRotation * formationPosition;
-        averagePosition += baseSpawnLocation + startRotation * formationPosition;
-        if (bomberController)
-        {
-            List<Vector3> offsetPathPoints = new List<Vector3>();
-            
-            //We need to go through our pathPoints and offset them according to heading
-            for (int i=0; i< pathPoints.Count; i++)
-            {
-                if (i < pathPoints.Count - 2) {
-                    angleToNext = Mathf.Atan2(pathPoints[i].x - pathPoints[i + 1].x, pathPoints[i].z - pathPoints[i + 1].z) * 180f / Mathf.PI;
-                    Vector3 pointWithOffset = pathPoints[i] + Quaternion.AngleAxis(angleToNext, Vector3.up) * formationPosition;
-                    //GameObject newPathPoint = new GameObject("formationPath: " + i.ToString());
-                    //newPathPoint.transform.position = pointWithOffset;
-                    offsetPathPoints.Add(pointWithOffset);
-                } else
-                {   //We want the point at the end looking back
-                    angleToNext = Mathf.Atan2(pathPoints[i].x - pathPoints[i - 1].x, pathPoints[i].z - pathPoints[i - 1].z) * 180f / Mathf.PI;
-                    Vector3 pointWithOffset = pathPoints[i] + Quaternion.AngleAxis(angleToNext + 180, Vector3.up) * formationPosition;
-                    //GameObject newPathPoint = new GameObject("formationPath: " + i.ToString());
-                    //newPathPoint.transform.position = pointWithOffset;
-                    offsetPathPoints.Add(pointWithOffset);
-                }
-            }
-
-            bomberController.pathPositions = offsetPathPoints;
-
-            //So our base target position will be Count-2
-            angleToNext = Mathf.Atan2(pathPoints[pathPoints.Count-2].x - pathPoints[pathPoints.Count-1].x, pathPoints[pathPoints.Count-2].z - pathPoints[pathPoints.Count - 1].z) * 180f / Mathf.PI;
-            bomberController.targetDropLocation = baseTargetPosition + Quaternion.AngleAxis(angleToNext, Vector3.up) * new Vector3(formationPosition.x, 0, 0);   //This'll need some logic applied to it
-            //GameObject targetPathPoint = new GameObject("targetPositionPoint");
-            //targetPathPoint.transform.position = bomberController.targetDropLocation;
-
-            bomberController.pathPositions = offsetPathPoints;
-        }
     }
 
 

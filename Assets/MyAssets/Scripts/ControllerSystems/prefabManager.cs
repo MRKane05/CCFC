@@ -16,6 +16,8 @@ public class prefabManager : MonoBehaviour {
 	public GameObject[] enemyBalloons, friendlyBalloons;
 
 	public GameObject[] enemyBombers, friendlyBombers;
+
+	public GameObject[] AckAckPrefab;
 	
 	
 	// Use this for initialization

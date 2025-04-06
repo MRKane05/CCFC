@@ -27,7 +27,7 @@ public class PathAircraft : Actor {
     public enum enBombingState { NULL, TOTARGET, BOMBING, FINISHED, FLYING }    //Flying is used for when we're a tailgunner
     public enBombingState bombingState = enBombingState.TOTARGET;
 
-    public enum enMissionState { NULL, NOTCOMPLETE, COMPLETE, FAILED }
+    public enum enMissionState { NULL, NOTCOMPLETE, COMPLETE, FAILED, JUSTFLYING }
     public enMissionState MissionState = enMissionState.NOTCOMPLETE;
 
     public override void DoStart()
@@ -50,13 +50,19 @@ public class PathAircraft : Actor {
 
     public void setMissionState(enMissionState newState)
     {
-        
+        if (MissionState == enMissionState.JUSTFLYING) { return; }
+
         if (newState == enMissionState.NOTCOMPLETE || newState == enMissionState.NULL)
         {
             MissionState = newState;
             //Inform our mission controller of something having happened with us
         }
-        ((Mission_Bombers)ourMissionConstructor).BomberReturnState(newState);
+        
+        Mission_Bombers bomberMission = ((Mission_Bombers)ourMissionConstructor);
+        if (bomberMission)  //Because we won't always be used in a bombing run
+        {
+            bomberMission.BomberReturnState(newState);
+        }
     }
 
     void Update()
@@ -88,7 +94,10 @@ public class PathAircraft : Actor {
             }
         } else
         {
-            CheckBombingBehavior();
+            if (MissionState != enMissionState.JUSTFLYING)
+            {
+                CheckBombingBehavior();
+            }
         }
     }
 
