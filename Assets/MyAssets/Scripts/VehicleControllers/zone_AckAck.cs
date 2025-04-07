@@ -10,19 +10,16 @@ public class zone_AckAck : MonoBehaviour {
 
 	public GameObject ackAckPrefab;
 	public float ZoneWidth = 20f;
-	public Range ZoneHeight = new Range(-5, 5);
 	public Range LeadRange = new Range(2f, 7f);
 
 	public int Team = 0;
 
+	public List<GameObject> EffectPrefabs = new List<GameObject>(); //The idea here is that we'll recycle these to prevent memory issues
+
 	bool bIsPositionInZone(Vector3 position)
     {
 		position = gameObject.transform.InverseTransformPoint(position);
-		if (new Vector2(position.x, position.z).magnitude > ZoneWidth)
-        {
-			return false;
-        }
-		if (position.y < ZoneHeight.Min || position.y > ZoneHeight.Max)
+		if (new Vector2(position.x, position.z).sqrMagnitude > ZoneWidth*ZoneWidth)
         {
 			return false;
         }
@@ -69,10 +66,13 @@ public class zone_AckAck : MonoBehaviour {
 				Vector3 targetPosition = ZoneActors[TargetActor].vehicle.gameObject.transform.position + ZoneActors[TargetActor].vehicle.gameObject.transform.forward * LeadRange.GetRandom();
 				//We could do with a random on the Ack Ack
 				targetPosition += new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
-				Instantiate(ackAckPrefab, targetPosition, Quaternion.identity);
+				GameObject newAckAck = Instantiate(ackAckPrefab, targetPosition, Quaternion.identity);
+				AckAckExplosion newAckAckScript = newAckAck.GetComponent<AckAckExplosion>();
+				newAckAckScript.SetupAckAck(targetPosition, Random.Range(0.5f, 1.2f));
+
 			}
 
-		
+			//We should also put down "background" ack ack for effect
 			//Instantiate(ackAckPrefab, spawnPoint, Quaternion.identity);
 		}
 	}
