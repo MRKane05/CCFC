@@ -4,33 +4,33 @@ using System.Collections;
 public class AircraftController : Actor {
 	//our overall scale is 1unit=5m
 	//kmph to mps conversion: 0.0555555555 aka 0.5/9
-	
-	
+
+
 	//We need a tweak that bleeds speed off if we're going up, and increases it as we're going down.
 	//public GUIText ourGUIText;
-	
+
 	public GameObject[] CannonEmpties; //these are the empties attached to our aircraft that denote cannons
 	public AttachedGun[] ourGunMP;
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
-                                                //public AIController ourAIController; //we can also get information from this
-                                                //public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
-                                                //public bool bControlArcade=false;
-                                                //these wil
-    #region Aircraft Properties For Player Control
-    public float mass = 7;
+												//public AIController ourAIController; //we can also get information from this
+												//public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
+												//public bool bControlArcade=false;
+												//these wil
+	#region Aircraft Properties For Player Control
+	public float mass = 7;
 	public float OverdriveAirSpeed = 10f;
 	public float MaxAirSpeed = 6f;
 	public float SlowAirSpeed = 2f;
 
 	public float StallSpeed = 1.5F;
-//	public float rollspeed = 1.5F;		//Used by the AI for doing turns
-//	public float pitchspeed = 1.5F;
-//	public float yawspeed = 1.5F;		//Used by the AI for doing turns
-	public float throttlespeed=0.5F;
+	//	public float rollspeed = 1.5F;		//Used by the AI for doing turns
+	//	public float pitchspeed = 1.5F;
+	//	public float yawspeed = 1.5F;		//Used by the AI for doing turns
+	public float throttlespeed = 0.5F;
 	#endregion
 
-	float throttle =0.75F, gravity=7, thrustPower = 30f, throttleAcceleration=0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
-	float thrust=8;
+	float throttle = 0.75F, gravity = 7, thrustPower = 30f, throttleAcceleration = 0.5F; //this is a consideration on our AirSpeed, this is what we should be tending toward given that the likes of gravity etc. aren't acting upon us...
+	float thrust = 8;
 	float enginePitchMin = 0.6f, enginePitchMax = 1.4f;
 	Engine[] engines; //well this is either as simple or as complicated as we want to make it really...
 
@@ -39,7 +39,7 @@ public class AircraftController : Actor {
 
 	public GameObject AircraftModel, AircraftMesh, FiringMarker;
 	//int FireState;
-	public bool isNPC=true;
+	public bool isNPC = true;
 	GameObject ourCameraObject;
 	Vector3 GravityVector;
 
@@ -57,11 +57,11 @@ public class AircraftController : Actor {
 	//public float health=100F, maxHealth = 100F;
 	//really this should be at the actor level
 	public override void gradeSkill(float factor) {
-		health*=factor;
-		maxHealth*=factor;
+		health *= factor;
+		maxHealth *= factor;
 
 		foreach (AttachedGun thisGun in ourGunMP) {
-			thisGun.damage*=factor;
+			thisGun.damage *= factor;
 		}
 	}
 
@@ -91,13 +91,13 @@ public class AircraftController : Actor {
 	//Not sure about the "after effect" here as it needs to fade or sink into the ground or something so we
 	//don't chew up too much memory
 	void doDitch() { //is called when our aircraft ditches
-		//Need to strip out anything that'd be using process, and leave the main system.
+					 //Need to strip out anything that'd be using process, and leave the main system.
 		foreach (GameObject thisCannon in CannonEmpties)
-			Destroy (thisCannon); //remove our guns.
+			Destroy(thisCannon); //remove our guns.
 
 		//we'll need to tweak the smoke so that it's rising now instead of trailing.
 		((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
-		Destroy (this); //remove this script.
+		Destroy(this); //remove this script.
 
 		//we also need to remove from the 
 	}
@@ -121,18 +121,18 @@ public class AircraftController : Actor {
 	public override void doCollision(Collider withThis) {
 
 		//Do a jolt from the collision which will be added to the velocity
-		impactJolt = (transform.position-withThis.gameObject.transform.position); //get our impact offset
-		//impactJolt -= transform.forward;
-		//impactJolt = impactJolt;
+		impactJolt = (transform.position - withThis.gameObject.transform.position); //get our impact offset
+																					//impactJolt -= transform.forward;
+																					//impactJolt = impactJolt;
 
 		//from the two there we need the quotents from transform.up and transform.right.
-		Vector3 resultingJolt = transform.right*Vector3.Dot(transform.right, impactJolt);
-		resultingJolt += transform.up*Vector3.Dot(transform.up, impactJolt);
+		Vector3 resultingJolt = transform.right * Vector3.Dot(transform.right, impactJolt);
+		resultingJolt += transform.up * Vector3.Dot(transform.up, impactJolt);
 
 
 		float joltHit = mass; //so for the moment that'll work it I suppose, but we need to consider the thing we've hit also
 
-		impactJolt = resultingJolt.normalized*joltHit;
+		impactJolt = resultingJolt.normalized * joltHit;
 
 		//check if this is a ground collider and if it is then put more punch up.
 		LayerMask groundLayer = LayerMask.NameToLayer("Ground");
@@ -141,38 +141,38 @@ public class AircraftController : Actor {
 			Debug.LogError("Hit Ground");
 			//need to make sure that this is tangental to the ground.
 			Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
-			
+
 			RaycastHit hit;
-			
+
 			//float contactOffset = gameObject.collider.bounds.center.y + gameObject.collider.bounds.extents.y;
 			//Debug.Log ("Contact offset: " + gameObject.collider.bounds.min);
-			
-			if (withThis.Raycast (ray, out hit, 5)) {
-				transform.position = new Vector3(transform.position[0], Mathf.Max (hit.point[1] + AircraftModel.GetComponent<Collider>().bounds.extents.y, transform.position[1]), transform.position[2]);
-				impactJolt = hit.normal*mass; //jolt up at the angle of the terrain
+
+			if (withThis.Raycast(ray, out hit, 5)) {
+				transform.position = new Vector3(transform.position[0], Mathf.Max(hit.point[1] + AircraftModel.GetComponent<Collider>().bounds.extents.y, transform.position[1]), transform.position[2]);
+				impactJolt = hit.normal * mass; //jolt up at the angle of the terrain
 
 				//I'm not sure the above ditch rule is fair enough...
 				if (bIsDead) { //handle what happens when we hit.
-					if (Vector3.Dot (hit.normal, AircraftModel.transform.up) > 0.75F)
+					if (Vector3.Dot(hit.normal, AircraftModel.transform.up) > 0.75F)
 						doDitch();
 					else
-						doExplode(0f);	//Die on contact
+						doExplode(0f);  //Die on contact
 				}
 				else {
-					if (Vector3.Dot (hit.normal, AircraftModel.transform.up) > 0.9F) { //check to see that we're tangential to our ground (as in not a crash)
-						//this is a collision with our gear down. Don't take damage, and if we're shot down this is a ditch
+					if (Vector3.Dot(hit.normal, AircraftModel.transform.up) > 0.9F) { //check to see that we're tangential to our ground (as in not a crash)
+																					  //this is a collision with our gear down. Don't take damage, and if we're shot down this is a ditch
 
 					}
 					else { //this collision should cause damage to our vehicle
-						//not sure if it should be constant, or graded according to angle stuff, or what, for the moment...
-						takeDamage(maxHealth/7F, "COLLISION", gameObject, team, 0F); //do a collision with the ground.
+						   //not sure if it should be constant, or graded according to angle stuff, or what, for the moment...
+						takeDamage(maxHealth / 7F, "COLLISION", gameObject, team, 0F); //do a collision with the ground.
 					}
 				}
 			}
 			else { //how the hell did we hit the ground? nevermind just put something in
-				impactJolt = Vector3.Lerp (resultingJolt, -Vector3.up*mass, 0.5F);
+				impactJolt = Vector3.Lerp(resultingJolt, -Vector3.up * mass, 0.5F);
 
-				takeDamage(maxHealth/7F, "COLLISION", gameObject, team, 0F);
+				takeDamage(maxHealth / 7F, "COLLISION", gameObject, team, 0F);
 			}
 
 			//Do our ground collision suff. Damage etc...
@@ -181,14 +181,31 @@ public class AircraftController : Actor {
 		//Debug.Log (impactJolt);
 
 		if (impactJolt.magnitude < 0.5F) //what happens when we strike square on?
-			impactJolt = (transform.right*Random.Range(0F,1F) + transform.up*Random.Range(0F,1F))*joltHit;
+			impactJolt = (transform.right * Random.Range(0F, 1F) + transform.up * Random.Range(0F, 1F)) * joltHit;
 
 		//We need to spin this fighter a little
 		//So how to translate this into spin?
 		//Need to look at positional stuff to see if it's left or right
-		impactSpin = Vector3.Dot(transform.right, impactJolt)*1.25F; //This works well
+		impactSpin = Vector3.Dot(transform.right, impactJolt) * 1.25F; //This works well
 
 		//we need to sort out the damage side of things here...
+
+	}
+
+	public override void DoImpactJolt(Vector3 centroid, float velocity)
+    {
+		impactJolt = (transform.position - centroid); //get our impact offset
+
+																					//from the two there we need the quotents from transform.up and transform.right.
+		Vector3 resultingJolt = transform.right * Vector3.Dot(transform.right, impactJolt);
+		resultingJolt += transform.up * Vector3.Dot(transform.up, impactJolt);
+
+		impactJolt = resultingJolt.normalized * velocity;
+
+		//We need to spin this fighter a little
+		//So how to translate this into spin?
+		//Need to look at positional stuff to see if it's left or right
+		impactSpin = Vector3.Dot(transform.right, impactJolt) * 1.25F; //This works well
 	}
 
 	// Use this for initialization, but it wipes out what we did at the base level...

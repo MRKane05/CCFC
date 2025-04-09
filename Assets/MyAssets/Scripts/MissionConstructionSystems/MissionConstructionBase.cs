@@ -36,6 +36,8 @@ public class MissionConstructionBase : MonoBehaviour {
     public enum enMissionPlayState { NULL, START, PLAYING, FINISHED }
     public enMissionPlayState MissionPlayState = enMissionPlayState.START;
 
+    float AckAckZoneRange = 40f;    //How much extra range to we add to the ack ack protection radius?
+
     void Awake()
     {
         if (instance)
@@ -170,13 +172,8 @@ public class MissionConstructionBase : MonoBehaviour {
     public void addBarrageBalloons(Vector3 clusterCenter, float clusterSpacing, int newTeam)
     {
         //I think balloons will be put down as their own objects so we've a bit of control over their location
-        //missionEvent newEvent = new missionEvent();
-        //newEvent.eventType = missionEvent.enEventType.BALLOON;
-        //newEvent.playerTask = missionEvent.enPlayerTask.DESTROY;
-        //newEvent.objectiveType = missionEvent.enObjectiveType.VISIBLE;
-        //newEvent.triggerType = missionEvent.enTriggerType.START;
+        List<Vector3> balloonPositions = new List<Vector3>();
 
-        //newEvent.eventTeam = 1; //Enemies for the moment
 
         int flightCount = Mathf.RoundToInt(Random.Range(1, 3));
         //int flightCount = 1;	//PROBLEM this is a testing hack
@@ -191,18 +188,30 @@ public class MissionConstructionBase : MonoBehaviour {
             //Make our line wonky
             float clusterNoise = clusterSpacing / 3f;
             spawnLocation += new Vector3(Random.Range(-clusterNoise, clusterNoise), Random.Range(-clusterNoise, clusterNoise), Random.Range(-clusterNoise, clusterNoise));
-
+            balloonPositions.Add(spawnLocation);
             string groupTag = "bomber_Group_" + Time.time.ToString("f0");
             GameObject targetBalloon = newTeam == 0 ? prefabManager.Instance.friendlyBalloons[0] : prefabManager.Instance.enemyBalloons[0];
             actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(targetBalloon, newTeam, spawnLocation, Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.up), groupTag, null);
-            totalBombers++;
-            //newEvent.spawnObject.Add(prefabManager.Instance.enemyBalloons[0]);
-            //So there are a couple of ways we could put down balloons:
-            //Within a circle
-            //More realistically along a line...
-            
-            //newEvent.spawnLocations.Add(spawnLocation);
         }
+
+        //We need to maybe add a zone to the ackack in the scene
+        Vector3 centroid = Vector3.zero;
+        foreach (Vector3 balloonPos in balloonPositions)
+        {
+            centroid += balloonPos;
+        }
+        centroid /= balloonPositions.Count;
+
+        //We need a measure of the size of the balloon field
+        float fieldSize = 0f;
+        foreach (Vector3 balloonPos in balloonPositions)
+        {
+            fieldSize = Mathf.Max(fieldSize,
+                Vector2.Distance(new Vector2(centroid.x, centroid.z), new Vector2(balloonPos.x, balloonPos.z)));
+        }
+
+        //fieldSize += AckAckZoneRange;
+        ((LevelController)LevelControllerBase.Instance).AckAckZone.Zones.Add(new Vector4(centroid.x, centroid.z, fieldSize, 0f));
     }
     #endregion
 }

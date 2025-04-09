@@ -125,6 +125,11 @@ public class Actor : MonoBehaviour {
 		//handle the collision stuff
 	}
 
+	public virtual void DoImpactJolt(Vector3 centroid, float velocity)
+    {
+
+    }
+
 	//These need to be here so that our control can be applied to any vehicle. Really this is a float class
 	public void AIUpdateInput(Quaternion newTargetRotation, float newRoll, float newSpeed, bool bIsFiring) {
 		bFiring = bIsFiring;

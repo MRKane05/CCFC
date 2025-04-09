@@ -14,7 +14,9 @@ public class AckAckExplosion : MonoBehaviour {
 	public float EffectDuration = 4f;
 	public float BlastRadius = 4f;
 	public float BlastDamage = 7f;
+	public float BlastJolt = 10f;
 	public float SparkleDamage = 1f;
+	public float SparkleJolt = 3f;
 	public float SparkleFrequency = 0.5f;
 	float SparkleStart = 0;
 
@@ -44,7 +46,7 @@ public class AckAckExplosion : MonoBehaviour {
 			yield return null;
         }
 		//Do our explosion
-		AreaDamage(gameObject.transform.position, BlastDamage);
+		AreaDamage(gameObject.transform.position, BlastDamage, BlastJolt, 0.125f);
 		foreach (ParticleSystem thisEmitter in ChildParticleSystems)
         {
 			thisEmitter.Play();
@@ -57,7 +59,7 @@ public class AckAckExplosion : MonoBehaviour {
 		while (Time.time < sparkleTime)
         {
 			yield return new WaitForSeconds(SparkleFrequency);
-			AreaDamage(gameObject.transform.position, SparkleDamage);
+			AreaDamage(gameObject.transform.position, SparkleDamage, SparkleJolt, 0.5f);
         }
 
 		bIsActive = false;
@@ -65,29 +67,21 @@ public class AckAckExplosion : MonoBehaviour {
     }
 
 	//I don't have this anywhere already?
-	public void AreaDamage(Vector3 position, float damage)
+	public void AreaDamage(Vector3 position, float damage, float jolt, float falloff = 0.2f)	//Falloff means that damage dropps off from the center
     {
 		//While this is a good approach it's probably faster to go through and check our actors individually as we always know there'll be a limited number of them
 		//And it'll provide us with more information
-		/*
-		Collider[] hitColliders = Physics.OverlapSphere(position, BlastRadius);
-		foreach (Collider hitCollider in hitColliders)
-		{
-			Actor hitActor = hitCollider.gameObject.GetComponent<Actor>();
-			if (hitActor)
-            {
-				hitActor.takeDamage(damage, "FLAK", gameObject, Team, 0f);
-            }
-			//hitCollider.SendMessage("AddDamage");
-			Debug.Log("Flak Hit: " + gameObject.name);
-		}
-		*/
+
 		float distanceSqr = BlastRadius * BlastRadius;
 		foreach (actorWrapper thisActor in ((LevelController)LevelControllerBase.Instance).friendlyList)
         {
-			if (Vector3.SqrMagnitude(gameObject.transform.position - thisActor.vehicle.transform.position) < distanceSqr)
+			float actorDistance = Vector3.SqrMagnitude(gameObject.transform.position - thisActor.vehicle.transform.position);
+			if (actorDistance < distanceSqr)
             {
+				float radiusFalloff = Mathf.Clamp01(Mathf.Sqrt(actorDistance) / BlastRadius);
+				float localDamage = Mathf.Lerp(damage, damage * falloff, radiusFalloff);
 				thisActor.actor.takeDamage(damage, "FLAK", gameObject, Team, 0f);
+				thisActor.actor.DoImpactJolt(position, jolt * radiusFalloff);
 			}
         }
 

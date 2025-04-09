@@ -51,7 +51,8 @@ public class LevelController : LevelControllerBase {
 	public GUIText ourGUIText;
 	
 	public GameObject playerAircraft; //Usually we'd
-	//public GameObject enemyPrefab, friendlyPrefab;
+	public zone_AckAck AckAckZone;	//What's the AckAck in the level?
+	
 	public int friendlyCount=3, enemyCount=5;
 	
 	public playerStats levelPlayerStats; //our stats for this level
