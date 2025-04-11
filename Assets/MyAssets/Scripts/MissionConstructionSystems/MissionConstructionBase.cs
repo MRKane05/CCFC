@@ -210,8 +210,11 @@ public class MissionConstructionBase : MonoBehaviour {
                 Vector2.Distance(new Vector2(centroid.x, centroid.z), new Vector2(balloonPos.x, balloonPos.z)));
         }
 
-        //fieldSize += AckAckZoneRange;
-        ((LevelController)LevelControllerBase.Instance).AckAckZone.Zones.Add(new Vector4(centroid.x, centroid.z, fieldSize, 0f));
+        //PROBLEM: Need to have something to control Ack Ack zones going down, but for now lets just make it into a random
+        if (Random.value > 0.33f)
+        {
+            ((LevelController)LevelControllerBase.Instance).AckAckZone.Zones.Add(new Vector4(centroid.x, centroid.z, fieldSize, 0f));
+        }
     }
     #endregion
 }

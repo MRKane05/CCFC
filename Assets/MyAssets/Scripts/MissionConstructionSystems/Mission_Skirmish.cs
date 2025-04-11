@@ -10,7 +10,7 @@ public class Mission_Skirmish : MissionConstructionBase {
     float levelStartTime = 0;
     public Range fighterSpawnHeight = new Range(30, 50);
 
-    float bomberSpawnChance = 1f;
+    float bomberSpawnChance = 0.25f;
 
     public bool bMissionConcluding = false;
     public override void DoStart()
@@ -27,7 +27,14 @@ public class Mission_Skirmish : MissionConstructionBase {
         ((LevelController)LevelControllerBase.Instance).AddWingmen();
         //We can also think about dropping in balloons, photographic points, and also enabling and positioning the Ack ack zone
         //Figure out our balloons
-        addBalloonField(Random.Range(1, 3));    //For the moment
+        if (Random.value > 0.75f)
+        {
+            if (LevelChatterController.Instance)
+            {
+                LevelChatterController.Instance.playChatter("hasballoons");
+            }
+            addBalloonField(Random.Range(1, 3));    //For the moment
+        }
     }
 
     void addBalloonField(int numFields)
@@ -169,12 +176,20 @@ public class Mission_Skirmish : MissionConstructionBase {
         int fightersToSpawn = Mathf.Min(Random.Range(2, 4), enemyRemaining);
         enemyRemaining -= fightersToSpawn;  //Count this down as we work through the fighers
         //Spawn in fighters
-        if (Random.value < bomberSpawnChance && false)
+        if (Random.value < bomberSpawnChance)
         {
+            if (LevelChatterController.Instance)
+            {
+                LevelChatterController.Instance.playChatter("hasbombers");
+            }
             AddPathBombers(PlayerController.Instance.gameObject.transform.position, Random.Range(100f, 150f), Random.Range(1, 4));
         }
         else
         { //just standard fighters 
+            if (LevelChatterController.Instance)
+            {
+                LevelChatterController.Instance.playChatter("hasfighters");
+            }
             ((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(PlayerController.Instance.gameObject.transform.position), fighterSpawnHeight.GetRandom(), 20f, fightersToSpawn, 1);
         }
     }

@@ -23,7 +23,6 @@ public class CameraController : MonoBehaviour {
 	{
 		lerpPosition = gameObject.transform.position;
 		ChaseCameraType = UISettingsHandler.Instance.getSettingInt("flight_cameratype");
-		Debug.LogError("Camera Type: " + ChaseCameraType);
 	}
 
 	void OnDestroy()
