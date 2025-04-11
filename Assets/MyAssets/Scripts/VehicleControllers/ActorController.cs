@@ -71,4 +71,7 @@ public class ActorController : MonoBehaviour {
 	}
 	
 	public virtual void TakeDamage(float thisDamage, string damageType, GameObject instigator, float delay) {} //really just a notification class that can be passed up to the AI
+
+
+	public virtual void AddHealth(float thisHealth) { }
 }

@@ -257,6 +257,7 @@ public class Actor : MonoBehaviour {
 	protected void applyShotDown()
 	{
 		StartCoroutine(shotDownProcess(0.5f, explosionDelay));
+		dropPickups();
 		callbackDie();  //Callback for this actor dying
 	}
 
@@ -268,6 +269,12 @@ public class Actor : MonoBehaviour {
 		{
 			owner.actorCallbackDie(this);
 		}
+    }
+
+	public virtual void dropPickups()
+    {
+		//Do drops for the player to collect :)
+
     }
 
 	public virtual void doExplode(float d_delay)
@@ -338,6 +345,11 @@ public class Actor : MonoBehaviour {
 	public virtual void DoUpdateInternalSettings()
     {
 		
+    }
+
+	public virtual void DoCollectPickup(GameObject thisPickup)
+    {
+		Debug.LogError("Collected Pickup");
     }
 
 	#endregion

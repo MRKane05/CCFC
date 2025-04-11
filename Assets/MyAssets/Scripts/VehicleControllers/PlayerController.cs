@@ -103,7 +103,12 @@ public class PlayerController : ActorController {
 		}
 
 	}
-	
+
+	public override void AddHealth(float thisHealth) {
+		float healthProp = ourAircraft.health / ourAircraft.maxHealth;
+		NGUI_Base.Instance.assignHealth(healthProp);
+	}
+
 	//This is called after health damage is taken
 	public override void TakeDamage(float thisDamage, string damageType, GameObject instigator, float delay) {
 		float damageProp = ourAircraft.health/ourAircraft.maxHealth;

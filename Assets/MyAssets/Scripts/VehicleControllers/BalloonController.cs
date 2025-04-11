@@ -46,29 +46,6 @@ public class BalloonController : Actor {
 		}
 	}
 	
-	//stuff for the terrain actually.
-	//this isn't responding as well as I'd like it to be...might have to make the casting continious actually
-	/*
-	public override void doContact(Collider withThis) {
-		//transform.position = with
-		Debug.LogError(withThis.name);
-		if (withThis.name == "Terrain") { //or is there a better way?
-			//do we want to use a Collider.ClosestPointOnBounds to somehow reverse calculate our height or
-			//some thing different? I suppose it'll have a bounce if we're coming in at an odd angle...
-			Vector3 terrainLocation = Vector3.zero;
-
-			Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
-
-			RaycastHit hit;
-
-			if (withThis.Raycast (ray, out hit, 5)) {
-				transform.position = new Vector3(transform.position[0], hit.point[1] + 0.64F, transform.position[2]);
-			}
-
-		}
-	}
-	*/
-	
 	void doExplode() { //is called with an explosive crash or when we're shot up enough
 		if (explosionEffect) //can't go bang if we don't have a bang effect
 			Instantiate(explosionEffect, transform.position, Quaternion.identity);

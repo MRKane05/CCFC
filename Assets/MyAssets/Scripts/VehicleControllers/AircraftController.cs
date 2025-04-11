@@ -65,29 +65,7 @@ public class AircraftController : Actor {
 		}
 	}
 
-	//stuff for the terrain actually.
-	//this isn't responding as well as I'd like it to be...might have to make the casting continious actually
-	/*
-	public override void doContact(Collider withThis) {
-		//transform.position = with
-		Debug.LogError(withThis.name);
-		if (withThis.name == "Terrain") { //or is there a better way?
-			//do we want to use a Collider.ClosestPointOnBounds to somehow reverse calculate our height or
-			//some thing different? I suppose it'll have a bounce if we're coming in at an odd angle...
-			Vector3 terrainLocation = Vector3.zero;
-
-			Ray ray = new Ray(transform.position, -Vector3.up); //shoot this ray down to see where we contact
-
-			RaycastHit hit;
-
-			if (withThis.Raycast (ray, out hit, 5)) {
-				transform.position = new Vector3(transform.position[0], hit.point[1] + 0.64F, transform.position[2]);
-			}
-
-		}
-	}
-	*/
-
+	
 	//Not sure about the "after effect" here as it needs to fade or sink into the ground or something so we
 	//don't chew up too much memory
 	void doDitch() { //is called when our aircraft ditches
@@ -102,23 +80,17 @@ public class AircraftController : Actor {
 		//we also need to remove from the 
 	}
 
-	/*
-	void doExplode() { //is called with an explosive crash or when we're shot up enough
-		if (explosionEffect) {//can't go bang if we don't have a bang effect
-			GameObject exp_Effect = Instantiate(explosionEffect, transform.position, transform.rotation) as GameObject;
-			//exp_Effect.transform.parent = transform; //stick it to this for the duration...
-			sfx_Explosion explosion = exp_Effect.GetComponent<sfx_Explosion>();
-			explosion.target = gameObject;
-		}
-
-		//Explode and delete this in the process
-		((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
-		Destroy (gameObject, d_delay); //destroy aircraft after small "effect" delay
-	}*/
-
 	//we're getting a collision called from our base classes, handle accordingly
 	//make sure we're not colliding with a target sphere!
 	public override void doCollision(Collider withThis) {
+
+		//Lets see if we've got a pickup! Because then we'll know what to do with it!
+		PickupBase potentialPickup = withThis.gameObject.GetComponent<PickupBase>();
+		if (potentialPickup)
+        {
+			DoCollectPickup(withThis.gameObject);
+			return; //Don't do anything else here
+		}
 
 		//Do a jolt from the collision which will be added to the velocity
 		impactJolt = (transform.position - withThis.gameObject.transform.position); //get our impact offset
@@ -213,6 +185,8 @@ public class AircraftController : Actor {
 	{
 		base.DoStart();
 		doVehicleSetup();
+		if (ourPlayerController)
+			ourPlayerController.AddHealth(health);
 	}
 
 	public virtual void doVehicleSetup() {
@@ -534,4 +508,21 @@ public class AircraftController : Actor {
 
 		bTriggerControlRight = UISettingsHandler.Instance.getSettingInt("flight_trigger_handedness") == 0;
 	}
+
+	public override void DoCollectPickup(GameObject targetPickup)
+	{
+		PickupBase thisPickup = targetPickup.GetComponent<PickupBase>();
+		if (thisPickup.Instigator == gameObject){ return; }
+		switch (thisPickup.PickupType)
+        {
+			case PickupBase.enPickupType.HEALTH:
+				health = Mathf.Clamp(health + thisPickup.PickupValue, 0f, maxHealth);
+				if (ourPlayerController)
+					ourPlayerController.AddHealth(health);
+				//Some sound
+				//Some effect
+				break;
+        }
+		Destroy(targetPickup);
+    }
 }
