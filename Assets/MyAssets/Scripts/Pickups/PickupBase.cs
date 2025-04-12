@@ -11,18 +11,42 @@ public class PickupBase : MonoBehaviour {
 
 
 	public GameObject Instigator;   //What was the thing that dropped us?
-	public float Lifespan = 30f;    //How long will we be alive for?
+	public float Lifespan = 15f;    //How long will we be alive for?
 	public float PickupValue = 10f;	//How much of whatever do we add?
 	float DieTime = 0;
-	public bool bIsParachute = true;	//Will this be behaving like something that pops up and then floats down?
+	public bool bIsParachute = true;    //Will this be behaving like something that pops up and then floats down?
+
+
+	float gravity = 10f;
+	float fallspeed = 1f;   //What's our maximum falling speed?
+	float initialSpeed = 5f;
+
+	Vector3 moveVelocity = Vector3.zero;
 
 	// Use this for initialization
 	void Start () {
+		//DoPickupStart();
+	}
+
+	public void DoPickupStart(GameObject newInstigator)
+    {
+		Instigator = newInstigator;
 		DieTime = Time.time + Lifespan;
+		moveVelocity = new Vector3(Random.Range(-1f, 1f), initialSpeed, Random.Range(-1f, 1f));	//Set our initial velocity
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		transform.position += moveVelocity * Time.deltaTime;
+		moveVelocity -= Vector3.up * gravity * Time.deltaTime;
+		if (moveVelocity.y < -fallspeed)
+        {
+			moveVelocity.y = -fallspeed;
+        }
+
+		if (Time.time > DieTime)
+        {
+			Destroy(gameObject);
+        }
 	}
 }

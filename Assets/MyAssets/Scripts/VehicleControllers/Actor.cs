@@ -56,6 +56,9 @@ public class Actor : MonoBehaviour {
 	[HideInInspector]
 	public bool bTriggerControlRight = true;
 
+	public float pickupDropOdds = 0.75f; //Odds of dropping a pickup
+	public int numPickups = 1;		//For anything that'd drop more than one pickup (balloons, bombers, etc)
+
 
 	public float inFade {
 		get { return Mathf.Clamp01((Time.time-inFadeStart)/inFadeTime); }
@@ -274,8 +277,18 @@ public class Actor : MonoBehaviour {
 	public virtual void dropPickups()
     {
 		//Do drops for the player to collect :)
-
-    }
+		if (LevelPickupManager.Instance)
+		{
+			for (int i = 0; i < numPickups; i++)
+			{
+				//A quick check to see if we're actually going to drop something
+				if (Random.value < pickupDropOdds)
+				{
+					LevelPickupManager.Instance.SpawnPickup(gameObject);
+				}
+			}
+		}
+	}
 
 	public virtual void doExplode(float d_delay)
 	{ //is called with an explosive crash or when we're shot up enough

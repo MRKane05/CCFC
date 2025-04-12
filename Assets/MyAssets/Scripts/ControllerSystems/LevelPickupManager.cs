@@ -34,4 +34,16 @@ public class LevelPickupManager : MonoBehaviour {
 		instance = this;
 	}
 
+	GameObject getRandomPickup()
+    {
+		return PickupPrefabs[Random.Range(0, PickupPrefabs.Count)].pickupPrefab;
+
+	}
+
+	public void SpawnPickup(GameObject instigator)
+    {
+		GameObject newPickup = Instantiate(getRandomPickup(), instigator.transform.position, Quaternion.identity) as GameObject;
+		PickupBase newPickupScript = newPickup.GetComponent<PickupBase>();
+		newPickupScript.DoPickupStart(instigator);
+    }
 }
