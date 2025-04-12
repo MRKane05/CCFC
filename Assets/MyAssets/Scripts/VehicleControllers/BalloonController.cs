@@ -72,7 +72,7 @@ public class BalloonController : Actor {
 		
 		//thrust should be calculated as the maximum angle the aircraft can climb without loosing 
 		thrust = Mathf.Sin(10*Mathf.Deg2Rad) * gravity;
-		speed = MaxAirSpeed*throttle; //get this setup for the kickoff.
+		speed = 0;// MaxAirSpeed*throttle; //get this setup for the kickoff.
 		ourCameraObject=Camera.main.gameObject; //used for arcade controls.
 		
 		ourGunMP = new AttachedGun[CannonEmpties.Length];
@@ -128,15 +128,13 @@ public class BalloonController : Actor {
 			if (health<0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
 				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-		((LevelController)LevelControllerBase.Instance).addKill(); //rack it up!
+				((LevelController)LevelControllerBase.Instance).addKill(); //rack it up!
 				
 				//doExplode(); //whack this.
 				bIsDead=true;
 				applyShotDown();
+				dropPickups();
 				callbackDie();
-				//we can't remove this as it'll mean the player can't shoot it...
-				//((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //but our targeting system needs to know I suppose
-				//Destroy (gameObject); //Just destroy it for now
 			}
 		}
 		
@@ -161,10 +159,6 @@ public class BalloonController : Actor {
 	
 	// Update is called once per frame
 	void Update () {
-		
-		//if (ourGUIText) {
-		//	ourGUIText.text = "Speed: " + speed;
-		
 		
 		if (ourMat) { //This is great apart from the target camera in which it looks a little odd...
 			if (bIsTarget) {
@@ -191,9 +185,9 @@ public class BalloonController : Actor {
 		
 		//Adjust throttle...
 		throttle +=throttleControl*throttlespeed*Time.deltaTime; //for the moment keep it conformed.
-		
+
 		//This calculates our speed through the air dependend upon our angles etc.
-		speed = Mathf.Clamp(speed + SpeedChange() * Time.deltaTime, 0, MaxAirSpeed*1.2F);
+		speed = 0;// Mathf.Clamp(speed + SpeedChange() * Time.deltaTime, 0, MaxAirSpeed*1.2F);
 		//speed += SpeedChange()*Time.deltaTime; //we don't need any variables as they're part of the class.
 		
 		//Handle our aircraft control - ie turning.

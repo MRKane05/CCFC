@@ -58,10 +58,10 @@ public class CameraController : MonoBehaviour {
 					transform.position = Vector3.Lerp(transform.position, viewCenter.transform.position - ownerAircraft.transform.forward.normalized * StartDistance + transform.up * viewElevation, Time.deltaTime * lookSpring);
 					if (gunSight)
 					{
-						transform.LookAt(gunSight.transform.position, transform.up);   //Oddly this isn't looking right at this point and there's some drift?
+						transform.LookAt(gunSight.transform.position, ownerAircraft.transform.up);   //Oddly this isn't looking right at this point and there's some drift?
 					} else
                     {
-						transform.LookAt(viewCenter.transform.position, transform.up);
+						transform.LookAt(viewCenter.transform.position, ownerAircraft.transform.up);
 					}
 					break;
 				case 2:	//Locked camera
@@ -72,7 +72,7 @@ public class CameraController : MonoBehaviour {
 					lerpPosition = Vector3.Lerp(lerpPosition, viewCenter.transform.position - ownerAircraft.transform.forward.normalized * StartDistance + transform.up * viewElevation, Time.deltaTime * lookSpring);
 
 					transform.position = viewCenter.transform.position - offsetLookRotation * Vector3.forward * Vector3.Distance(lerpPosition, viewCenter.transform.position);
-					transform.LookAt(viewCenter.transform, transform.up);
+					transform.LookAt(viewCenter.transform, ownerAircraft.transform.up);
 
 					break;
 			}

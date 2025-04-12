@@ -276,6 +276,7 @@ public class Actor : MonoBehaviour {
 
 	public virtual void dropPickups()
     {
+		//Here's a fun problem: bombers in formation can accidentally get pickups from other bombers that are shot down!
 		//Do drops for the player to collect :)
 		if (LevelPickupManager.Instance)
 		{
