@@ -41,10 +41,14 @@ public class Actor : MonoBehaviour {
 	protected float inFadeStart, inFadeTime = 2f;
 
 	//And the movement variables :)
+	/*
+	//Depricated
 	public float rollspeed = 1.5F;      //Used by the AI for doing turns
 	public float pitchspeed = 1.5F;
 	public float yawspeed = 1.5F;       //Used by the AI for doing turns
+	*/
 
+	public float turnspeed = 1.5f;
 
 	//Some internal player settings stuff
 	//public float controllerSoftness = 50f; //The higher the number the harder the input action
@@ -336,9 +340,9 @@ public class Actor : MonoBehaviour {
 	protected virtual void AircraftDeathSpiral()
     {
 		if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-			transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 2f);
+			transform.RotateAround(transform.right, turnspeed * Time.deltaTime * 2f);
 		else
-			transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 2f);
+			transform.RotateAround(transform.right, -turnspeed * Time.deltaTime * 2f);
 	}
 
 

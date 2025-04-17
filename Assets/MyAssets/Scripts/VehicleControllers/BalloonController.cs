@@ -202,31 +202,31 @@ public class BalloonController : Actor {
 		if (speed<StallSpeed) {
 			//this needs to be more natural
 			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
+				transform.RotateAround(transform.right, turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
 			else
-				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
+				transform.RotateAround(transform.right, -turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
 		}
 		//Debug.Log (transform.localRotation.eulerAngles);
 		//Shoot our aircraft down...
 		if (bIsDead) {
 			//roll commands
-			//transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
+			//transform.RotateAroundLocal(transform.forward, -roll*turnspeed*Time.deltaTime);
 			//pitch commands
 			
 			//We want to have this one pointing down...
-			//transform.RotateAroundLocal(transform.right, pitch*pitchspeed*Time.deltaTime);
+			//transform.RotateAroundLocal(transform.right, pitch*turnspeed*Time.deltaTime);
 			//Make this tend toward "down" as a general direction
 			//Need to graduate this so that the force increases as damage is dealt - that way we can actually fight to keep the aircraft flying
 			
 			//back off on the force here so that the AI can ditch
 			/*
 			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*0.5F);
+				transform.RotateAround(transform.right, turnspeed*Time.deltaTime*0.5F);
 			else
-				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*0.5F);
+				transform.RotateAround(transform.right, -turnspeed*Time.deltaTime*0.5F);
 				*/
 			//yaw commands
-			//transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
+			//transform.RotateAroundLocal(transform.up, yaw*turnspeed*Time.deltaTime);
 			//throttle details
 			//basically this needs to start dropping after it's been shotup
 			transform.position += Vector3.up * -1 * Time.deltaTime;
@@ -258,8 +258,8 @@ public class BalloonController : Actor {
 		
 		//Basically we want to always be facing "up" with the direction of turn.
 		
-		transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, yawspeed); 
-		//AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (rollspeed)*Time.deltaTime));
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnspeed); 
+		//AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
 		
 		//for our ground stuff...
 		
@@ -273,27 +273,27 @@ public class BalloonController : Actor {
 	void PlayerUpdate() {
 		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
 			//roll commands
-			transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -roll*turnspeed*Time.deltaTime);
 			//pitch commands
-			transform.RotateAroundLocal(transform.right, pitch*pitchspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.right, pitch*turnspeed*Time.deltaTime);
 			//yaw commands
-			transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.up, yaw*turnspeed*Time.deltaTime);
 			//throttle details
 		}
 		else { //we want to control relitive to where we think it should be going
 			//this is a camera relitive control.
-			transform.RotateAround(ourCameraObject.transform.up, roll*rollspeed*Time.deltaTime);
-			transform.RotateAround(ourCameraObject.transform.right, pitch*pitchspeed*Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.up, roll*turnspeed*Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.right, pitch*turnspeed*Time.deltaTime);
 			
 			//command to roll us back up the proper way.
-			transform.RotateAroundLocal(transform.forward, -yaw*rollspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -yaw*turnspeed*Time.deltaTime);
 			//Need to figure out what up is...
 			
 			//not sure what to do about yaw...
 			
 			//Aircraft interpertation section of this controller.
 			//if we're pulling left or right we should rotate to the relitive 90...
-			BalloonModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(BalloonModel.transform.localEulerAngles[2], -roll*90, (rollspeed)*Time.deltaTime));
+			BalloonModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(BalloonModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
 		}
 	}
 	

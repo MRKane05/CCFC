@@ -171,7 +171,7 @@ public class PathAircraft : Actor {
         //float remainingAngle = Vector3.Angle(transform.forward, toVector);
         turnDot = Mathf.Lerp(turnDot, (AngleDir(transform.forward, toVector)), Time.deltaTime * 1f);    //Smooth our turnDot out so it's not so abrupt when rounding a point
         Quaternion lookRotation = Quaternion.LookRotation(toVector, Vector3.up); //Figure out where we should be going
-        transTargRotation = Quaternion.RotateTowards(transTargRotation, lookRotation, yawspeed);
+        transTargRotation = Quaternion.RotateTowards(transTargRotation, lookRotation, turnspeed);
         targetRotation = Quaternion.Slerp(targetRotation, transTargRotation, Time.deltaTime * 1f);
 
         //Apply our aircraft roll to our targetRotation and set our actual transform rotation
@@ -258,13 +258,13 @@ public class PathAircraft : Actor {
     {
         if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
         {
-            transform.RotateAround(transform.right, rollspeed * Time.deltaTime * 2f);
-            transform.RotateAround(transform.forward, rollspeed * Time.deltaTime);
+            transform.RotateAround(transform.right, turnspeed * Time.deltaTime * 2f);
+            transform.RotateAround(transform.forward, turnspeed * Time.deltaTime);
         }
         else
         {
-            transform.RotateAround(transform.right, -rollspeed * Time.deltaTime * 2f);
-            transform.RotateAround(transform.forward, -rollspeed * Time.deltaTime);
+            transform.RotateAround(transform.right, -turnspeed * Time.deltaTime * 2f);
+            transform.RotateAround(transform.forward, -turnspeed * Time.deltaTime);
         }
     }
 }

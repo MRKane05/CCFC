@@ -23,9 +23,9 @@ public class AircraftController : Actor {
 	public float SlowAirSpeed = 2f;
 
 	public float StallSpeed = 1.5F;
-	//	public float rollspeed = 1.5F;		//Used by the AI for doing turns
-	//	public float pitchspeed = 1.5F;
-	//	public float yawspeed = 1.5F;		//Used by the AI for doing turns
+	//	public float turnspeed = 1.5F;		//Used by the AI for doing turns
+	//	public float turnspeed = 1.5F;
+	//	public float turnspeed = 1.5F;		//Used by the AI for doing turns
 	public float throttlespeed = 0.5F;
 	#endregion
 
@@ -373,9 +373,9 @@ public class AircraftController : Actor {
 		if (speed<StallSpeed) {
 			//this needs to be more natural
 			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, rollspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
+				transform.RotateAround(transform.right, turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
 			else
-				transform.RotateAround(transform.right, -rollspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
+				transform.RotateAround(transform.right, -turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
 		}
 		//Debug.Log (transform.localRotation.eulerAngles);
 		//Shoot our aircraft down...
@@ -407,8 +407,8 @@ public class AircraftController : Actor {
 			
 		//Basically we want to always be facing "up" with the direction of turn.
 			
-		transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, yawspeed); 
-		AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (rollspeed)*Time.deltaTime));
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnspeed); 
+		AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
 			
 		//for our ground stuff...
 
@@ -468,27 +468,27 @@ public class AircraftController : Actor {
 
 		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
 			//roll commands
-			transform.RotateAroundLocal(transform.forward, -roll*rollspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -roll*turnspeed*Time.deltaTime);
 			//pitch commands
-			transform.RotateAroundLocal(transform.right, pitch*pitchspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.right, pitch*turnspeed*Time.deltaTime);
 			//yaw commands
-			transform.RotateAroundLocal(transform.up, yaw*yawspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.up, yaw*turnspeed*Time.deltaTime);
 			//throttle details
 		}
 		else { //we want to control relitive to where we think it should be going
 			//this is a camera relitive control.
-			transform.RotateAround(ourCameraObject.transform.up, roll*rollspeed*Time.deltaTime);
-			transform.RotateAround(ourCameraObject.transform.right, pitch*pitchspeed*Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.up, roll*turnspeed*Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.right, pitch*turnspeed*Time.deltaTime);
 			
 			//command to roll us back up the proper way.
-			transform.RotateAroundLocal(transform.forward, -yaw*rollspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -yaw*turnspeed*Time.deltaTime);
 			//Need to figure out what up is...
 			
 			//not sure what to do about yaw...
 
 			//Aircraft interpertation section of this controller.
 			//if we're pulling left or right we should rotate to the relitive 90...
-			AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (rollspeed)*Time.deltaTime));
+			AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
 		}
 	}
 

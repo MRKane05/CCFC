@@ -14,9 +14,9 @@ public class TurretController : Actor {
 	GameObject ourCameraObject;
 
 	public float crusingSpeed = 3;      //It's important that this is the same as the aircraft we're riding on as the AI uses the player object as a reference
-										//public float rollspeed = 1.5F;      //Used by the AI for doing turns
-										//public float pitchspeed = 1.5F;
-										//public float yawspeed = 1.5F;       //Used by the AI for doing turns
+										//public float turnspeed = 1.5F;      //Used by the AI for doing turns
+										//public float turnspeed = 1.5F;
+										//public float turnspeed = 1.5F;       //Used by the AI for doing turns
 
 
 
@@ -63,8 +63,8 @@ public class TurretController : Actor {
 		yaw = Mathf.Lerp(yaw, targetYaw, Time.deltaTime * controlResponce);
 
 
-		transform.RotateAround(transform.parent.transform.up, roll * rollspeed * Time.deltaTime);
-		transform.RotateAround(ourCameraObject.transform.right, pitch * pitchspeed * Time.deltaTime);
+		transform.RotateAround(transform.parent.transform.up, roll * turnspeed * Time.deltaTime);
+		transform.RotateAround(ourCameraObject.transform.right, pitch * turnspeed * Time.deltaTime);
 
 		//Problematically we're dealing with that 360 problem again
 		transform.localEulerAngles = new Vector3(ClampAngle(transform.localEulerAngles.x, -60, 30), Mathf.Clamp(transform.localEulerAngles.y, 10, 230f), transform.localEulerAngles.z);

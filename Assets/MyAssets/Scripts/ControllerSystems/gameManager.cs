@@ -6,6 +6,80 @@ using static Mission_MapSection;
 using System.IO;
 
 [System.Serializable]
+public class AirframeDescription
+{
+	//I really don't know about any of these values
+	public float weight_standard = 50f;
+	public float weight_max = 75f;
+	public float turnspeed_standard = 1.5f;
+	public float turnspeed_max = 2.0f;
+}
+
+
+[System.Serializable]
+public class AircraftDescription	//Basically this is all the stats that we need to make a player aircraft and will be used with the Hangar and also to shuffle data back and forth
+{
+	[Header("Upgrade Details")]
+	//A limiting factor for what we can equip
+	public float weight_max = 100f;
+	public float weight_standard = 80f;
+	public float weight_current = 100f;
+
+	//Player health in another name
+	public float armor_max = 150f;
+	public float armor_standard = 100f;
+	public float armor_current = 100f;
+
+	//Agility. Don't know if this is correct
+	public float agility_max = 2f;
+	public float agility_standard = 1.5f;
+	public float agility_current = 1.5f;
+
+
+	//Speed. Don't know if this is correct
+	public float speed_max = 8f;
+	public float speed_standard = 6f;
+	public float speed_current = 6f;
+
+	//Accel. Don't know if this is correct
+	public float accel_max = 65f;
+	public float accel_standard = 50f;
+	public float accel_current = 50f;
+
+
+	//Start with the guns I guess
+	[Space]
+	[Header("Cannon Details")]
+	public float cannons_damage = 1f;   //Damage per shot
+	public float cannons_refire_time = 0.25f;	//This is per cannon
+	public float cannons_bullet_speed = 50f;
+	public float cannons_bullet_range = 100f;
+	public float cannons_spread = 0.01f;
+	public float cannons_autoaim_angle = 7f;
+	[Space]
+	[Header("Aircraft Details")]
+	public string airframe_modelname = "";
+	public AirframeDescription airframe = new AirframeDescription();	//This is our base definitions that'll be exposed in the settings for the menus and sets limits on weight etc.
+	public float airframe_health = 100f;
+	public float airframe_turnspeed = 1.5f; //A multiplier for the Time.deltaTime to make aircraft turn faster
+	public float airframe_mass = 7; //This is a number that worked well with the systems. It has no real world counterpart
+	public Color airframe_color_primary = Color.green;
+	public Color airframe_color_secondary = Color.yellow;
+	[Space]
+	[Header("Engine Details")]
+	public float engine_max_overdrive_speed = 10f;
+	public float engine_max_airspeed = 6;
+	public float engine_min_airspeed = 2;
+	public float engine_stall_speed = 1.5f;
+	public float engine_thrust_power = 30f; //How quickly we can accellerate
+	[Space]
+	[Header("Secondary Weapons")]
+	public string secondary_weapon_name = "";
+
+
+}
+
+[System.Serializable]
 public class LevelResults
 {
 	public bool bWonLevel = true;
@@ -31,8 +105,12 @@ public class gameManager : MonoBehaviour {
 	int currentlySelectedTile = -1;
 	//need some way of knowing which level we'd want to load
 
-	#region Level Results to Pass Through
-	public LevelResults levelResults;
+	#region Selected Aircraft Details
+	public AircraftDescription SelectedAircraft;
+    #endregion
+
+    #region Level Results to Pass Through
+    public LevelResults levelResults;
 	#endregion
 
 	#region Level Load Screen
