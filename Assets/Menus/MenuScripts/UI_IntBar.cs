@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UI_IntBar : MonoBehaviour {
+    public UI_UpgradePanelActive ParentUpgradePanel;
+
     public Image IntDisplaySprite;
     public float IntSegments = 5f;
     public float IntValue = 1f; //What's our current value?
@@ -21,12 +23,14 @@ public class UI_IntBar : MonoBehaviour {
     public void SetIntValue(int toThis)
     {
         IntValue = toThis;
+
         SetIntFraction();
     }
 
     public void ChangeIntValue(int byThis)
     {
-        IntValue = Mathf.Clamp(IntValue + byThis, 1, IntSegments);
+        IntValue = Mathf.Clamp(IntValue + byThis, 0, IntSegments);
+        ParentUpgradePanel.BarLevelCallback(IntValue, byThis);
         SetIntFraction();
     }
 }

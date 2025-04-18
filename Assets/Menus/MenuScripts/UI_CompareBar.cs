@@ -32,16 +32,20 @@ public class UI_CompareBar : MonoBehaviour {
 
     public void DoCompareValue(float compareWith)
     {
-        if (compareWith > currentBarValue)
+        //Compare with needs to be "normalized"
+
+        compareWith = currentBarValue + compareWith;
+        compareValue = compareWith;
+        if (compareValue > currentBarValue)
         {
-            Bar_Bottom.fillAmount = compareWith;
+            Bar_Bottom.fillAmount = compareValue;
             Bar_Bottom.color = Color_Gain;
             Bar_Top.fillAmount = currentBarValue;
         } else
         {
             Bar_Bottom.fillAmount = currentBarValue;
             Bar_Bottom.color = Color_Loss;
-            Bar_Top.fillAmount = compareWith;
+            Bar_Top.fillAmount = compareValue;
         }
     }
 }

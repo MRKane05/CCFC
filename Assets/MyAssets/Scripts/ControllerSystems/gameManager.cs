@@ -15,6 +15,30 @@ public class AirframeDescription
 	public float turnspeed_max = 2.0f;
 }
 
+[System.Serializable]
+public class UpgradePathEffects
+{
+	//This needs to control how our upgrade affects the different stats of our aircraft
+	//float levels = 5; //lets make this standard
+	public float upgradeLevel = 0f;	//What's our current level?
+	public float costPerLevel = 10f;	//I don't know, this'll be something open to balance
+	public float finalWeight = 0f;		//How much weight will we add with the complete upgrade?
+	public float finalArmor = 0f;		//How much armor will this upgrade add in final
+	public float finalAgility = 0f;	//How much agility will this add in final
+	public float finalSpeed = 0f;		//How much speed will this add in final
+	public float finalAccel = 0f;		//How much acceleration will this add in final?
+
+	public UpgradePathEffects(float cost, float weight, float armor, float agility, float speed, float accel)
+    {
+		costPerLevel = cost;
+		finalWeight = weight;
+		finalArmor = armor;
+		finalAgility = agility;
+		finalSpeed = speed;
+		finalAccel = accel;
+    } 
+}
+
 
 [System.Serializable]
 public class AircraftDescription	//Basically this is all the stats that we need to make a player aircraft and will be used with the Hangar and also to shuffle data back and forth
@@ -24,27 +48,31 @@ public class AircraftDescription	//Basically this is all the stats that we need 
 	public float weight_max = 100f;
 	public float weight_standard = 80f;
 	public float weight_current = 100f;
-
+	[Space]
 	//Player health in another name
 	public float armor_max = 150f;
 	public float armor_standard = 100f;
 	public float armor_current = 100f;
-
+	[Space]
 	//Agility. Don't know if this is correct
 	public float agility_max = 2f;
 	public float agility_standard = 1.5f;
 	public float agility_current = 1.5f;
-
-
+	[Space]
 	//Speed. Don't know if this is correct
 	public float speed_max = 8f;
 	public float speed_standard = 6f;
 	public float speed_current = 6f;
-
+	[Space]
 	//Accel. Don't know if this is correct
 	public float accel_max = 65f;
 	public float accel_standard = 50f;
 	public float accel_current = 50f;
+
+	[Header("Upgrade Linear Sections")]
+	public UpgradePathEffects upgrade_airframe = new UpgradePathEffects(10f, 5f, 0f, 0.5f, 0f, 0f);
+	public UpgradePathEffects upgrade_engine = new UpgradePathEffects(15f, 10f, 0f, -0.2f, 2f, 0f);
+	public UpgradePathEffects upgrade_armor = new UpgradePathEffects(10f, 15f, 50f, -0.2f, -1.5f, 0f);
 
 
 	//Start with the guns I guess
