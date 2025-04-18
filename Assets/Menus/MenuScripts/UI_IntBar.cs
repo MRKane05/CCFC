@@ -29,8 +29,11 @@ public class UI_IntBar : MonoBehaviour {
 
     public void ChangeIntValue(int byThis)
     {
-        IntValue = Mathf.Clamp(IntValue + byThis, 0, IntSegments);
-        ParentUpgradePanel.BarLevelCallback(IntValue, byThis);
-        SetIntFraction();
+        float tempIntValue = Mathf.Clamp(IntValue + byThis, 0, IntSegments);
+        if (ParentUpgradePanel.BarLevelCallback(tempIntValue, byThis))
+        {
+            IntValue = tempIntValue;
+            SetIntFraction();
+        }
     }
 }

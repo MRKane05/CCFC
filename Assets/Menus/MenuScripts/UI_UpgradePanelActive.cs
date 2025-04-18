@@ -25,7 +25,7 @@ public class UI_UpgradePanelActive : MonoBehaviour {
     }
 
     //Called when the user interacts with our bar, and the system will squawk if there's something preventing this interaction (money, weight, whatever)
-    public void BarLevelCallback(float currentLevel, float thisLevel)
+    public bool BarLevelCallback(float currentLevel, float thisLevel)
     {
         //Do a check for the current cost
         //Do a check for the current weight
@@ -33,7 +33,7 @@ public class UI_UpgradePanelActive : MonoBehaviour {
 
         //Lets start with the comparitors
         currentUpgradeLevel = currentLevel;
-        staticsPanel.SetComparison(currentUpgradePath, currentLevel);
+        return staticsPanel.SetComparison(currentUpgradePath, currentLevel);    //Handle weights
     }
 
     public void ApplySelectedUpgrades()

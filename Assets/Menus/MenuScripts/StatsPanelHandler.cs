@@ -38,15 +38,23 @@ public class StatsPanelHandler : MonoBehaviour {
 		Accel.SetCurrentValue(thisAircraft.accel_current / AccelMax);
 	}
 
-	public void SetComparison(UpgradePathEffects currentUpgradePath, float lerpFactor)
+	public bool SetComparison(UpgradePathEffects currentUpgradePath, float lerpFactor)
     {
 		lerpFactor -= currentUpgradePath.upgradeLevel;
 		lerpFactor /= 5f;
+
+		if (gameManager.Instance.SelectedAircraft.weight_current + currentUpgradePath.finalWeight * lerpFactor > gameManager.Instance.SelectedAircraft.weight_max)
+        {
+			return false;
+        }
+
 		//Because this is a smooth gradient we can apply values to the airframe and take differences with this
 		Weight.DoCompareValue(currentUpgradePath.finalWeight * lerpFactor / WeightMax);
 		Armor.DoCompareValue(currentUpgradePath.finalArmor * lerpFactor / ArmorMax);
 		Agility.DoCompareValue(currentUpgradePath.finalAgility * lerpFactor / AgilityMax);
 		Speed.DoCompareValue(currentUpgradePath.finalSpeed * lerpFactor / SpeedMax);
 		Accel.DoCompareValue(currentUpgradePath.finalAccel * lerpFactor / AccelMax);
+
+		return true;
     }
 }
