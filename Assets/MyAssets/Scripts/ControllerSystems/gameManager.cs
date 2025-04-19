@@ -113,6 +113,12 @@ public class LevelResults
 	public bool bWonLevel = true;
 }
 
+[System.Serializable]
+public class PlayerGameStats
+{
+	public float money = 30;	//Because calling it "requsition points" might only be a surface level thing
+}
+
 //This is the core of all the game mechanics, it handles the information transfer sections basically.
 //Can't be too cluttered
 public class gameManager : MonoBehaviour {
@@ -135,6 +141,10 @@ public class gameManager : MonoBehaviour {
 
 	#region Selected Aircraft Details
 	public AircraftDescription SelectedAircraft;
+	#endregion
+
+	#region player statistics and other data
+	public PlayerGameStats playerStats;
     #endregion
 
     #region Level Results to Pass Through

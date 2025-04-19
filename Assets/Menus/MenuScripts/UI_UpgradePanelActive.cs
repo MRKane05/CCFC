@@ -65,5 +65,10 @@ public class UI_UpgradePanelActive : MonoBehaviour {
         }
         //And finally we need to set our stats after the upgrade
         staticsPanel.SetStats(gameManager.Instance.SelectedAircraft);
+
+        //And of course we need to do the money thing!
+        gameManager.Instance.playerStats.money -= ourDisplayBar.totalUpgradeCost;
+        //And apply to our int bar too
+        ourDisplayBar.SetIntValue((int)currentUpgradeLevel);
     }
 }
