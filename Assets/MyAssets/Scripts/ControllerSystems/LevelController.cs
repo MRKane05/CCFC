@@ -18,23 +18,46 @@ public class actorWrapper {
 	public GameObject targetListPrefab; //a model displayed on our target list
 }
 
-//small wrapperish class that acts to handle the players statistics
-[System.Serializable]
-public class playerStats {
-	public int kills=0; //how many vehicles have we destroyed in this level?
-	public int murders=0;
-	//do we want to record the shots etc? probably should
-	public int shots=0;
-	public int hits=0;
-
-}
-
 [System.Serializable]
 public class waypointWrapper {
 	public GameObject waypoint;
 	public float checkDistance; //distance from the end goal where we activate.
 	public float sqrCheckDistance; //used for checking...man that's a stupid little annotation really
 	public waypoint wayScript;
+}
+
+[System.Serializable]
+public class LevelScoreItem
+{
+	//public string itemName = "";
+	public float itemPoints = 1;
+	public int count = 0;
+
+	public LevelScoreItem(float newPoints, int newCount)
+    {
+		//itemName = newName;	//We probably don't need to be storing this twice
+		itemPoints = newPoints;
+		count = newCount;
+    }
+}
+
+//Some way of keeping track of the players score. I guess
+[System.Serializable]
+public class PlayerLevelScore
+{
+	public Dictionary<string, LevelScoreItem> playerLevelScore = new Dictionary<string, LevelScoreItem>();
+
+	public void AddScoreItem(string itemName, float itemPoints)	//Called when we get a kill
+    {
+		if (playerLevelScore.ContainsKey(itemName))
+        {
+			playerLevelScore[itemName].count++;
+        } else
+        {
+			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1);
+			playerLevelScore.Add(itemName, newScoreItem);
+        }
+    }
 }
 
 public class LevelController : LevelControllerBase {
@@ -51,11 +74,12 @@ public class LevelController : LevelControllerBase {
 	public GUIText ourGUIText;
 	
 	public GameObject playerAircraft; //Usually we'd
+
 	public zone_AckAck AckAckZone;	//What's the AckAck in the level?
 	
 	public int friendlyCount=3, enemyCount=5;
 	
-	public playerStats levelPlayerStats; //our stats for this level
+	public PlayerLevelScore PlayerScore = new PlayerLevelScore(); //our stats for this level
 
 	#region levelStuff
 	public GameObject waypointPrefab;
@@ -375,14 +399,11 @@ public class LevelController : LevelControllerBase {
 	#endregion
 
 	#region scoreKeeping
-	public void addKill() {
-		levelPlayerStats.kills++;
+	public void addKill(string itemName, float itemPoints) {
+		//levelPlayerStats.kills++;
+		Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
+		PlayerScore.AddScoreItem(itemName, itemPoints);
 	}
-
-	public void addMurder() {
-		levelPlayerStats.murders++;
-	}
-
 
 	#endregion
 

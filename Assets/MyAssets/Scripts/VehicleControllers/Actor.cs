@@ -7,13 +7,16 @@ public class Actor : MonoBehaviour {
 	//A little bit of target handling stuff :)
 	public float targetViewDistance = 3f;
 	public int targetValue = 1; //Higher number means a higher priority target
-
+	public string vehicleType = "Fighter";	//used in our score keeping system
+	public float vehicleScore = 1;	//How many points does the player get for this?
+	[Space]
+	[Header("Vehicle handling numbers")]
 	public bool bIsPlayerVehicle=false;
 	public int team = 0; //0 friendly 1 enemy (for this anyway)
 	public float speed=6;
 	public float hitSphere = 1.2F; //what is our hit area?
 	public bool bIsTarget=false; //is the player targeting this?
-	protected bool bFiring, bLastFiring; //Our firing mechs
+	protected bool bFiring, bLastFiring; //Our firing mechs PROBLEM: This really needs to be improved!
 	protected Quaternion targetRotation;
 	protected float roll, yaw, pitch, throttleControl;
 	protected float targetRoll, targetYaw, targetPitch;
@@ -61,7 +64,10 @@ public class Actor : MonoBehaviour {
 	public bool bTriggerControlRight = true;
 
 	public float pickupDropOdds = 0.75f; //Odds of dropping a pickup
-	public int numPickups = 1;		//For anything that'd drop more than one pickup (balloons, bombers, etc)
+	public int numPickups = 1;      //For anything that'd drop more than one pickup (balloons, bombers, etc)
+
+	float lastPlayerDamageTime = 0f;     //A little ticker to see when our player damaged us
+	float playerKillTimeThreshold = 1f; //Because we don't care about the AI getting points and if the player is shooting at something we should give the kill to the player
 
 
 	public float inFade {
@@ -222,31 +228,35 @@ public class Actor : MonoBehaviour {
 		}
 	}
 
+	public virtual void CheckPlayerKill(GameObject instigator)
+    {
+		if (instigator == PlayerController.Instance.ourAircraft.gameObject)
+			lastPlayerDamageTime = Time.time;   //Keep a ticker to see if the player should get a kill
+
+		//need to check and see if this is the player, and if it is then add the score up.
+		if (instigator == PlayerController.Instance.ourAircraft.gameObject)
+		{
+			((LevelController)LevelControllerBase.Instance).addKill(vehicleType, vehicleScore); //Give kill to player
+		}
+		else if (Time.time - lastPlayerDamageTime < playerKillTimeThreshold)
+		{
+			((LevelController)LevelControllerBase.Instance).addKill(vehicleType, vehicleScore); //Give kill to player despite the killing blow not being the players
+		}
+			
+	}
+
 	//kind of explains why this isn't getting shot now doesn't it?
 	public virtual void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay) {
 		//Debug.LogError("Getting Shot");
 
 		//Make this invincible for the moment...
-		if (!isInvincible) {
+		if (!isInvincible)
+		{
 			health -= thisDamage;
-			if (health<0 && !bIsDead) {
-				//need to check and see if this is the player, and if it is then add the score up.
-				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-		((LevelController)LevelControllerBase.Instance).addKill(); //rack it up!
-				
-				//doExplode(); //whack this.
-				bIsDead=true;
-				//applyShotDown();
-				//we can't remove this as it'll mean the player can't shoot it...
-				//((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //but our targeting system needs to know I suppose
-				//Destroy (gameObject); //Just destroy it for now
-			}
-			if (health<-maxHealth/2) { //then destroy this aircraft fully for whatever reason
-				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-		((LevelController)LevelControllerBase.Instance).addMurder(); //not a good thing actually, and we're counting it
-				
-	((LevelController)LevelControllerBase.Instance).removeSelf(gameObject, team); //For the moment I suppose
-				Destroy (gameObject);
+			if (health <= 0)
+			{
+				CheckPlayerKill(instigator);
+				bIsDead = true;
 			}
 		}
 		if (owner)

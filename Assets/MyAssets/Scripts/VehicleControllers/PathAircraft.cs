@@ -190,7 +190,8 @@ public class PathAircraft : Actor {
         if (health <= 0 && !bIsDead)
         {
             bIsDead = true;
-            dropPickups(); //So that we leave something when we die
+            dropPickups(); //So that we leave something when we die\
+            CheckPlayerKill(instigator);
             dieTime = Time.time + 5f;   //How long until we expode and get removed?
             setMissionState(enMissionState.FAILED); //We've been unsuccessful with our bombing run as we've been shot down before it was complete
         }
