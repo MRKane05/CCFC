@@ -4,16 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using static Mission_MapSection;
 using System.IO;
-
-[System.Serializable]
-public class AirframeDescription
-{
-	//I really don't know about any of these values
-	public float weight_standard = 50f;
-	public float weight_max = 75f;
-	public float turnspeed_standard = 1.5f;
-	public float turnspeed_max = 2.0f;
-}
+using System.Collections.Generic;
 
 [System.Serializable]
 public class UpgradePathEffects
@@ -41,8 +32,44 @@ public class UpgradePathEffects
 
 
 [System.Serializable]
+public class CannonsItem
+{
+	public string cannons_name = "standard_cannons";
+
+	public float unlock_cost = 200f;
+	public float apply_cost = 25f;
+	public float downgrade_cost = 5f;
+	public float cannons_weight = 25f;
+
+	public float cannons_damage = 1f;   //Damage per shot
+	public float cannons_refire_time = 0.25f;   //This is per cannon
+	public float cannons_bullet_speed = 50f;
+	public float cannons_bullet_range = 100f;
+	public float cannons_spread = 0.01f;
+	public float cannons_autoaim_angle = 7f;
+
+	public CannonsItem(string newName, float newUnlockCost, float newApplyCost, float newCannonsWeight, float newDamage, float newRefireTime, float newBulletSpeed, float newRange, float newSpread, float newAutoaim)
+    {
+		cannons_name = newName;
+		unlock_cost = newUnlockCost;
+		apply_cost = newApplyCost;
+		cannons_weight = newCannonsWeight;
+
+		cannons_damage = newDamage;
+		cannons_refire_time = newRefireTime;
+		cannons_bullet_speed = newBulletSpeed;
+		cannons_bullet_range = newRange;
+		cannons_spread = newSpread;
+		cannons_autoaim_angle = newAutoaim;
+    }
+}
+
+
+[System.Serializable]
 public class AircraftDescription	//Basically this is all the stats that we need to make a player aircraft and will be used with the Hangar and also to shuffle data back and forth
 {
+	public string aircraft_model = "camel";
+
 	[Header("Upgrade Details")]
 	//A limiting factor for what we can equip
 	public float weight_max = 100f;
@@ -74,16 +101,15 @@ public class AircraftDescription	//Basically this is all the stats that we need 
 	public UpgradePathEffects upgrade_engine = new UpgradePathEffects(15f, 10f, 0f, -0.2f, 2f, 0f);
 	public UpgradePathEffects upgrade_armor = new UpgradePathEffects(10f, 15f, 50f, -0.2f, -1.5f, 0f);
 
-
 	//Start with the guns I guess
 	[Space]
 	[Header("Cannon Details")]
-	public float cannons_damage = 1f;   //Damage per shot
-	public float cannons_refire_time = 0.25f;	//This is per cannon
-	public float cannons_bullet_speed = 50f;
-	public float cannons_bullet_range = 100f;
-	public float cannons_spread = 0.01f;
-	public float cannons_autoaim_angle = 7f;
+	//I don't know if this should be stored here, or in another part of the system and referred to
+	//I don't know if this should be stored here, or in another part of the system and referred to
+	public CannonsItem AttachedCannons = new CannonsItem("standard_cannons", 200f, 25f, 25f, 1f, 0.25f, 50f, 100f, 0.01f, 7f);
+
+	/*
+	//We kind of don't need this
 	[Space]
 	[Header("Aircraft Details")]
 	public string airframe_modelname = "";
@@ -100,10 +126,13 @@ public class AircraftDescription	//Basically this is all the stats that we need 
 	public float engine_min_airspeed = 2;
 	public float engine_stall_speed = 1.5f;
 	public float engine_thrust_power = 30f; //How quickly we can accellerate
+	*/
 	[Space]
 	[Header("Secondary Weapons")]
 	public string secondary_weapon_name = "";
-
+	[Space]
+	[Header("Special Ability")]
+	public string special_ability_name = "";
 
 }
 
@@ -117,6 +146,42 @@ public class LevelResults
 public class PlayerGameStats
 {
 	public float money = 30;	//Because calling it "requsition points" might only be a surface level thing
+}
+
+
+[System.Serializable]
+public class LevelScoreItem
+{
+	//public string itemName = "";
+	public float itemPoints = 1;
+	public int count = 0;
+
+	public LevelScoreItem(float newPoints, int newCount)
+	{
+		//itemName = newName;	//We probably don't need to be storing this twice
+		itemPoints = newPoints;
+		count = newCount;
+	}
+}
+
+//Some way of keeping track of the players score. I guess
+[System.Serializable]
+public class PlayerLevelScore
+{
+	public Dictionary<string, LevelScoreItem> playerLevelScore = new Dictionary<string, LevelScoreItem>();
+
+	public void AddScoreItem(string itemName, float itemPoints) //Called when we get a kill
+	{
+		if (playerLevelScore.ContainsKey(itemName))
+		{
+			playerLevelScore[itemName].count++;
+		}
+		else
+		{
+			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1);
+			playerLevelScore.Add(itemName, newScoreItem);
+		}
+	}
 }
 
 //This is the core of all the game mechanics, it handles the information transfer sections basically.
@@ -141,9 +206,12 @@ public class gameManager : MonoBehaviour {
 
 	#region Selected Aircraft Details
 	public AircraftDescription SelectedAircraft;
+	//We need something that contains a description of all the aircraft we're working with. This shouldn't take up too much memory, and I'm not sure
+	//where it should live...
 	#endregion
 
 	#region player statistics and other data
+	public PlayerLevelScore PlayerScore = new PlayerLevelScore(); //our stats for this level
 	public PlayerGameStats playerStats;
     #endregion
 
@@ -189,8 +257,30 @@ public class gameManager : MonoBehaviour {
 		instance = this;
 		
 		DontDestroyOnLoad(this); //this is about the only thing that's not cycled around.
+		loadPlayerData();	//Load the data for our player
 	}
-	
+
+	public void loadPlayerData()
+	{
+		if (SaveUtility.Instance.CheckSaveFile("playerData.json"))
+		{
+			string saveText = SaveUtility.Instance.LoadTXTFile("playerData.json");
+			PlayerGameStats ourSaveForm = new PlayerGameStats();
+			playerStats = JsonUtility.FromJson<PlayerGameStats>(saveText);
+		}
+	}
+
+	public void savePlayerData()
+    {
+		string playerSaveState = JsonUtility.ToJson(playerStats);
+		SaveUtility.Instance.SaveTXTFile(playerSaveState, "playerData.json");
+	}
+
+	public void DoHangarClose()
+    {
+		savePlayerData();
+    }
+
 	int enemies, wingmen;
 	
 	public void reEnableMapInteraction()
@@ -357,4 +447,15 @@ public class gameManager : MonoBehaviour {
 		}
         #endregion
     }
+
+
+	#region scoreKeeping
+	public void addKill(string itemName, float itemPoints)
+	{
+		//levelPlayerStats.kills++;
+		Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
+		PlayerScore.AddScoreItem(itemName, itemPoints);
+	}
+
+	#endregion
 }

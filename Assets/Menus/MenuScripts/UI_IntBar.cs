@@ -11,7 +11,7 @@ public class UI_IntBar : MonoBehaviour {
     public TextMeshProUGUI totalCost;
     public Image IntDisplaySprite;
     public float IntSegments = 5f;
-    public float IntValue = 1f; //What's our current value?
+    public float IntValue = 0f; //What's our current value?
     public float totalUpgradeCost = 0f;
 
     void Start()
@@ -39,12 +39,14 @@ public class UI_IntBar : MonoBehaviour {
 
         //We need to handle costs
         float intDifference = tempIntValue - ParentUpgradePanel.currentUpgradePath.upgradeLevel;
-        totalUpgradeCost = intDifference * ParentUpgradePanel.currentUpgradePath.costPerLevel;
-        if (totalUpgradeCost > gameManager.Instance.playerStats.money)
+        float tempTotalUpgradeCost = intDifference * ParentUpgradePanel.currentUpgradePath.costPerLevel;
+        if (tempTotalUpgradeCost > gameManager.Instance.playerStats.money)
         {
             //This is a false
             return;
         }
+
+        totalUpgradeCost = tempTotalUpgradeCost;
 
         totalCost.text = Mathf.Clamp(totalUpgradeCost, 0, 9999999).ToString() + "/" + gameManager.Instance.playerStats.money.ToString();
 

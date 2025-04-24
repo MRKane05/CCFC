@@ -38,6 +38,12 @@ public class UI_UpgradePanelActive : MonoBehaviour {
 
     public void ApplySelectedUpgrades()
     {
+        //First we need to check if we've actually got upgrades to apply
+        if (ourDisplayBar.totalUpgradeCost <= 0 && currentUpgradeLevel == currentUpgradePath.upgradeLevel)
+        {
+            return;
+        }
+
         float upgradeDifference = (currentUpgradeLevel - currentUpgradePath.upgradeLevel)/5f;
 
         gameManager.Instance.SelectedAircraft.weight_current += currentUpgradePath.finalWeight * upgradeDifference;
@@ -67,7 +73,11 @@ public class UI_UpgradePanelActive : MonoBehaviour {
         staticsPanel.SetStats(gameManager.Instance.SelectedAircraft);
 
         //And of course we need to do the money thing!
-        gameManager.Instance.playerStats.money -= ourDisplayBar.totalUpgradeCost;
+        if (ourDisplayBar.totalUpgradeCost > 0) //because the lazy system can be negative when undoing upgrades
+        {
+            gameManager.Instance.playerStats.money -= ourDisplayBar.totalUpgradeCost;
+        }
+        ourDisplayBar.totalUpgradeCost = 0;
         //And apply to our int bar too
         ourDisplayBar.SetIntValue((int)currentUpgradeLevel);
     }

@@ -275,7 +275,7 @@ public class AircraftController : Actor {
 			if (health<0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
 				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					((LevelController)LevelControllerBase.Instance).addKill(vehicleType, vehicleScore); //rack it up!
+					gameManager.Instance.addKill(vehicleType, vehicleScore); //rack it up!
 
 				//doExplode(); //whack this.
 				bIsDead=true;

@@ -26,40 +26,6 @@ public class waypointWrapper {
 	public waypoint wayScript;
 }
 
-[System.Serializable]
-public class LevelScoreItem
-{
-	//public string itemName = "";
-	public float itemPoints = 1;
-	public int count = 0;
-
-	public LevelScoreItem(float newPoints, int newCount)
-    {
-		//itemName = newName;	//We probably don't need to be storing this twice
-		itemPoints = newPoints;
-		count = newCount;
-    }
-}
-
-//Some way of keeping track of the players score. I guess
-[System.Serializable]
-public class PlayerLevelScore
-{
-	public Dictionary<string, LevelScoreItem> playerLevelScore = new Dictionary<string, LevelScoreItem>();
-
-	public void AddScoreItem(string itemName, float itemPoints)	//Called when we get a kill
-    {
-		if (playerLevelScore.ContainsKey(itemName))
-        {
-			playerLevelScore[itemName].count++;
-        } else
-        {
-			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1);
-			playerLevelScore.Add(itemName, newScoreItem);
-        }
-    }
-}
-
 public class LevelController : LevelControllerBase {
 
 	public enum enEndMethod { ALL, WAYPOINTS, ENEMIES, TIME } //different mission end conditions...not sure how these will "evolve" if you will
@@ -79,8 +45,6 @@ public class LevelController : LevelControllerBase {
 	
 	public int friendlyCount=3, enemyCount=5;
 	
-	public PlayerLevelScore PlayerScore = new PlayerLevelScore(); //our stats for this level
-
 	#region levelStuff
 	public GameObject waypointPrefab;
 	public GameObject enemySpawnNodePrefab; //this is a little touchy I suppose, will need development here
@@ -394,15 +358,6 @@ public class LevelController : LevelControllerBase {
 			//Assign our AI actions for this fighter
 			((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
 		}
-	}
-
-	#endregion
-
-	#region scoreKeeping
-	public void addKill(string itemName, float itemPoints) {
-		//levelPlayerStats.kills++;
-		Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
-		PlayerScore.AddScoreItem(itemName, itemPoints);
 	}
 
 	#endregion

@@ -236,11 +236,11 @@ public class Actor : MonoBehaviour {
 		//need to check and see if this is the player, and if it is then add the score up.
 		if (instigator == PlayerController.Instance.ourAircraft.gameObject)
 		{
-			((LevelController)LevelControllerBase.Instance).addKill(vehicleType, vehicleScore); //Give kill to player
+			gameManager.Instance.addKill(vehicleType, vehicleScore); //Give kill to player
 		}
 		else if (Time.time - lastPlayerDamageTime < playerKillTimeThreshold)
 		{
-			((LevelController)LevelControllerBase.Instance).addKill(vehicleType, vehicleScore); //Give kill to player despite the killing blow not being the players
+			gameManager.Instance.addKill(vehicleType, vehicleScore); //Give kill to player despite the killing blow not being the players
 		}
 			
 	}

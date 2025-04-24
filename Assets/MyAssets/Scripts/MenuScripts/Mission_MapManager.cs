@@ -869,23 +869,7 @@ public class Mission_MapManager : MonoBehaviour {
 		
 		string mapTileState = JsonUtility.ToJson(ourSaveForm);
 		SaveUtility.Instance.SaveTXTFile(mapTileState, "mapTileState.json");
-		/*
-		System.IO.File.WriteAllText(Application.persistentDataPath + "/mapTileState.json", mapTileState);
-		Debug.Log(mapTileState);
-		Debug.Log("MapSaved: " + Application.persistentDataPath + "/mapTileState.json");
-		*/
 	}
-
-	/*
-	public bool checkSavedMap()
-    {
-		//Check and see if we've got a saved map state
-		if (!System.IO.File.Exists(Application.persistentDataPath + "/mapTileState.json"))
-		{
-			return false;
-		}
-		return true;
-	}*/
 
 	public void loadMapState()
     {   
