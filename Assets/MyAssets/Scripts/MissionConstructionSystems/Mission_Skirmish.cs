@@ -10,7 +10,7 @@ public class Mission_Skirmish : MissionConstructionBase {
     float levelStartTime = 0;
     public Range fighterSpawnHeight = new Range(30, 50);
 
-    float bomberSpawnChance = 0.25f;
+    float bomberSpawnChance = 0.125f;
 
     public bool bMissionConcluding = false;
     public override void DoStart()
@@ -199,7 +199,7 @@ public class Mission_Skirmish : MissionConstructionBase {
         base.DoUpdate();
 
         //So if we're over an enemy base we're going to need to keep spawning in fighters to harass the player and the bombers
-        if (((LevelController)LevelControllerBase.Instance).enemyList.Count < nextMinSpawnCount && Time.time - levelStartTime > 5f) //Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
+        if (((LevelController)LevelControllerBase.Instance).enemyList.Count < nextMinSpawnCount && Time.time - levelStartTime > 5f && enemyRemaining > 0) //Make sure that we give everything a breath before we're into it. This might be modified for storytelling reasons
         { 
             nextMinSpawnCount = Random.Range(2, 6); //This should reflect the number of bombers in our flight in order to balance difficulty
             SpawnWave();

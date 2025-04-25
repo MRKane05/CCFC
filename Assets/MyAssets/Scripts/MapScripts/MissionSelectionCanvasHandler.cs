@@ -42,6 +42,12 @@ public class MissionSelectionCanvasHandler : MonoBehaviour {
         }
     }
 
+	public void OpenHangar()
+    {
+		mapObject.SetActive(false);
+		SelectMainCanvas(enCurrentCanvas.HANGAR);
+    }
+
 	public void HangarClose()
     {
 		//Kind of important that we save our settings here, and that'll be done through the game controller
