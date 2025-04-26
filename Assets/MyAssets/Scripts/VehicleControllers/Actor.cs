@@ -271,7 +271,7 @@ public class Actor : MonoBehaviour {
 	float explosionDelay = 2f; //how many seconds before we go boom
 	int d_parachutes = 1;
 	//do our shot down setup stuff...
-	protected void applyShotDown()
+	protected virtual void applyShotDown()
 	{
 		StartCoroutine(shotDownProcess(0.5f, explosionDelay));
 		dropPickups();

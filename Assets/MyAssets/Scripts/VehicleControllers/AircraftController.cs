@@ -187,6 +187,24 @@ public class AircraftController : Actor {
 		doVehicleSetup();
 		if (ourPlayerController)
 			ourPlayerController.AddHealth(health);
+
+		if (bIsPlayerVehicle)
+			GrabPlayerVehicleStats();
+	}
+
+	public void GrabPlayerVehicleStats()
+    {
+		//PROBLEM: This setup is a mess an sorely needs refactored
+
+		//Apply our modified stats to our aircraft for play
+		//This will also have to go through selecting the fighter model, assigning the cannons, and assigning the secondary weapon/setting up the UI
+		//For the moment...
+		maxHealth = gameManager.Instance.SelectedAircraft.armor_current;
+		health = maxHealth; //of course for missions that are played concessively this won't fly...
+		turnspeed = gameManager.Instance.SelectedAircraft.agility_current;
+		thrustPower = gameManager.Instance.SelectedAircraft.accel_current;
+		MaxAirSpeed = gameManager.Instance.SelectedAircraft.speed_current;
+		OverdriveAirSpeed = MaxAirSpeed * 10f / 6f;	//Stand in constant from previously
 	}
 
 	public virtual void doVehicleSetup() {

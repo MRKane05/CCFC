@@ -10,7 +10,7 @@ public class Mission_Skirmish : MissionConstructionBase {
     float levelStartTime = 0;
     public Range fighterSpawnHeight = new Range(30, 50);
 
-    float bomberSpawnChance = 0.125f;
+    float bomberSpawnChance = 1f; //0.125f;
 
     public bool bMissionConcluding = false;
     public override void DoStart()

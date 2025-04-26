@@ -182,7 +182,17 @@ public class PathAircraft : Actor {
 
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay)
 	{
-        base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
+        //base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
+        if (!isInvincible)
+        {
+            health -= thisDamage;
+        }
+
+        if (owner)
+        {
+            owner.actorTakingDamage(owner, this, health / maxHealth);
+        }
+
         checkSmokeSystem(health / maxHealth);
 
         //PROBLEM: We need to update the players UI just for this particular type of aircraft (this is going to get screwy when we add more than one, but for the moment it's getting things on the ground)
