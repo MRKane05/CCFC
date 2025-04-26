@@ -241,8 +241,7 @@ public class Actor : MonoBehaviour {
 		else if (Time.time - lastPlayerDamageTime < playerKillTimeThreshold)
 		{
 			gameManager.Instance.addKill(vehicleType, vehicleScore); //Give kill to player despite the killing blow not being the players
-		}
-			
+		}			
 	}
 
 	//kind of explains why this isn't getting shot now doesn't it?

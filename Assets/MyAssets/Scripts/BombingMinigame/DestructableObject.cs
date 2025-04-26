@@ -11,6 +11,9 @@ public class DestructableObject : MonoBehaviour {
     public GameObject liveObject, destroyedObject;
     public GameObject explosionPrefab, burningPrefab;   //Our prefabs for effects
 
+    public string objectType = "";
+    public float objectScore = 0;
+
     void Start()
     {
         if (!liveObject || !destroyedObject)
@@ -73,6 +76,13 @@ public class DestructableObject : MonoBehaviour {
         if (!destroyedObject && !liveObject)
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false; //Turn this off so it's not visible
+        }
+
+        //Finally handle our scoring
+        //This is actually a good way to handle scoring for base defense stuff as friendly structures can have a negative score
+        if (objectType.Length > 0)
+        {
+            gameManager.Instance.addKill(objectType, objectScore); //Give kill to player
         }
     }
 }

@@ -453,7 +453,7 @@ public class gameManager : MonoBehaviour {
 	public void addKill(string itemName, float itemPoints)
 	{
 		//levelPlayerStats.kills++;
-		Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
+		//Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
 		PlayerScore.AddScoreItem(itemName, itemPoints);
 	}
 
