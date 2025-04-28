@@ -34,7 +34,7 @@ public class UpgradePathEffects
 [System.Serializable]
 public class CannonsItem
 {
-	public string cannons_name = "standard_cannons";
+	public string cannons_name = "Standard";
 
 	public float unlock_cost = 200f;
 	public float apply_cost = 25f;
@@ -47,6 +47,10 @@ public class CannonsItem
 	public float cannons_bullet_range = 100f;
 	public float cannons_spread = 0.01f;
 	public float cannons_autoaim_angle = 7f;
+
+	public float cannons_agility = -0.125f;
+	public float cannons_speed = -0.5f;
+	public float cannons_accel = -5f;
 
 	public CannonsItem(string newName, float newUnlockCost, float newApplyCost, float newCannonsWeight, float newDamage, float newRefireTime, float newBulletSpeed, float newRange, float newSpread, float newAutoaim)
     {
@@ -106,7 +110,7 @@ public class AircraftDescription	//Basically this is all the stats that we need 
 	[Header("Cannon Details")]
 	//I don't know if this should be stored here, or in another part of the system and referred to
 	//I don't know if this should be stored here, or in another part of the system and referred to
-	public CannonsItem AttachedCannons = new CannonsItem("standard_cannons", 200f, 25f, 25f, 1f, 0.25f, 50f, 100f, 0.01f, 7f);
+	public CannonsItem AttachedCannons = new CannonsItem("standard_cannons", 200f, 25f, 15f, 1f, 0.25f, 50f, 100f, 0.01f, 7f);
 
 	/*
 	//We kind of don't need this
