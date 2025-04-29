@@ -11,6 +11,10 @@ public class AircraftController : Actor {
 
 	public GameObject[] CannonEmpties; //these are the empties attached to our aircraft that denote cannons
 	public AttachedGun[] ourGunMP;
+	public float cannon_refire = 0.2f;
+	float lastCannonFireTime = 0;
+	int cannon_current = 0;
+
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
 												//public AIController ourAIController; //we can also get information from this
 												//public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
@@ -61,6 +65,13 @@ public class AircraftController : Actor {
 		maxHealth *= factor;
 
 		foreach (AttachedGun thisGun in ourGunMP) {
+			if (bIsPlayerVehicle)
+            {
+				thisGun.damage = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_damage;  //Set our cannons damage as based on what the player selected
+				thisGun.spread = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_spread;
+				thisGun.autoAimAngle = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_autoaim_angle;
+			}
+
 			thisGun.damage *= factor;
 		}
 	}
@@ -204,20 +215,13 @@ public class AircraftController : Actor {
 		turnspeed = gameManager.Instance.SelectedAircraft.agility_current;
 		thrustPower = gameManager.Instance.SelectedAircraft.accel_current;
 		MaxAirSpeed = gameManager.Instance.SelectedAircraft.speed_current;
-		OverdriveAirSpeed = MaxAirSpeed * 10f / 6f;	//Stand in constant from previously
+		OverdriveAirSpeed = MaxAirSpeed * 10f / 6f; //Stand in constant from previously
+
+		cannon_refire = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_refire_time;
 	}
 
 	public virtual void doVehicleSetup() {
-		/*
-		if (!groundCollider)
-        {
-			GameObject groundObject = GameObject.Find("Terrain");
-			if (groundObject)
-			{
-				groundCollider = groundObject.GetComponent<Collider>(); //this is used for our ground contact
-			}
-		}
-		*/
+
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
 		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
@@ -334,6 +338,7 @@ public class AircraftController : Actor {
 		//speed = Airspeed; //really this should be += (CompfDifference(throttle*Airspeed, speed, Gravity()) * Time.deltaTime;
 		//Really only need to set on and off for these...
 		//Solved by having a mainBlind and targetBlind, but I think the connection between the two (with highlite) is actually pretty good...
+		/*
 		if (bFiring!=bLastFiring) {
 			bLastFiring=bFiring;
 			for (int i=0; i<ourGunMP.Length; i++) {
@@ -342,7 +347,16 @@ public class AircraftController : Actor {
 					ourGunMP[i].FireState = FireState; //Will probably take over from bFiring
 				}
 			}
-		}
+		}*/
+
+		//Shoot our guns
+		if (bFiring && Time.time > lastCannonFireTime + cannon_refire)
+        {
+			lastCannonFireTime = Time.time;
+			ourGunMP[cannon_current].doFireEffect();
+			cannon_current++;
+			cannon_current = cannon_current % ourGunMP.Length;
+        }
 
 		if (isNPC)
 		{

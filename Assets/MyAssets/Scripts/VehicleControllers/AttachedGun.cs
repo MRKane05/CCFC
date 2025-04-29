@@ -62,7 +62,7 @@ public class AttachedGun : MonoBehaviour {
 		//we want to bleed down our muzzle flare.
 		if (Time.time > flareDieTime && gunFlare)
 			gunFlare.SetActive(false); //annull this.
-
+		/*
 		if (bFiring && bfirstFire && bSynced) { //then set forward our refire time
 			ReFireTime = Time.time + RefireRate/2;
 			bfirstFire = false;
@@ -74,7 +74,7 @@ public class AttachedGun : MonoBehaviour {
 			//Play the fire sound
 			//Do our fire effect (which can be overwritten by other classes)
 			doFireEffect();
-		}
+		}*/
 	}
 
 	//this gunflare probably needs to get a little transparent because it is seriously obscuring the view!
