@@ -134,6 +134,34 @@ public class BaseGenerator : MonoBehaviour {
 		BaseCenterPoint /= (float)spawnedBaseObjects.Length;
 	}
 
+
+
+	public void setBaseBuildingsPoints(bool bIsPlayerBase, GameObject thisGameObject)
+    {
+		WorldDestructableObject[] buildings = thisGameObject.GetComponentsInChildren<WorldDestructableObject>();
+
+		if (thisGameObject.transform.childCount > 0)	//Recurse over the entire array
+		{
+			foreach (Transform child in thisGameObject.transform)
+			{
+				setBaseBuildingsPoints(bIsPlayerBase, child.gameObject);
+			}
+		}
+
+		foreach (WorldDestructableObject thisBuilding in buildings)
+        {
+			if (bIsPlayerBase)
+            {
+				thisBuilding.objectType = "Friendly Building";
+				thisBuilding.objectScore = Random.Range(-3, -6);
+            } else
+            {
+				thisBuilding.objectType = "Assisted Enemy Building Destroyed";
+				thisBuilding.objectScore = 1;
+            }
+        }
+    }
+
 	public Vector3 getBomberTarget()
     {
 		//For the moment lets return anything, although I'd like to advance this to try to return targets along a path

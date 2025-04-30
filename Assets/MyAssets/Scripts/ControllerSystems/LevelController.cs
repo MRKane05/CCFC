@@ -623,6 +623,7 @@ public class LevelController : LevelControllerBase {
 			//Grab our constructor and send through the necessary information to generate a mission
 			Mission_Bombers MissionGenerator = newConstructor.GetComponent<Mission_Bombers>();
 			MissionGenerator.GenerateMission(gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE, gameManager.Instance.missionDifficulty);
+			
 		} 
 		else if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.SKIRMISH)
         {

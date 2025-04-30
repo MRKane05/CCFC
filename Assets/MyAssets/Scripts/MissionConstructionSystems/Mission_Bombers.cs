@@ -80,6 +80,8 @@ public class Mission_Bombers : MissionConstructionBase
         yield return StartCoroutine(ourBaseGenerator.CreateBase());
         //Now we need to sort out our starting bombers after pulling some information from the base builder
 
+        //Assign points to the buildings to reflect in mission score
+        ourBaseGenerator.setBaseBuildingsPoints(BombingTeam == enBombingTeam.ENEMY, ourBaseGenerator.baseParent);
 
         //Then we position our player
         //Then we give everything the all-clear to proceed
@@ -87,7 +89,7 @@ public class Mission_Bombers : MissionConstructionBase
 
         //IDEA Add in an optional requirement to clear the airspace before bombers will approach
         //So we need to know if we should be protecting the bombers or stopping them. Both will have diffferent implications
-       
+
         missionClearedBombers = 0;
         //Debug.Log("Total Bombers: " + totalBombers);
         int numBombers = 0;

@@ -32,7 +32,10 @@ public class LineResultHolder : MonoBehaviour {
 		}
 
 		finalScore = Mathf.RoundToInt(finalScore);
-
+		if (finalScore < 0)
+        {
+			finalScore = 0; //I don't want the player to lose money for a bad performance
+        }
 		totalNumber.text = finalNumber.ToString();
 		totalScore.text = finalScore.ToString();
 
