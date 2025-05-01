@@ -153,7 +153,7 @@ public class BaseGenerator : MonoBehaviour {
 			if (bIsPlayerBase)
             {
 				thisBuilding.objectType = "Friendly Building";
-				thisBuilding.objectScore = Random.Range(-3, -6);
+				thisBuilding.objectScore = -4;	//How much does losing a building cost?
             } else
             {
 				thisBuilding.objectType = "Assisted Enemy Building Destroyed";
