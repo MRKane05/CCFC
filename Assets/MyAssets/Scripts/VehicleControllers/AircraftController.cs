@@ -8,13 +8,14 @@ public class AircraftController : Actor {
 
 	//We need a tweak that bleeds speed off if we're going up, and increases it as we're going down.
 	//public GUIText ourGUIText;
-
+	[Header("Weapon Stuff")]
 	public GameObject[] CannonEmpties; //these are the empties attached to our aircraft that denote cannons
 	public AttachedGun[] ourGunMP;
+	public SecondaryWeapon_Base attachedSecondary;
 	public float cannon_refire = 0.2f;
 	float lastCannonFireTime = 0;
 	int cannon_current = 0;
-
+	[Space]
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
 												//public AIController ourAIController; //we can also get information from this
 												//public float pitch, roll, yaw, throttleControl; //treated differently depending on the control scheme
@@ -378,6 +379,9 @@ public class AircraftController : Actor {
 					if (targetActor)
                     {
 						targetSpeed = targetActor.getSpeed();
+						if (targetSpeed == 0) {  //we're dealing with a stationary target
+							targetSpeed = MaxAirSpeed;
+						}
                     }
                 }
             }
@@ -557,4 +561,17 @@ public class AircraftController : Actor {
         }
 		Destroy(targetPickup);
     }
+
+	public override void TapSecondary() {
+		if (attachedSecondary)
+        {
+			attachedSecondary.DoTapSecondary();
+        }
+	}
+	public override void HoldDownSecondary() {
+		if (attachedSecondary)
+        {
+			attachedSecondary.DoHoldSecondary();
+        }
+	}
 }
