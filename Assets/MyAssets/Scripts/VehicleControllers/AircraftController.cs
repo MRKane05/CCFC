@@ -1,5 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class SecondaryWeaponAttachment
+{
+	public string SelectedSecondary = "";
+	public GameObject AssociatedSecondary;
+}
 
 public class AircraftController : Actor {
 	//our overall scale is 1unit=5m
@@ -11,6 +19,7 @@ public class AircraftController : Actor {
 	[Header("Weapon Stuff")]
 	public GameObject[] CannonEmpties; //these are the empties attached to our aircraft that denote cannons
 	public AttachedGun[] ourGunMP;
+	public List<SecondaryWeaponAttachment> AvaliableSecondaryWeapons = new List<SecondaryWeaponAttachment>();
 	public SecondaryWeapon_Base attachedSecondary;
 	public float cannon_refire = 0.2f;
 	float lastCannonFireTime = 0;
@@ -200,7 +209,7 @@ public class AircraftController : Actor {
 		if (ourPlayerController)
 			ourPlayerController.AddHealth(health);
 
-		if (bIsPlayerVehicle)
+		if (bIsPlayerVehicle) 
 			GrabPlayerVehicleStats();
 	}
 
@@ -219,6 +228,24 @@ public class AircraftController : Actor {
 		OverdriveAirSpeed = MaxAirSpeed * 10f / 6f; //Stand in constant from previously
 
 		cannon_refire = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_refire_time;
+
+		attachedSecondary = null; //Clear this ahead of setting it correctly
+		//PROBLEM: This needs to be a much cleaner implementation, but does open up the possibility of changing secondaries mid-game
+		//Handle the secondary weapon
+		if (gameManager.Instance.SelectedAircraft.secondary_weapon_name.Length > 4)	//Because "null" is 4 letters!
+        {
+			for (int i= 0; i< AvaliableSecondaryWeapons.Count; i++)
+            {
+				if (AvaliableSecondaryWeapons[i].SelectedSecondary == gameManager.Instance.SelectedAircraft.secondary_weapon_name)
+                {
+					AvaliableSecondaryWeapons[i].AssociatedSecondary.SetActive(true);
+					attachedSecondary = AvaliableSecondaryWeapons[i].AssociatedSecondary.GetComponent<SecondaryWeapon_Base>();
+				} else
+                {
+					AvaliableSecondaryWeapons[i].AssociatedSecondary.SetActive(false);
+				}
+            }
+        }
 	}
 
 	public virtual void doVehicleSetup() {
@@ -321,10 +348,6 @@ public class AircraftController : Actor {
 	
 	// Update is called once per frame
 	void Update () {
-		
-		//if (ourGUIText) {
-		//	ourGUIText.text = "Speed: " + speed;
-
 
 		if (ourMat) { //This is great apart from the target camera in which it looks a little odd...
 			if (bIsTarget) {
@@ -334,21 +357,6 @@ public class AircraftController : Actor {
 				ourMat.SetColor ("_OutlineColor", Color.black);
 			}
 		}
-			
-		//}
-		//speed = Airspeed; //really this should be += (CompfDifference(throttle*Airspeed, speed, Gravity()) * Time.deltaTime;
-		//Really only need to set on and off for these...
-		//Solved by having a mainBlind and targetBlind, but I think the connection between the two (with highlite) is actually pretty good...
-		/*
-		if (bFiring!=bLastFiring) {
-			bLastFiring=bFiring;
-			for (int i=0; i<ourGunMP.Length; i++) {
-				if (ourGunMP[i]!=null) {
-					ourGunMP[i].bFiring = bFiring;
-					ourGunMP[i].FireState = FireState; //Will probably take over from bFiring
-				}
-			}
-		}*/
 
 		//Shoot our guns
 		if (bFiring && Time.time > lastCannonFireTime + cannon_refire)
