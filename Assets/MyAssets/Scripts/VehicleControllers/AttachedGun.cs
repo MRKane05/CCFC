@@ -10,7 +10,7 @@ public class AttachedGun : MonoBehaviour {
 
 	public GameObject gunFlare; //not sure what I'll need built into this.
 
-	public bool bSynced=false;
+	//public bool bSynced=false;
 	protected float forwardStep=-0.8F;
 	public AudioClip firingSound;
 	public GameObject bulletPrefab;

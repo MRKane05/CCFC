@@ -638,6 +638,7 @@ public class LevelController : LevelControllerBase {
 		yield return null;
 		//This needs to be handled in the mission construction
 		//playerAircraft.transform.position = getTerrainHeightAtPoint(playerAircraft.transform.position) + Vector3.up * Random.Range(30, 70);
+		gameManager.Instance.setGameState(gameManager.enGameState.LEVELPLAYING);	//Set our level to it's actually starting state
 	}
 
 	public void SetPlayerPosition(Vector3 toThis, float playerHeading)

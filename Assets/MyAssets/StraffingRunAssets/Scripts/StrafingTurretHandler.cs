@@ -38,7 +38,7 @@ public class StrafingTurretHandler : DestructableObject {
 		GameObject newProjectile = Instantiate(projectilePrefab) as GameObject;
 		newProjectile.transform.position = turretHead.transform.position;
 		ProjectileBase projectileScript = newProjectile.GetComponent<ProjectileBase>();
-		projectileScript.SetupProjectile(turretHead.transform.forward, projectileSpeed, projectileDamage);
+		projectileScript.SetupProjectile(gameObject, turretHead.transform.forward, projectileSpeed, projectileDamage);
 		Destroy(newProjectile, 5f);	//Limit how long this can go on for
     }
 }

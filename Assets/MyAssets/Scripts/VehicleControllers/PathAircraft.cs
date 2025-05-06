@@ -141,7 +141,7 @@ public class PathAircraft : Actor {
     {
         GameObject newBomb = Instantiate(bombPrefab, gameObject.transform.position, gameObject.transform.rotation);
         Bomber_Bomb newBombScript = newBomb.GetComponent<Bomber_Bomb>();
-        newBombScript.SetupProjectile(transform.forward * crusingSpeed, 1, -1);
+        newBombScript.SetupProjectile(gameObject, transform.forward * crusingSpeed, 1, -1);
     }
 
     public static float AngleDir(Vector3 fwd, Vector3 targetDir)

@@ -334,7 +334,27 @@ public class PlayerController : ActorController {
 			else
 				bFiring = false;
 		}
-        #endregion
+		#endregion
+
+		#region button controls
+
+		if (!bFiring)
+        {
+			if (Input.GetButton("Cross"))
+            {
+				bFiring = true;
+            }
+        }
+
+		if (Input.GetButtonDown("Square"))
+		{
+			ourAircraft.TapSecondary();
+		}
+		if (Input.GetButton("Square"))
+		{
+			ourAircraft.HoldDownSecondary();
+		}
+		#endregion
 
 		Vector2 LeftInput = new Vector2(Input.GetAxis("Left Stick Horizontal"), Input.GetAxis("Left Stick Vertical"));		
 		Vector2 RightInput = new Vector2(Input.GetAxis("Right Stick Horizontal"), Input.GetAxis("Right Stick Vertical"));
@@ -482,33 +502,23 @@ public class PlayerController : ActorController {
 
 		//print (ourAircraft.transform.localEulerAngles);
 		if (bControlArcade) { //then lookout for a "return" option
-			/*
-			if (Input.touchCount>0) {
-				RollReturnTime = Time.time + RollReturnWait;
-				ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-			} else */
-			
 			if (Time.time > RollReturnTime) {
 				//a Transform.LookAt does the trick!
 				returnAngles.SetLookRotation(gunSightObject.transform.position, Vector3.up);
-
-				//Turned off for the quick engine hack...
-
-				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-
-				//editor input hack
-				//ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(pitch),ControlSensitivityCurve.Evaluate(roll),InvertReturnCurve.Evaluate(Mathf.Repeat(returnAngles.eulerAngles[2]- ourAircraft.transform.eulerAngles[2],360)), throttleControl, bFiring, FireState);
 				ourAircraft.DirectUpdateInput(proxyLeftStick, proxyRightStick, bFiring, FireState);
 			}
 			else { //annol input for the controls.
 				ourAircraft.UpdateInput(0,0,0,0,bFiring,FireState);
 			}
 		}
-		
-		//I've pretty much decided that this won't be happening and I'll stick to the arcade method of control
-		/*
-		if (!bControlArcade){ //update this accordingly.
-			ourAircraft.UpdateInput(ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[1]*YControl),ControlSensitivityCurve.Evaluate(ourJoyMP[0].VJRnormals[0]),ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[0]), ControlSensitivityCurve.Evaluate(ourJoyMP[1].VJRnormals[1]), bFiring, FireState);
-		}*/
+
+		if (Input.GetKeyDown(KeyCode.Z))
+        {
+			ourAircraft.TapSecondary();
+        }
+		if (Input.GetKey(KeyCode.F))
+        {
+			ourAircraft.HoldDownSecondary();
+        }
 	}
 }

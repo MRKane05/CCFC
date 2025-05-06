@@ -199,6 +199,9 @@ public class Actor : MonoBehaviour {
 		FireState = iFireState;
 	}
 
+	public virtual void TapSecondary() { }
+	public virtual void HoldDownSecondary() { }
+
 	protected int popStage = 0;
 
 	public virtual void checkSmokeSystem(float newHealthRatio) { //pinged with take Damage

@@ -6,11 +6,16 @@ public class ProjectileBase : MonoBehaviour {
 	public Vector3 moveDir = Vector3.forward;
 	public float moveSpeed = 15f;
 	public float damage = 3f;
-
-	public void SetupProjectile(Vector3 newMoveDir, float newMoveSpeed, float newDamage)
+	public GameObject Instigator;
+	public virtual void SetupProjectile(GameObject newInstigator, Vector3 newMoveDir, float newMoveSpeed, float newDamage)
 	{
+		Instigator = newInstigator;
 		moveDir = newMoveDir;
-		moveSpeed = newMoveSpeed;
+		//We'll send through -1 if we want to keep our momentium 
+		if (newMoveSpeed > 0)
+		{
+			moveSpeed = newMoveSpeed;
+		}
 		if (newDamage > 0)
 		{
 			damage = newDamage;
