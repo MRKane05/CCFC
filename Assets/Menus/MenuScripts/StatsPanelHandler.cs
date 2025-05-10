@@ -68,6 +68,18 @@ public class StatsPanelHandler : MonoBehaviour {
 		return true;
     }
 
+	public bool SetSpecialComparison(SelectableUpgradeType thisSelectableType)
+    {
+		Weight.DoCompareValue((thisSelectableType.upgradEffect.finalWeight - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_weight) / WeightMax);
+		//Armor.DoCompareValue((thisSelectableType.upgradEffect.finalArmor - thisSelectableType.upgradEffect.finalArmor) / ArmorMax);
+		//Armor.DoCompareValue(currentUpgradePath.finalArmor * lerpFactor / ArmorMax);
+
+		Agility.DoFlatCompare((gameManager.Instance.SelectedAircraft.agility_current - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_agility + thisSelectableType.upgradEffect.finalAgility) / AgilityMax);
+		Speed.DoFlatCompare((gameManager.Instance.SelectedAircraft.speed_current - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_speed + thisSelectableType.upgradEffect.finalSpeed) / SpeedMax);
+		Accel.DoFlatCompare((gameManager.Instance.SelectedAircraft.accel_current - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_accel + thisSelectableType.upgradEffect.finalAccel) / AccelMax);
+		return true;
+	}
+
 	public bool SetCannonsComparison(SelectableUpgradeType thisSelectableType)
     {
 		//except this isn't quite the same as far as comparisons go (because of course it's not)

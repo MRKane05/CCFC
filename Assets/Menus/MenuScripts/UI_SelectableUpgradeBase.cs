@@ -12,6 +12,8 @@ public class SelectableUpgradeType
 
 	public float fireRate = 0.2f;
 	public float spread = 0.01f;    //will need to have the bar go backwards for higher spreads...
+    public float ammoMax = 60f;
+    public float ammoRefil = 20f;   //How much ammo will be refilled when we collect a refil?
 	public float damage = 1f;
 	public float autoAimAngle = 7f; //This will need to change depending on the spread value so that it doesn't seem as accurate for the player
 	public float distance = 50f; //Just in case we want to include this also
@@ -27,9 +29,11 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
 
 	public UI_SelectableUpgrade[] ChildSelectables;
 
-	public StatsPanelHandler statsPanel;
+    public SelectableUpgradeType nullUpgrade;
 
-    SelectableUpgradeType selectedUpgrade;
+    public StatsPanelHandler statsPanel;
+
+    protected SelectableUpgradeType selectedUpgrade;
 
     // Use this for initialization
     void Start () {
@@ -50,14 +54,33 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
 	}
 
 	//Called from children when the user selects one
-	public void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType)
+	public virtual void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType, UI_SelectableUpgrade thisSelectable)
     {
         selectedUpgrade = thisSelectableType;
+        if (bState)
+        {
+            statsPanel.SetCannonsComparison(thisSelectableType);
+        } else
+        {
+            statsPanel.SetCannonsComparison(nullUpgrade);
+        }
+        HandleRadioButtonFunction(thisSelectable, bState);
+    }
 
-        statsPanel.SetCannonsComparison(thisSelectableType);
-	}
+    public virtual void HandleRadioButtonFunction(UI_SelectableUpgrade thisSelectable, bool bSelectedState)
+    {
+        for (int i = 0; i < ChildSelectables.Length; i++)
+        {
+            if (ChildSelectables[i] != thisSelectable)
+            {
+                ChildSelectables[i].SetCheckSelected(false); //Make sure we turn this off
+            } else {
+                ChildSelectables[i].SetCheckSelected(bSelectedState); //Make sure we turn this off
+            }
+        }
+    }
 
-	public void ApplySelectedItem()
+	public virtual void ApplySelectedItem()
     {
         //First we need to check if we're over weight or anything like that
         if (false)
@@ -65,11 +88,11 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
             return;
         }
 
-        gameManager.Instance.SelectedAircraft.weight_current += selectedUpgrade.upgradEffect.finalWeight;
-        gameManager.Instance.SelectedAircraft.armor_current += selectedUpgrade.upgradEffect.finalArmor;
-        gameManager.Instance.SelectedAircraft.agility_current += selectedUpgrade.upgradEffect.finalAgility;
-        gameManager.Instance.SelectedAircraft.speed_current += selectedUpgrade.upgradEffect.finalSpeed;
-        gameManager.Instance.SelectedAircraft.accel_current += selectedUpgrade.upgradEffect.finalAccel;
+        gameManager.Instance.SelectedAircraft.weight_current += (selectedUpgrade.upgradEffect.finalWeight - gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_weight);
+        //gameManager.Instance.SelectedAircraft.armor_current += (selectedUpgrade.upgradEffect.finalArmor = gameManager.Instance.SelectedAircraft;  //Cannons/etc. shouldn't affect armor
+        gameManager.Instance.SelectedAircraft.agility_current += (selectedUpgrade.upgradEffect.finalAgility - gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_agility);
+        gameManager.Instance.SelectedAircraft.speed_current += (selectedUpgrade.upgradEffect.finalSpeed - gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_speed);
+        gameManager.Instance.SelectedAircraft.accel_current += (selectedUpgrade.upgradEffect.finalAccel - gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_accel);
 
         gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_accel = selectedUpgrade.upgradEffect.finalAccel;
         gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_agility = selectedUpgrade.upgradEffect.finalAgility;

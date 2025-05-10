@@ -112,6 +112,8 @@ public class AircraftDescription	//Basically this is all the stats that we need 
 	//I don't know if this should be stored here, or in another part of the system and referred to
 	public CannonsItem AttachedCannons = new CannonsItem("standard_cannons", 200f, 25f, 15f, 1f, 0.25f, 50f, 100f, 0.01f, 7f);
 
+	public CannonsItem AttachedSpecial = new CannonsItem("", 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
 	/*
 	//We kind of don't need this
 	[Space]

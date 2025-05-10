@@ -8,6 +8,7 @@ using TMPro;
 //An upgrade class that can be toggled, radiobutton etc.
 public class UI_SelectableUpgrade : MonoBehaviour {
     public UI_SelectableUpgradeBase parentPanel;
+    public Image Checkbox;
     public SelectableUpgradeType ourSelectableType;
 
     public TextMeshProUGUI buttonTitle;
@@ -35,6 +36,16 @@ public class UI_SelectableUpgrade : MonoBehaviour {
     public void GetUserToggle()
     {
         bIsSelected = !bIsSelected; //Will need to handle some unlock functionality here
-        parentPanel.SetChildSelected(bIsSelected, ourSelectableType);
+        
+        parentPanel.SetChildSelected(bIsSelected, ourSelectableType, this);
+    }
+
+    public void SetCheckSelected(bool newState)
+    {
+        bIsSelected = newState;
+        if (Checkbox)
+        {
+            Checkbox.gameObject.SetActive(bIsSelected);
+        }
     }
 }

@@ -5,7 +5,8 @@ using UnityEngine;
 public class UI_UpgradeSelectionPanel : MonoBehaviour {
 
     public GameObject LinearSelectionPanel;
-    public GameObject ItemUpgradePanel;
+    public GameObject CannonsUpgradePanel;
+    public GameObject SecondarylUpgradePanel;
     public string currentUpgradePath = "";
 
     public void SelectUpgradePath(string thisPath)
@@ -17,29 +18,38 @@ public class UI_UpgradeSelectionPanel : MonoBehaviour {
         {
             case "airframe":
                 LinearSelectionPanel.SetActive(true);
-                ItemUpgradePanel.SetActive(false);
+                CannonsUpgradePanel.SetActive(false);
+                SecondarylUpgradePanel.SetActive(false);
                 thisUpgradePanel = LinearSelectionPanel.GetComponent<UI_UpgradePanelActive>();
                 thisUpgradePanel.currentUpgradePath = gameManager.Instance.SelectedAircraft.upgrade_airframe;
                 thisUpgradePanel.SetupUpgradePanel("Airframe");
                 break;
             case "engine":
                 LinearSelectionPanel.SetActive(true);
-                ItemUpgradePanel.SetActive(false);
+                CannonsUpgradePanel.SetActive(false);
+                SecondarylUpgradePanel.SetActive(false);
                 thisUpgradePanel = LinearSelectionPanel.GetComponent<UI_UpgradePanelActive>();
                 thisUpgradePanel.currentUpgradePath = gameManager.Instance.SelectedAircraft.upgrade_engine;
                 thisUpgradePanel.SetupUpgradePanel("Engine");
                 break;
             case "armor":
                 LinearSelectionPanel.SetActive(true);
-                ItemUpgradePanel.SetActive(false);
+                CannonsUpgradePanel.SetActive(false);
+                SecondarylUpgradePanel.SetActive(false);
                 thisUpgradePanel = LinearSelectionPanel.GetComponent<UI_UpgradePanelActive>();
                 thisUpgradePanel.currentUpgradePath = gameManager.Instance.SelectedAircraft.upgrade_armor;
                 thisUpgradePanel.SetupUpgradePanel("Armor");
                 break;
             case "cannons":
-                ItemUpgradePanel.SetActive(true);
+                CannonsUpgradePanel.SetActive(true);
                 LinearSelectionPanel.SetActive(false);
+                SecondarylUpgradePanel.SetActive(false);
                 //we don't have any other fancy setup here
+                break;
+            case "secondary":
+                CannonsUpgradePanel.SetActive(false);
+                LinearSelectionPanel.SetActive(false);
+                SecondarylUpgradePanel.SetActive(true);
                 break;
         }
     }
