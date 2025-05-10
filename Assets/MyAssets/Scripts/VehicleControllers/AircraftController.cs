@@ -24,6 +24,7 @@ public class AircraftController : Actor {
 	public float cannon_refire = 0.2f;
 	float lastCannonFireTime = 0;
 	int cannon_current = 0;
+	public bool bCanFireCannons = true;
 	[Space]
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
 												//public AIController ourAIController; //we can also get information from this
@@ -228,15 +229,16 @@ public class AircraftController : Actor {
 		OverdriveAirSpeed = MaxAirSpeed * 10f / 6f; //Stand in constant from previously
 
 		cannon_refire = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_refire_time;
+		bCanFireCannons = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name != "None";
 
 		attachedSecondary = null; //Clear this ahead of setting it correctly
 		//PROBLEM: This needs to be a much cleaner implementation, but does open up the possibility of changing secondaries mid-game
 		//Handle the secondary weapon
-		if (gameManager.Instance.SelectedAircraft.secondary_weapon_name.Length > 4)	//Because "null" is 4 letters!
+		if (gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name.Length > 4)	//Because "null" is 4 letters!
         {
 			for (int i= 0; i< AvaliableSecondaryWeapons.Count; i++)
             {
-				if (AvaliableSecondaryWeapons[i].SelectedSecondary == gameManager.Instance.SelectedAircraft.secondary_weapon_name)
+				if (AvaliableSecondaryWeapons[i].SelectedSecondary == gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name)
                 {
 					AvaliableSecondaryWeapons[i].AssociatedSecondary.SetActive(true);
 					attachedSecondary = AvaliableSecondaryWeapons[i].AssociatedSecondary.GetComponent<SecondaryWeapon_Base>();
@@ -359,7 +361,7 @@ public class AircraftController : Actor {
 		}
 
 		//Shoot our guns
-		if (bFiring && Time.time > lastCannonFireTime + cannon_refire)
+		if (bFiring && Time.time > lastCannonFireTime + cannon_refire && bCanFireCannons)
         {
 			lastCannonFireTime = Time.time;
 			ourGunMP[cannon_current].doFireEffect();

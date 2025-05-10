@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class StatsPanelHandler : MonoBehaviour {
 	public UI_CompareBar Weight;
@@ -19,9 +20,10 @@ public class StatsPanelHandler : MonoBehaviour {
 	public UI_CompareBar Accuracy;  //Another nverted stat
 	public float AccuracyMax = 0.1f;    //I guess?
 	public UI_CompareBar Damage;    //Not inverted :)
-	public float DamageMax = 5f;	//Which is a mental amount of damage
+	public float DamageMax = 5f;    //Which is a mental amount of damage
 
-
+	public TextMeshProUGUI cannonsTypeLabel;
+	public TextMeshProUGUI secondaryWeaponLabel;
 	// Use this for initialization
 	void Start () {
 		SetStats(gameManager.Instance.SelectedAircraft);
@@ -46,6 +48,9 @@ public class StatsPanelHandler : MonoBehaviour {
 		FireRate.SetCurrentValue(thisAircraft.AttachedCannons.cannons_refire_time / FireRateMax);
 		Accuracy.SetCurrentValue(thisAircraft.AttachedCannons.cannons_spread / AccuracyMax);
 		Damage.SetCurrentValue(thisAircraft.AttachedCannons.cannons_damage / DamageMax);
+
+		cannonsTypeLabel.text = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name;
+		secondaryWeaponLabel.text = gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name;
 	}
 
 	public bool SetComparison(UpgradePathEffects currentUpgradePath, float lerpFactor)
