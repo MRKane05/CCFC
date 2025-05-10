@@ -56,12 +56,14 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
 	//Called from children when the user selects one
 	public virtual void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType, UI_SelectableUpgrade thisSelectable)
     {
-        selectedUpgrade = thisSelectableType;
+        
         if (bState)
         {
+            selectedUpgrade = thisSelectableType;
             statsPanel.SetCannonsComparison(thisSelectableType);
         } else
         {
+            selectedUpgrade = nullUpgrade;
             statsPanel.SetCannonsComparison(nullUpgrade);
         }
         HandleRadioButtonFunction(thisSelectable, bState);

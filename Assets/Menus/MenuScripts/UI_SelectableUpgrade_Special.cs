@@ -5,11 +5,13 @@ using UnityEngine;
 public class UI_SelectableUpgrade_Special : UI_SelectableUpgradeBase {
     public override void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType, UI_SelectableUpgrade thisSelectable)
     {
-        selectedUpgrade = thisSelectableType;
-        if (bState) { 
+        
+        if (bState) {
+            selectedUpgrade = thisSelectableType;
             statsPanel.SetSpecialComparison(thisSelectableType);
         } else
         {
+            selectedUpgrade = nullUpgrade;
             statsPanel.SetCannonsComparison(nullUpgrade);
         }
         HandleRadioButtonFunction(thisSelectable, bState);
@@ -23,12 +25,13 @@ public class UI_SelectableUpgrade_Special : UI_SelectableUpgradeBase {
             return;
         }
 
-        gameManager.Instance.SelectedAircraft.weight_current += selectedUpgrade.upgradEffect.finalWeight;
-        gameManager.Instance.SelectedAircraft.armor_current += selectedUpgrade.upgradEffect.finalArmor;
-        gameManager.Instance.SelectedAircraft.agility_current += selectedUpgrade.upgradEffect.finalAgility;
-        gameManager.Instance.SelectedAircraft.speed_current += selectedUpgrade.upgradEffect.finalSpeed;
-        gameManager.Instance.SelectedAircraft.accel_current += selectedUpgrade.upgradEffect.finalAccel;
+        gameManager.Instance.SelectedAircraft.weight_current += (selectedUpgrade.upgradEffect.finalWeight - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_weight);
+        //gameManager.Instance.SelectedAircraft.armor_current += selectedUpgrade.upgradEffect.finalArmor;
+        gameManager.Instance.SelectedAircraft.agility_current += (selectedUpgrade.upgradEffect.finalAgility - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_agility);
+        gameManager.Instance.SelectedAircraft.speed_current += (selectedUpgrade.upgradEffect.finalSpeed - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_speed);
+        gameManager.Instance.SelectedAircraft.accel_current += (selectedUpgrade.upgradEffect.finalAccel - gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_accel);
 
+        
         gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_accel = selectedUpgrade.upgradEffect.finalAccel;
         gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_agility = selectedUpgrade.upgradEffect.finalAgility;
         gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_autoaim_angle = selectedUpgrade.autoAimAngle;
