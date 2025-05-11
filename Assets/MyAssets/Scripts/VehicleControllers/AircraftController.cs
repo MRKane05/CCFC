@@ -242,12 +242,17 @@ public class AircraftController : Actor {
                 {
 					AvaliableSecondaryWeapons[i].AssociatedSecondary.SetActive(true);
 					attachedSecondary = AvaliableSecondaryWeapons[i].AssociatedSecondary.GetComponent<SecondaryWeapon_Base>();
+					//Need to set the avaliable ammo on the secondary here also
+
 				} else
                 {
 					AvaliableSecondaryWeapons[i].AssociatedSecondary.SetActive(false);
 				}
             }
-        }
+        } else
+        {
+			NGUI_Base.Instance.setSecondaryAmmoCount(0, false); //Turn our ammo display off
+		}
 	}
 
 	public virtual void doVehicleSetup() {
@@ -567,6 +572,12 @@ public class AircraftController : Actor {
 					ourPlayerController.AddHealth(health);
 				//Some sound
 				//Some effect
+				break;
+			case PickupBase.enPickupType.SECONDARYAMMO:
+				if (attachedSecondary)
+                {
+					attachedSecondary.addAmmoPercent(thisPickup.PickupValue);
+                }
 				break;
         }
 		Destroy(targetPickup);

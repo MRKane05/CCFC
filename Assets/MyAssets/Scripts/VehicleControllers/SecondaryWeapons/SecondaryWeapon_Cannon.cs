@@ -10,12 +10,15 @@ public class SecondaryWeapon_Cannon : SecondaryWeapon_Base {
 	{
 		if (Time.time > nextRefireTime)
         {
-			nextRefireTime = Time.time + refireRate;
-			if (cannonGun)
-            {
-				cannonGun.doFireEffect();
-				//Increment our ammo accordingly
-            }
+			if (UseAmmo(1))
+			{
+				nextRefireTime = Time.time + refireRate;
+				if (cannonGun)
+				{
+					cannonGun.doFireEffect();
+					//Increment our ammo accordingly
+				}
+			}
         }
 	}
 }

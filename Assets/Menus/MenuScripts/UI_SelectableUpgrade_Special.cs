@@ -3,6 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UI_SelectableUpgrade_Special : UI_SelectableUpgradeBase {
+
+    void Start()
+    {
+        populateSelectables();
+        //We need to set one of them as selected (if it is selected)
+        foreach (UI_SelectableUpgrade thisSelectable in ChildSelectables)
+        {
+            if (thisSelectable.ourSelectableType != null)
+            {
+                if (thisSelectable.ourSelectableType.upgradeName == gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name)
+                {
+                    thisSelectable.SetCheckSelected(true);
+                }
+            }
+        }
+    }
+
     public override void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType, UI_SelectableUpgrade thisSelectable)
     {
         

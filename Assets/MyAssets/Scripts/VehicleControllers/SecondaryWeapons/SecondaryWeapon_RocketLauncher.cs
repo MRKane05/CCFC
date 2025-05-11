@@ -10,17 +10,20 @@ public class SecondaryWeapon_RocketLauncher : SecondaryWeapon_Base {
 	{
 		if (Time.time > nextRefireTime)
 		{
-			nextRefireTime = Time.time + refireRate;
+			if (UseAmmo(1))
+			{
+				nextRefireTime = Time.time + refireRate;
 
-			GameObject newRocket = Instantiate(rocketPrefab, transform.position, transform.rotation) as GameObject;
+				GameObject newRocket = Instantiate(rocketPrefab, transform.position, transform.rotation) as GameObject;
 
-			ProjectileBase rocketScript = newRocket.GetComponent<ProjectileBase>();
-			rocketScript.SetupProjectile(weaponOwner, transform.forward, -1, -1);
-			Destroy(newRocket, 3f); //Give this a kill timer
-			if (ourAudio)
-            {
-				ourAudio.PlayOneShot(ourAudio.clip);
-            }
+				ProjectileBase rocketScript = newRocket.GetComponent<ProjectileBase>();
+				rocketScript.SetupProjectile(weaponOwner, transform.forward, -1, -1);
+				Destroy(newRocket, 3f); //Give this a kill timer
+				if (ourAudio)
+				{
+					ourAudio.PlayOneShot(ourAudio.clip);
+				}
+			}
 		}
 	}
 }

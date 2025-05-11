@@ -37,21 +37,39 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		ChildSelectables = gameObject.GetComponentsInChildren<UI_SelectableUpgrade>();
-
-		//Go through and set each of our selectable panels to one of the assigned types
-		for (int i=0; i<ChildSelectables.Length; i++)
+        populateSelectables();
+        //We need to set one of them as selected (if it is selected)
+        foreach (UI_SelectableUpgrade thisSelectable in ChildSelectables)
         {
-			ChildSelectables[i].parentPanel = this;
-			if (CurrentUpgrades.Count > i)
-			{
-				ChildSelectables[i].SetUpgrade(CurrentUpgrades[i]);
-			} else
+            if (thisSelectable.ourSelectableType != null)
             {
-				ChildSelectables[i].SetUpgrade(null);
+                if (thisSelectable.ourSelectableType.upgradeName == gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name)
+                {
+                    thisSelectable.SetCheckSelected(true);
+                }
             }
         }
 	}
+
+    public void populateSelectables()
+    {
+
+        ChildSelectables = gameObject.GetComponentsInChildren<UI_SelectableUpgrade>();
+
+        //Go through and set each of our selectable panels to one of the assigned types
+        for (int i = 0; i < ChildSelectables.Length; i++)
+        {
+            ChildSelectables[i].parentPanel = this;
+            if (CurrentUpgrades.Count > i)
+            {
+                ChildSelectables[i].SetUpgrade(CurrentUpgrades[i]);
+            }
+            else
+            {
+                ChildSelectables[i].SetUpgrade(null);
+            }
+        }
+    }
 
 	//Called from children when the user selects one
 	public virtual void SetChildSelected(bool bState, SelectableUpgradeType thisSelectableType, UI_SelectableUpgrade thisSelectable)

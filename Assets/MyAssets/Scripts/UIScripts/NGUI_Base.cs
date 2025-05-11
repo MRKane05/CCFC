@@ -9,6 +9,7 @@ public class NGUI_Base : MonoBehaviour {
 	public static NGUI_Base Instance {get {return instance;}}
 	
 	public NGUI_HealthBar ourHealthBar;
+	public UI_SecondaryAmmoCounter secondaryAmmoCounter;
 	public Player_Radar ourPlayerRadar;
 	public NGUI_ObjectTracker ourTargetSight; //will we want these to be customizable?
 	public NGUI_ObjectTracker waypointGUI; //can also be used for the waypoint stuff
@@ -20,8 +21,10 @@ public class NGUI_Base : MonoBehaviour {
 
 	//this will need modified
 	public NGUI_firingTracker targetFiringMarker; //what we should shoot at with our target
-	public GUI_Speedo speedo;
+	//public GUI_Speedo speedo;
 	public TargetCamera_View ourTargetCamera;
+
+
 
 	AudioSource ourAudio;
 
@@ -72,6 +75,19 @@ public class NGUI_Base : MonoBehaviour {
 	public void assignHealth(float newProp) {
 		if (ourHealthBar) {
 			ourHealthBar.setHealthProp(newProp); //feed this through to the system
+		}
+	}
+
+	public void setSecondaryAmmoCount(float newCount, bool bIsVisible)
+	{
+		if (secondaryAmmoCounter) {
+			if (bIsVisible)
+			{
+				secondaryAmmoCounter.setAmmoCount(newCount);
+			} else
+            {
+				secondaryAmmoCounter.gameObject.SetActive(false);	//Disable this counter
+            }
 		}
 	}
 
@@ -130,13 +146,15 @@ public class NGUI_Base : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		//handle ongoing things like the speedo, and altimeter
-		handleSpeedo();
+		//handleSpeedo();
 	}
-	
+	/*
 	void handleSpeedo() {
 		if (speedo && PlayerController.Instance) {
 			//speedo.transform.eulerAngles = new Vector3(0, 0, 160-PlayerController.Instance.ourAircraft.getSpeed()*70); //Not the best way to do things
 			speedo.speed = PlayerController.Instance.ourAircraft.getSpeed();
 		}
-	}
+	}*/
+
+
 }

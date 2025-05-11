@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 public class PickupBase : MonoBehaviour {
-	public enum enPickupType { NULL, HEALTH, AMMO, DOUBLEDAMAGE, COOLDOWN }
+	public enum enPickupType { NULL, HEALTH, AMMO, SECONDARYAMMO, DOUBLEDAMAGE, COOLDOWN }
 	public enPickupType PickupType = enPickupType.HEALTH;
 
 
