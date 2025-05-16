@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class SelectableUpgradeType
 {
-	public string upgradeName = "Standard";
+	public string upgradeName = "Std";
 	public float unlockCost = 120f;
 	public float applyCost = 10f;
 	public bool bIsUnlocked = false;
@@ -23,15 +23,14 @@ public class SelectableUpgradeType
 
 
 //A grid layout for selectable upgrades, will need communication to allow for radio button selection behavior
-public class UI_SelectableUpgradeBase : MonoBehaviour {
+public class UI_SelectableUpgradeBase : UI_UpgradePanelBase
+{
 
 	public List<SelectableUpgradeType> CurrentUpgrades = new List<SelectableUpgradeType>();
 
 	public UI_SelectableUpgrade[] ChildSelectables;
 
     public SelectableUpgradeType nullUpgrade;
-
-    public StatsPanelHandler statsPanel;
 
     protected SelectableUpgradeType selectedUpgrade;
 
@@ -100,7 +99,7 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
         }
     }
 
-	public virtual void ApplySelectedItem()
+    public override void ApplySelectedItem()
     {
         //First we need to check if we're over weight or anything like that
         if (false)
@@ -137,5 +136,26 @@ public class UI_SelectableUpgradeBase : MonoBehaviour {
         {
             gameManager.Instance.playerStats.money -= ourDisplayBar.totalUpgradeCost;
         }*/
+    }
+
+    public override bool hasUpgradesOutstanding()
+    {
+        if (selectedUpgrade == null)
+        {
+            return false;
+        } else
+        {
+            if (selectedUpgrade.upgradeName == "Standard" || selectedUpgrade.upgradeName.Length < 4)
+            {
+                return false;    //This is simply setup as it stands
+            }
+        }
+        Debug.Log("Checking Cannons Upgrade: " + gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name + ", " + selectedUpgrade.upgradeName);
+        return gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name != selectedUpgrade.upgradeName;
+    }
+    public override void rejectApply()
+    {
+        selectedUpgrade.upgradeName = gameManager.Instance.SelectedAircraft.AttachedCannons.cannons_name;
+        base.rejectApply();
     }
 }

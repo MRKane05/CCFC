@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 
 //This is an interface class to the other systems and will pass things back and forward
-public class UI_UpgradePanelActive : MonoBehaviour {
+public class UI_UpgradePanelActive : UI_UpgradePanelBase{
     public TextMeshProUGUI titleText;
     public UI_IntBar ourDisplayBar;
     public StatsPanelHandler staticsPanel;
@@ -34,6 +34,12 @@ public class UI_UpgradePanelActive : MonoBehaviour {
         //Lets start with the comparitors
         currentUpgradeLevel = currentLevel;
         return staticsPanel.SetComparison(currentUpgradePath, currentLevel);    //Handle weights
+    }
+
+    public override void ApplySelectedItem()
+    {
+        base.ApplySelectedItem();
+        ApplySelectedUpgrades();
     }
 
     public void ApplySelectedUpgrades()
@@ -80,5 +86,17 @@ public class UI_UpgradePanelActive : MonoBehaviour {
         ourDisplayBar.totalUpgradeCost = 0;
         //And apply to our int bar too
         ourDisplayBar.SetIntValue((int)currentUpgradeLevel);
+    }
+
+    public override bool hasUpgradesOutstanding()
+    {
+        return ourDisplayBar.totalUpgradeCost != 0; //Costs haven't been applied
+    }
+
+    public override void rejectApply()
+    {
+        ourDisplayBar.totalUpgradeCost = 0; //Cancel our cost
+
+        base.rejectApply();
     }
 }

@@ -9,8 +9,51 @@ public class UI_UpgradeSelectionPanel : MonoBehaviour {
     public GameObject SecondarylUpgradePanel;
     public string currentUpgradePath = "";
 
+
+    public bool CheckPanelsReady()
+    {
+        if (LinearSelectionPanel.GetComponent<UI_UpgradePanelBase>().hasUpgradesOutstanding())
+        {
+            //We need to bring up our menu and handle this instead of sending the call through
+            gameManager.Instance.CallConfirmScreen(LinearSelectionPanel.GetComponent<UI_UpgradePanelBase>(), "Do you wish to apply changes?", "confirmApply", "rejectApply");
+            return false;
+        }
+        if (CannonsUpgradePanel.GetComponentInChildren<UI_UpgradePanelBase>().hasUpgradesOutstanding())
+        {
+            //We need to bring up our menu and handle this instead of sending the call through
+            gameManager.Instance.CallConfirmScreen(CannonsUpgradePanel.GetComponentInChildren<UI_UpgradePanelBase>(), "Do you wish to apply changes?", "confirmApply", "rejectApply");
+            return false;
+        }
+        if (SecondarylUpgradePanel.GetComponentInChildren<UI_UpgradePanelBase>().hasUpgradesOutstanding())
+        {
+            //We need to bring up our menu and handle this instead of sending the call through
+            gameManager.Instance.CallConfirmScreen(SecondarylUpgradePanel.GetComponentInChildren<UI_UpgradePanelBase>(), "Do you wish to apply changes?", "confirmApply", "rejectApply");
+            return false;
+        }
+        return true;
+    }
+
+    string pendingUpgradePath = "";
+
     public void SelectUpgradePath(string thisPath)
     {
+        pendingUpgradePath = thisPath;
+        if (!CheckPanelsReady())
+        {
+            //well do nothing for the moment I guess as our panel will handle this :)
+        } else
+        {
+            doSelecteUpgradePath(pendingUpgradePath);
+        }
+    }
+
+    public void blindDoSelectUpgradePath()
+    {
+
+        doSelecteUpgradePath(pendingUpgradePath);
+    }
+
+    public void doSelecteUpgradePath(string thisPath) { 
         currentUpgradePath = thisPath;
         UI_UpgradePanelActive thisUpgradePanel;
         //switch case based off of string

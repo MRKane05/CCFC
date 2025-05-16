@@ -224,7 +224,8 @@ public class gameManager : MonoBehaviour {
     #region Level Results to Pass Through
     public LevelResults levelResults;
 	#endregion
-
+	[Space]
+	[Header("Loading Screen")]
 	#region Level Load Screen
 	public TextMeshProUGUI loadingScreenMessage;
     public GameObject LoadingScreenBase;
@@ -233,9 +234,14 @@ public class gameManager : MonoBehaviour {
 	public TextMeshProUGUI loadingScreenDescription;
 	public TextMeshProUGUI loadingScreenHint;
 	#endregion
+	[Space]
+	[Header("Confirm Screen")]
+	#region Confirm Action Screen
+	public GameObject confirmScreen;
+    #endregion
 
-	#region Universal Debug Flags
-	public bool bDebugEvents = false;
+    #region Universal Debug Flags
+    public bool bDebugEvents = false;
 	#endregion
 
 	#region Level Selection Details
@@ -458,10 +464,17 @@ public class gameManager : MonoBehaviour {
 	#region scoreKeeping
 	public void addKill(string itemName, float itemPoints)
 	{
-		//levelPlayerStats.kills++;
-		//Debug.LogError("Adding Kill: " + itemName + ", " + itemPoints);
 		PlayerScore.AddScoreItem(itemName, itemPoints);
 	}
 
-	#endregion
+    #endregion
+
+    #region Confirm Screen Handlers
+	public void CallConfirmScreen(MonoBehaviour thisCaller, string confirmMessage, string confirmFunction, string rejectFunction)
+    {
+		confirmScreen.SetActive(true);
+		UI_ConfirmBoxHandler ourConfirmBox = confirmScreen.GetComponent<UI_ConfirmBoxHandler>(); //This isn't going to be called often so we can be lazy about it
+		ourConfirmBox.setupCallback(thisCaller, confirmMessage,  confirmFunction, rejectFunction);
+	}
+    #endregion
 }

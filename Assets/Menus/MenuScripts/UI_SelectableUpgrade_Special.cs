@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class UI_SelectableUpgrade_Special : UI_SelectableUpgradeBase {
 
+
+
     void Start()
     {
         populateSelectables();
@@ -72,5 +74,27 @@ public class UI_SelectableUpgrade_Special : UI_SelectableUpgradeBase {
         {
             gameManager.Instance.playerStats.money -= ourDisplayBar.totalUpgradeCost;
         }*/
+    }
+
+    public override bool hasUpgradesOutstanding()
+    {
+        if (selectedUpgrade == null)
+        {
+            return false;
+        } else
+        {
+            if (selectedUpgrade.upgradeName == "Standard" || selectedUpgrade.upgradeName.Length < 4)
+            {
+                return false;    //This is simply setup as it stands
+            }
+        }
+        Debug.Log("Checking Special Upgrade: " + gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name + ", " + selectedUpgrade.upgradeName);
+        return gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name != selectedUpgrade.upgradeName;
+    }
+
+    public override void rejectApply()
+    {
+        selectedUpgrade.upgradeName = gameManager.Instance.SelectedAircraft.AttachedSpecial.cannons_name;
+        base.rejectApply();
     }
 }
