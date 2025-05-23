@@ -62,10 +62,12 @@ public class BalloonController : Actor {
 	}
 	
 	// Use this for initialization, but it wipes out what we did at the base level...
-	void Start() {	//This could go onto the base actor class
-		
-		//groundCollider = GameObject.Find ("Terrain").GetComponent<Collider>(); //this is used for our ground contact
-		
+	void Start() {  //This could go onto the base actor class
+		if (team == 1)  //We don't scare about friendlies
+		{
+			gameManager.Instance.addSpawn(vehicleType, vehicleScore);
+		}
+
 		//because the parent script stuff isn't working...?
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
 		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();

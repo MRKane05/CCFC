@@ -16,6 +16,7 @@ public class DestructableObject : MonoBehaviour {
 
     void Start()
     {
+        gameManager.Instance.addSpawn(objectType, objectScore);
         if (!liveObject || !destroyedObject)
         {
             //Debug.Log("GameObject: " + gameObject.name + " does not have live/destroyed meshes set");

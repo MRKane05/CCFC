@@ -161,12 +161,14 @@ public class LevelScoreItem
 	//public string itemName = "";
 	public float itemPoints = 1;
 	public int count = 0;
+	public int totalInLevel = 0;
 
-	public LevelScoreItem(float newPoints, int newCount)
+	public LevelScoreItem(float newPoints, int newCount, int newInLevel)
 	{
 		//itemName = newName;	//We probably don't need to be storing this twice
 		itemPoints = newPoints;
 		count = newCount;
+		totalInLevel = newInLevel;
 	}
 }
 
@@ -184,7 +186,22 @@ public class PlayerLevelScore
 		}
 		else
 		{
-			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1);
+			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1, 1);
+			playerLevelScore.Add(itemName, newScoreItem);
+		}
+	}
+
+	//In theory this'll be called every time a potential target spawns so that it can be displayed when we're doing our summary screen
+	public void AddLevelSpawn(string itemName, float itemPoints)
+    {
+		if (playerLevelScore.ContainsKey(itemName))
+		{
+			playerLevelScore[itemName].totalInLevel++;
+			//Debug.Log("Total " + itemName + ": " + playerLevelScore[itemName].totalInLevel);
+		}
+		else
+		{
+			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1, 1);
 			playerLevelScore.Add(itemName, newScoreItem);
 		}
 	}
@@ -465,6 +482,11 @@ public class gameManager : MonoBehaviour {
 	public void addKill(string itemName, float itemPoints)
 	{
 		PlayerScore.AddScoreItem(itemName, itemPoints);
+	}
+
+	public void addSpawn(string itemName, float itemPoints)
+    {
+		PlayerScore.AddLevelSpawn(itemName, itemPoints);
 	}
 
     #endregion

@@ -75,6 +75,11 @@ public class Actor : MonoBehaviour {
 	}
 
 	IEnumerator Start() {
+		if (team == 1)	//We don't scare about friendlies
+		{
+			gameManager.Instance.addSpawn(vehicleType, vehicleScore);
+		}
+
 		hitEffect = gameObject.GetComponentInChildren<Emitter_Hit>();
 		smokeEffects = gameObject.GetComponentsInChildren<Emitter_Smoke>();
 
