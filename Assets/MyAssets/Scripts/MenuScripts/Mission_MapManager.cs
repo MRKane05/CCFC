@@ -191,8 +191,10 @@ public class Mission_MapManager : MonoBehaviour {
 		addKeyLocation(friendlyTeam, keyLocation.enKeyLocationType.TOWN);
 		gameManager.Instance.SetLoadingScreen("Generating Map", 1, false);
 		bMapLoaded = true;
+		yield return null; //Give everything a breather before saving
 		//We need to save our map
 		saveMapState();
+		yield return null;
 	}
 
 	// Use this for initialization
