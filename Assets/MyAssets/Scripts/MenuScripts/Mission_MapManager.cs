@@ -720,7 +720,7 @@ public class Mission_MapManager : MonoBehaviour {
 			{
 				GameObject newMapTile = Instantiate(mapTile) as GameObject;
 
-				newMapTile.transform.parent = transform; //set it to this, which will also be linked to the handler
+				newMapTile.transform.SetParent(transform); //set it to this, which will also be linked to the handler
 
 				if (Mathf.Approximately(y / 2F, y / 2)) //this is a normal section
 					newMapTile.transform.localPosition = new Vector3((x - mapWidth / 2F) * tileWidth, (mapHeight / 4F - y / 2F) * tileHeight, 0);

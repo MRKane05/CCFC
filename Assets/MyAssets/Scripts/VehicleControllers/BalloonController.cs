@@ -173,20 +173,6 @@ public class BalloonController : Actor {
 			}
 		}
 		
-		//}
-		//speed = Airspeed; //really this should be += (CompfDifference(throttle*Airspeed, speed, Gravity()) * Time.deltaTime;
-		//Really only need to set on and off for these...
-		//Solved by having a mainBlind and targetBlind, but I think the connection between the two (with highlite) is actually pretty good...
-		if (bFiring!=bLastFiring) {
-			bLastFiring=bFiring;
-			for (int i=0; i<ourGunMP.Length; i++) {
-				if (ourGunMP[i]!=null) {
-					ourGunMP[i].bFiring = bFiring;
-					ourGunMP[i].FireState = FireState; //Will probably take over from bFiring
-				}
-			}
-		}
-		
 		//Adjust throttle...
 		throttle +=throttleControl*throttlespeed*Time.deltaTime; //for the moment keep it conformed.
 

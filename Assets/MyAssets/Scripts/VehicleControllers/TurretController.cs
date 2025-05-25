@@ -11,6 +11,10 @@ public class TurretController : Actor {
 	public AttachedGun[] ourGunMP;
 	public ActorController ourPlayerController; //we get a feed from this sent through to the UpdateInput.
 
+	public float cannon_refire = 0.2f;
+	float lastCannonFireTime = 0;
+	int cannon_current = 0;
+
 	GameObject ourCameraObject;
 
 	public float crusingSpeed = 3;      //It's important that this is the same as the aircraft we're riding on as the AI uses the player object as a reference
@@ -36,18 +40,6 @@ public class TurretController : Actor {
 	// Update is called once per frame
 	void Update () {
 		PlayerUpdate();
-		if (bFiring != bLastFiring)
-		{
-			bLastFiring = bFiring;
-			for (int i = 0; i < ourGunMP.Length; i++)
-			{
-				if (ourGunMP[i] != null)
-				{
-					ourGunMP[i].bFiring = bFiring;
-					ourGunMP[i].FireState = FireState; //Will probably take over from bFiring
-				}
-			}
-		}
 	}
 
 	private float ClampAngle(float angle, float min, float max)
@@ -55,6 +47,8 @@ public class TurretController : Actor {
 		angle = (angle > 180f) ? angle - 360f : angle;
 		return Mathf.Clamp(angle, min, max);
 	}
+
+	bool bCanFireCannons = true;
 
 	void PlayerUpdate()
 	{
@@ -68,6 +62,15 @@ public class TurretController : Actor {
 
 		//Problematically we're dealing with that 360 problem again
 		transform.localEulerAngles = new Vector3(ClampAngle(transform.localEulerAngles.x, -60, 30), Mathf.Clamp(transform.localEulerAngles.y, 10, 230f), transform.localEulerAngles.z);
+
+		//And our firing logic (this broke!)
+		if (bFiring && Time.time > lastCannonFireTime + cannon_refire && bCanFireCannons)
+		{
+			lastCannonFireTime = Time.time;
+			ourGunMP[cannon_current].doFireEffect();
+			cannon_current++;
+			cannon_current = cannon_current % ourGunMP.Length;
+		}
 	}
 
 	public override void DoUpdateInternalSettings()
