@@ -412,7 +412,29 @@ public class LevelController : LevelControllerBase {
 
         return null; //We nave no viable target
     }
-	
+
+
+	public void requestNextTarget(ActorController ourController, Actor currentTarget, int direction)
+	{
+		if (ourController.team == 0)
+		{
+			int targetInt = -1;
+			for (int i=0; i<enemyList.Count; i++)
+            {
+				if (enemyList[i].actor == currentTarget)
+                {
+					targetInt = i;
+                }
+            }
+
+			if (targetInt != -1)
+            {
+				int selectInt = targetInt + direction;
+				selectInt = (int)Mathf.Repeat(selectInt, enemyList.Count);
+				ourController.targetCallback(enemyList[selectInt].actor, enemyList[selectInt].vehicle, 1); //list this target and attack it!
+			}
+		}
+	}
 
 	//The fighters can use this to call for another target
 	public void requestTarget(ActorController ourController, bool bDirectionMatters) {
