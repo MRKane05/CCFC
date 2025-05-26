@@ -191,7 +191,7 @@ public class MissionConstructionBase : MonoBehaviour {
             balloonPositions.Add(spawnLocation);
             string groupTag = "bomber_Group_" + Time.time.ToString("f0");
             GameObject targetBalloon = newTeam == 0 ? prefabManager.Instance.friendlyBalloons[0] : prefabManager.Instance.enemyBalloons[0];
-            actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(targetBalloon, newTeam, spawnLocation, Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.up), groupTag, null);
+            actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(targetBalloon, newTeam, spawnLocation,  Quaternion.Euler(0, Random.Range(0, 360), 0), groupTag, null);
         }
 
         //We need to maybe add a zone to the ackack in the scene

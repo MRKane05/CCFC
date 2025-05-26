@@ -88,39 +88,6 @@ public class BalloonController : Actor {
 		if (AircraftMesh)
 			ourMat = AircraftMesh.GetComponent<Renderer>().material; //and make a dupe of it
 	}
-	
-	
-	float SpeedChange() {
-		//thrust, gravity
-		GravityVector = transform.forward.normalized;
-		//print (GravityVector);
-		
-		//some way of knowing if we need to speed up or slow down?
-		// thrust-(expectedSpeed) ..which will mean we speed up or slow down according
-		//expected speed = MaxSpeed*throttle. if we're below this we need to speed up, otherwise we need to slow down.
-		//if we're going too slow we need to apply the speed of accelleration
-		//check to see if we're going down here...
-		
-		//need to do an engine thing and recovery curve etc?
-		//if we're pointing down we should increase speed reguardless of our throttle.
-		//But up until we hit Maximum
-		
-		if (GravityVector.y < 0) { //then we're going downhill
-			return (thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass; //we'll be increasing regardless	
-		}
-		else{
-			if (speed > MaxAirSpeed*throttle) { //then we're wanting to go slower.
-				return (-thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass;
-			}
-			else {
-				return (thrust-Mathf.Abs(GravityVector.y)*GravityVector.y*gravity)/mass;
-			}
-		}
-		
-		return 0;
-	}
-
-
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay) {
 		
 		
@@ -173,29 +140,6 @@ public class BalloonController : Actor {
 			}
 		}
 		
-		//Adjust throttle...
-		throttle +=throttleControl*throttlespeed*Time.deltaTime; //for the moment keep it conformed.
-
-		//This calculates our speed through the air dependend upon our angles etc.
-		speed = 0;// Mathf.Clamp(speed + SpeedChange() * Time.deltaTime, 0, MaxAirSpeed*1.2F);
-		//speed += SpeedChange()*Time.deltaTime; //we don't need any variables as they're part of the class.
-		
-		//Handle our aircraft control - ie turning.
-		if (!isNPC) {
-			PlayerUpdate();
-		}
-		else {
-			NPCUpdate();
-			
-		}
-		
-		if (speed<StallSpeed) {
-			//this needs to be more natural
-			if (transform.localRotation.eulerAngles.z < 90F || transform.localRotation.eulerAngles.z > 270)
-				transform.RotateAround(transform.right, turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
-			else
-				transform.RotateAround(transform.right, -turnspeed*Time.deltaTime*((StallSpeed-speed)/StallSpeed)*2);
-		}
 		//Debug.Log (transform.localRotation.eulerAngles);
 		//Shoot our aircraft down...
 		if (bIsDead) {
@@ -223,8 +167,8 @@ public class BalloonController : Actor {
 			
 		}
 		
-		impactJolt = Vector3.Lerp(impactJolt, Vector3.zero, Time.deltaTime*joltDecay);
-		impactSpin = Mathf.Lerp (impactSpin, 0, Time.deltaTime*joltDecay);
+		//impactJolt = Vector3.Lerp(impactJolt, Vector3.zero, Time.deltaTime*joltDecay);
+		//impactSpin = Mathf.Lerp (impactSpin, 0, Time.deltaTime*joltDecay);
 		
 		//and the direction of travel for the aircraft. Later this will need to be cut against gravity, but for the moment this'll work
 		/*
@@ -239,54 +183,12 @@ public class BalloonController : Actor {
 			*/
 		
 	}
-	
-	void NPCUpdate() {
-		//Rotates us around the world origin...
-		//Quaternion currentRotation = transform.rotation;
-		//While it's awesome to do this we need to think about how the aircraft is going to behave...they bank while
-		//turning and we need to emulate that here as this isn't a real sim...
-		
-		//Basically we want to always be facing "up" with the direction of turn.
-		
-		transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnspeed); 
-		//AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
-		
-		//for our ground stuff...
-		
-	}
-	
+
 	//this works fine for doing player ground contact but it's a bit much for the AI I think.
 	public void checkGroundContacts() {
 		
 	}
-	
-	void PlayerUpdate() {
-		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
-			//roll commands
-			transform.RotateAroundLocal(transform.forward, -roll*turnspeed*Time.deltaTime);
-			//pitch commands
-			transform.RotateAroundLocal(transform.right, pitch*turnspeed*Time.deltaTime);
-			//yaw commands
-			transform.RotateAroundLocal(transform.up, yaw*turnspeed*Time.deltaTime);
-			//throttle details
-		}
-		else { //we want to control relitive to where we think it should be going
-			//this is a camera relitive control.
-			transform.RotateAround(ourCameraObject.transform.up, roll*turnspeed*Time.deltaTime);
-			transform.RotateAround(ourCameraObject.transform.right, pitch*turnspeed*Time.deltaTime);
-			
-			//command to roll us back up the proper way.
-			transform.RotateAroundLocal(transform.forward, -yaw*turnspeed*Time.deltaTime);
-			//Need to figure out what up is...
-			
-			//not sure what to do about yaw...
-			
-			//Aircraft interpertation section of this controller.
-			//if we're pulling left or right we should rotate to the relitive 90...
-			BalloonModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(BalloonModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
-		}
-	}
-	
+		
 	public override GameObject getModel() {
 		return BalloonModel; //it really is that simple
 	}
