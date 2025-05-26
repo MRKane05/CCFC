@@ -19,11 +19,17 @@ public class UI_SwipeElement : MonoBehaviour, IDragHandler, IEndDragHandler
 		DraggedDirection draggedDir = GetDragDirection(dragVectorDirection);
 		switch (draggedDir)
         {
+			//Left/Right cycles targets
 			case DraggedDirection.Left:
 				((LevelController)LevelControllerBase.Instance).requestNextTarget(PlayerController.Instance, PlayerController.Instance.targetController, -1);
 				break;
 			case DraggedDirection.Right:
 				((LevelController)LevelControllerBase.Instance).requestNextTarget(PlayerController.Instance, PlayerController.Instance.targetController, 1);
+				break;
+			case DraggedDirection.Down: //Dragging down targets the first fighter targetting the caller
+				((LevelController)LevelControllerBase.Instance).requestFighterTargeting(PlayerController.Instance, PlayerController.Instance);
+				break;
+			case DraggedDirection.Up: //This will request the first fighter targeting the first thing we have to protect
 				break;
 		}
 
@@ -42,7 +48,7 @@ public class UI_SwipeElement : MonoBehaviour, IDragHandler, IEndDragHandler
 		{
 			draggedDir = (dragVector.y > 0) ? DraggedDirection.Up : DraggedDirection.Down;
 		}
-		Debug.Log(draggedDir);
+		//Debug.Log(draggedDir);
 		return draggedDir;
 	}
 

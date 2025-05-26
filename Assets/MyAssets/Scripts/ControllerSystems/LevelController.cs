@@ -413,6 +413,24 @@ public class LevelController : LevelControllerBase {
         return null; //We nave no viable target
     }
 
+	//Request the fighter targeting a subject controller
+	public void requestFighterTargeting(ActorController subjectController, ActorController requestingController)
+    {
+		bool bTargetFound = false;
+		for (int i=0; i<enemyList.Count; i++)
+        {
+			if (enemyList[i].ourController.target == subjectController.ourAircraft)
+            {
+				bTargetFound = true;
+				requestingController.targetCallback(enemyList[i].actor, enemyList[i].vehicle, 1); //list this target and attack it!
+			}
+        }
+
+		if (!bTargetFound)
+        {
+			requestingController.targetCallback(null, null, -1);
+		}
+    }
 
 	public void requestNextTarget(ActorController ourController, Actor currentTarget, int direction)
 	{
