@@ -60,7 +60,9 @@ public class LevelController : LevelControllerBase {
 	//public GameObject[] enemyList, friendlyList;
 	
 	public List<actorWrapper> enemyList, friendlyList; //list of all our fighters in the scene
-	
+
+	public List<actorWrapper> reconPointList;
+
 	public float score = 0;
 	
 	public Player_Radar targetRadar;
@@ -134,6 +136,7 @@ public class LevelController : LevelControllerBase {
 		
 	}
 	*/
+	#endregion
 
 	//if one aircraft wants to send a message to all fighters in the flight group (for whatever reason)
 	public void notifyWithTag(int thisTeam, string thisMessage, string thisTag) {
@@ -360,8 +363,6 @@ public class LevelController : LevelControllerBase {
 		}
 	}
 
-	#endregion
-
 	public void setRadar(Player_Radar thisRadar) {
 		targetRadar = thisRadar;	
 	}
@@ -535,6 +536,7 @@ public class LevelController : LevelControllerBase {
 	public MissionConstructionBase ourMissonConstructor;
 	public GameObject bombingMissionConstructor;
 	public GameObject skirmishMissionContstructor;
+	public GameObject reconMissionConstructor;
 
 	public void removeSelf(GameObject thisActor, int thisTeam) {
 		if (thisTeam == 0) { //Pull us out of the list
@@ -642,19 +644,39 @@ public class LevelController : LevelControllerBase {
 		//return newTarget; //for those of us who need the vehicle
 		return newActor;
 	}
-	
+
+	//Slightly different to the above that the recon point just adds itself to the list
+	public void AddReconPoint(int thisTeam, GameObject thisObject)
+    {
+		reconPointActor newActor = thisObject.GetComponent<reconPointActor>();
+		actorWrapper newReconPointActor = new actorWrapper();
+		newReconPointActor.actor = newActor;
+		newReconPointActor.vehicle = thisObject;
+
+		if (newActor.ourRadarPrefab)
+		{
+			newReconPointActor.radarObject = Instantiate(newActor.ourRadarPrefab) as GameObject; //Put down our radar object
+			newReconPointActor.radarObject.transform.SetParent(targetRadar.gameObject.transform); //child it to this.
+			newReconPointActor.radarObject.transform.localScale = Vector3.one;
+			newReconPointActor.radarLink = newReconPointActor.radarObject.GetComponent<RadarItem>();
+		}
+
+		reconPointList.Add(newReconPointActor);
+	}
+
 	IEnumerator Start() {
 		yield return null;
 		//basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?
 		//This all needs to be disabled if we're outside of testing
-		
+
 		if (!prefabManager.Instance)
-        {
+		{
 			yield return null;
-        }
+		}
 
 		//As a FYI I did consider making this as a switch and case, but wanted to include variables in everything. I'm sure that'll bite me in the ass somehow
 		//We need to make a MissionConstructor and run everything here accordingly
+		//PROBLEM: This code block really could be refactored to be significantly smaller and more readable
 		if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE || gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEATTACK)
 		{
 			GameObject newConstructor = Instantiate(bombingMissionConstructor) as GameObject;
@@ -663,16 +685,25 @@ public class LevelController : LevelControllerBase {
 			//Grab our constructor and send through the necessary information to generate a mission
 			Mission_Bombers MissionGenerator = newConstructor.GetComponent<Mission_Bombers>();
 			MissionGenerator.GenerateMission(gameManager.Instance.missionType == Mission_MapSection.enMissionType.BASEDEFENCE, gameManager.Instance.missionDifficulty);
-			
-		} 
+
+		}
 		else if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.SKIRMISH)
-        {
+		{
 			GameObject newConstructor = Instantiate(skirmishMissionContstructor) as GameObject;
 			ourMissonConstructor = newConstructor.GetComponent<Mission_Skirmish>();
 
 			Mission_Skirmish MissionGenerator = newConstructor.GetComponent<Mission_Skirmish>();
 			MissionGenerator.GenerateMission(gameManager.Instance.missionDifficulty);
-        }
+		}
+		else if (gameManager.Instance.missionType == Mission_MapSection.enMissionType.RECON)
+        {
+			GameObject newConstructor = Instantiate(reconMissionConstructor) as GameObject;
+			ourMissonConstructor = newConstructor.GetComponent<Mission_Skirmish>();
+
+			Mission_Recon MissionGenerator = newConstructor.GetComponent<Mission_Recon>();
+			MissionGenerator.GenerateMission(gameManager.Instance.missionDifficulty);
+		}
+
 
 		//We need to position our player according to what's happening, and I'm not sure what script should be handling that, possibly not this one, but just in case
 		yield return null;

@@ -41,13 +41,13 @@ public class Player_Radar : MonoBehaviour {
 		if (levelLink!=null && playerAircraft!=null)
 			updateRadarItem();
 	}
-	
+
 	void updateRadarItem() {
-		sqrRadius = radius*radius;
-		
+		sqrRadius = radius * radius;
+
 		//detail our rotations
-		transform.localEulerAngles = new Vector3(0, 0, playerAircraft.transform.eulerAngles[1]+180F); //so our radar should rotate
-		
+		transform.localEulerAngles = new Vector3(0, 0, playerAircraft.transform.eulerAngles[1] + 180F); //so our radar should rotate
+
 		//Need to go through all the stuff on the LevelController and place them on our radar.
 		if (levelLink.friendlyList.Count > 0) {
 			foreach (actorWrapper thisActor in levelLink.friendlyList) {
@@ -55,9 +55,19 @@ public class Player_Radar : MonoBehaviour {
 					radarOffsetItem(thisActor);
 			}
 		}
-		
+
 		if (levelLink.enemyList.Count > 0) {
 			foreach (actorWrapper thisActor in levelLink.enemyList) {
+				if (thisActor.radarObject) //No radar object...invisible!
+					radarOffsetItem(thisActor);
+			}
+		}
+
+		//And now our points of interest/waypoints etc.
+		if (levelLink.reconPointList.Count > 0)
+        {
+			foreach (actorWrapper thisActor in levelLink.reconPointList)
+			{
 				if (thisActor.radarObject) //No radar object...invisible!
 					radarOffsetItem(thisActor);
 			}

@@ -168,14 +168,46 @@ public class MissionConstructionBase : MonoBehaviour {
 
     #endregion
 
+    #region Intel Photo Generation Methods
+    public void addPhotoCluster(Vector3 clusterCenter, float clusterSpacing, Range numberOfPhotos)
+    {
+        //I think balloons will be put down as their own objects so we've a bit of control over their location
+        List<Vector3> photoPositions = new List<Vector3>();
+
+
+        int flightCount = Mathf.RoundToInt(numberOfPhotos.GetRandom());
+        //System for adding photos in a line:
+        float lineAngle = Random.Range(0f, 360f);
+        Quaternion AngleAxis = Quaternion.AngleAxis(lineAngle, Vector3.up);
+        Vector3 lineForward = new Vector3(clusterSpacing, 0, 0);
+        for (int i = 0; i < flightCount; i++)
+        {
+            Vector3 spawnLocation = clusterCenter;
+            spawnLocation += AngleAxis * lineForward * i;
+
+            //Make our line wonky
+            float clusterNoise = clusterSpacing / 3f;
+            spawnLocation += new Vector3(Random.Range(-clusterNoise, clusterNoise), Random.Range(-clusterNoise, clusterNoise), Random.Range(-clusterNoise, clusterNoise));
+            photoPositions.Add(spawnLocation);
+            string groupTag = "photo_group_" + Time.time.ToString("f0");
+
+            //We need to position above the ground
+            spawnLocation = LevelControllerBase.Instance.getTerrainHeightAtPoint(spawnLocation) + Vector3.up * Random.Range(15, 50);    //This height should be a config of sorts
+            GameObject newPhotoObject = Instantiate(LevelPickupManager.Instance.PhotoPositionPrefab, spawnLocation, Quaternion.identity) as GameObject;
+            //This needs to be added to our Level controller?
+           }
+    }
+
+    #endregion
+
     #region Balloon Generation Methods
-    public void addBarrageBalloons(Vector3 clusterCenter, float clusterSpacing, int newTeam)
+    public void addBarrageBalloons(Vector3 clusterCenter, float clusterSpacing, Range numberOfBalloons, int newTeam)
     {
         //I think balloons will be put down as their own objects so we've a bit of control over their location
         List<Vector3> balloonPositions = new List<Vector3>();
 
 
-        int flightCount = Mathf.RoundToInt(Random.Range(1, 3));
+        int flightCount = Mathf.RoundToInt(numberOfBalloons.GetRandom());
         //int flightCount = 1;	//PROBLEM this is a testing hack
         float lineAngle = Random.Range(0f, 360f);
         Quaternion AngleAxis = Quaternion.AngleAxis(lineAngle, Vector3.up);

@@ -47,7 +47,7 @@ public class Mission_Skirmish : MissionConstructionBase {
         for (int i = 0; i < numFields; i++)
         {
             //Put down a patch of balloons positioned at random around the player
-            addBarrageBalloons(PlayerController.Instance.gameObject.transform.position + Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.up) * Vector3.forward * Random.Range(75f, 150f), 25f, 1);
+            addBarrageBalloons(PlayerController.Instance.gameObject.transform.position + Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.up) * Vector3.forward * Random.Range(75f, 150f), 25f, new Range(1, 3), 1);
         }
     }
 

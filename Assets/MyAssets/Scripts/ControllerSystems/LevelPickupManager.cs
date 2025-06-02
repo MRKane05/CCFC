@@ -21,6 +21,8 @@ public class LevelPickupManager : MonoBehaviour {
 
 	public List<PickupObject> PickupPrefabs = new List<PickupObject>();
 
+	public GameObject PhotoPositionPrefab;
+
 
 	void Awake()
 	{

@@ -5,13 +5,13 @@ using UnityEngine;
 
 
 public class PickupBase : MonoBehaviour {
-	public enum enPickupType { NULL, HEALTH, AMMO, SECONDARYAMMO, DOUBLEDAMAGE, COOLDOWN }
+	public enum enPickupType { NULL, HEALTH, AMMO, SECONDARYAMMO, DOUBLEDAMAGE, COOLDOWN, PHOTO }
 	public enPickupType PickupType = enPickupType.HEALTH;
 
 
 
 	public GameObject Instigator;   //What was the thing that dropped us?
-	public float Lifespan = 15f;    //How long will we be alive for?
+	public float Lifespan = 15f;    //How long will we be alive for? If this is zero we're always present in the scene
 	public float PickupValue = 10f;	//How much of whatever do we add?
 	float DieTime = 0;
 	public bool bIsParachute = true;    //Will this be behaving like something that pops up and then floats down?
@@ -26,6 +26,10 @@ public class PickupBase : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		//DoPickupStart();
+		if (PickupType == enPickupType.PHOTO)
+        {
+			gameManager.Instance.addSpawn("Photo", 0.5f);
+        }
 	}
 
 	public void DoPickupStart(GameObject newInstigator)
@@ -37,14 +41,17 @@ public class PickupBase : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position += moveVelocity * Time.deltaTime;
-		moveVelocity -= Vector3.up * gravity * Time.deltaTime;
-		if (moveVelocity.y < -fallspeed)
-        {
-			moveVelocity.y = -fallspeed;
-        }
+		if (bIsParachute)
+		{
+			transform.position += moveVelocity * Time.deltaTime;
+			moveVelocity -= Vector3.up * gravity * Time.deltaTime;
+			if (moveVelocity.y < -fallspeed)
+			{
+				moveVelocity.y = -fallspeed;
+			}
+		}
 
-		if (Time.time > DieTime)
+		if (Time.time > DieTime && Lifespan > 0)
         {
 			Destroy(gameObject);
         }

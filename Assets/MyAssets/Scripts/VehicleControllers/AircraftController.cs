@@ -579,6 +579,11 @@ public class AircraftController : Actor {
 					attachedSecondary.addAmmoPercent(thisPickup.PickupValue);
                 }
 				break;
+			case PickupBase.enPickupType.PHOTO:
+				//we need to send through to the system that we've taken a photo, so happy times :)
+				//We also need to play an effect of a photo being taken
+				gameManager.Instance.addKill("Photograph", 0.5f);	//How many points should a photograph be worth?
+				break;
         }
 		Destroy(targetPickup);
     }
