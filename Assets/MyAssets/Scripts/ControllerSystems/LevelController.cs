@@ -664,6 +664,32 @@ public class LevelController : LevelControllerBase {
 		reconPointList.Add(newReconPointActor);
 	}
 
+	public void RemoveReconPoint(GameObject thisActor)
+    {
+		for (int i = 0; i < reconPointList.Count; i++)
+		{
+			if (reconPointList[i].vehicle == thisActor)
+			{ //remove this entry
+				if (reconPointList[i].radarObject)
+				{
+					Animation blipAnim = reconPointList[i].radarObject.GetComponent<Animation>();
+					if (blipAnim != null && blipAnim.clip != null)
+					{
+						blipAnim.Play(blipAnim.clip.name);
+						Destroy(reconPointList[i].radarObject, 0.5f);
+					}
+					else
+					{
+						Destroy(reconPointList[i].radarObject);
+					}
+				}
+
+				reconPointList.RemoveAt(i); //that way we'll get the correct one
+
+			}
+		}
+	}
+
 	IEnumerator Start() {
 		yield return null;
 		//basicAckAck.SetActive(Random.value > 0.33f); //Do we want AckAck for this level?

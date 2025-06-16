@@ -517,29 +517,32 @@ public class AircraftController : Actor {
 		roll = Mathf.Lerp(roll, targetRoll, Time.deltaTime * controlResponce);
 		yaw = Mathf.Lerp(yaw, targetYaw, Time.deltaTime * controlResponce);
 
+		//Put in a little tweak to give our aircraft more agility if we're going slower
+		float turnSpeedBreaking = Mathf.Lerp(turnspeed * 1.25f, turnspeed, Mathf.Clamp01((speed - SlowAirSpeed) / (MaxAirSpeed / SlowAirSpeed)));
+
 		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
 			//roll commands
-			transform.RotateAroundLocal(transform.forward, -roll*turnspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -roll* turnSpeedBreaking * Time.deltaTime);
 			//pitch commands
-			transform.RotateAroundLocal(transform.right, pitch*turnspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.right, pitch* turnSpeedBreaking * Time.deltaTime);
 			//yaw commands
-			transform.RotateAroundLocal(transform.up, yaw*turnspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.up, yaw* turnSpeedBreaking * Time.deltaTime);
 			//throttle details
 		}
 		else { //we want to control relitive to where we think it should be going
 			//this is a camera relitive control.
-			transform.RotateAround(ourCameraObject.transform.up, roll*turnspeed*Time.deltaTime);
-			transform.RotateAround(ourCameraObject.transform.right, pitch*turnspeed*Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.up, roll* turnSpeedBreaking * Time.deltaTime);
+			transform.RotateAround(ourCameraObject.transform.right, pitch* turnSpeedBreaking * Time.deltaTime);
 			
 			//command to roll us back up the proper way.
-			transform.RotateAroundLocal(transform.forward, -yaw*turnspeed*Time.deltaTime);
+			transform.RotateAroundLocal(transform.forward, -yaw* turnSpeedBreaking * Time.deltaTime);
 			//Need to figure out what up is...
 			
 			//not sure what to do about yaw...
 
 			//Aircraft interpertation section of this controller.
 			//if we're pulling left or right we should rotate to the relitive 90...
-			AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnspeed)*Time.deltaTime));
+			AircraftModel.transform.localEulerAngles = new Vector3(0,0,Mathf.LerpAngle(AircraftModel.transform.localEulerAngles[2], -roll*90, (turnSpeedBreaking) *Time.deltaTime));
 		}
 	}
 
@@ -581,12 +584,25 @@ public class AircraftController : Actor {
 				break;
 			case PickupBase.enPickupType.PHOTO:
 				//we need to send through to the system that we've taken a photo, so happy times :)
-				//We also need to play an effect of a photo being taken
 				gameManager.Instance.addKill("Photograph", 0.5f);	//How many points should a photograph be worth?
+
+				//And now play some sort of effect using some clever system...
+				if (!ourPhotoHandler)
+                {
+					ourPhotoHandler = gameObject.GetComponentInChildren<PhotoEffectHandler>(); //I can't remember if this is recursive...
+                }
+
+				if (ourPhotoHandler)
+                {
+					ourPhotoHandler.doCameraEffect();
+                }
+
 				break;
         }
 		Destroy(targetPickup);
     }
+
+	PhotoEffectHandler ourPhotoHandler;
 
 	public override void TapSecondary() {
 		if (attachedSecondary)

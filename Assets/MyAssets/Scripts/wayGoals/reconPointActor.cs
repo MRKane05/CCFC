@@ -56,7 +56,7 @@ public class reconPointActor : Actor {
     {
 		ourMissionConstructor = newMissionConstructor;
 		numBalloons = newNumBalloons;
-		numPhotoPoints = newNumBalloons;
+		numPhotoPoints = newNumPhotoPoints;
 		FightersToSpawn = newNumSpawnedFighters;
 
 		if (numBalloons > 0)
@@ -89,5 +89,30 @@ public class reconPointActor : Actor {
 	public virtual void TriggerReconPoint()
     {
 		//Ok, now what? I assume that there's something we've got to do here?
-    }
+		//Lets start by spitting out what there is to do at this point!
+		//Debug.LogError("Photos: " + numPhotoPoints + " Balloons: " + numBalloons + " Fighters: " + FightersToSpawn);
+		//We should disable or change our icon for the radar
+		((LevelController)LevelControllerBase.Instance).RemoveReconPoint(gameObject);	//We should remove this so that it's not hanging around, and make sure that our activities happen
+
+		//Need to play some sort of comment to inform the player of what's happening around here
+		if (numPhotoPoints + numBalloons + FightersToSpawn == 0)	//Empty node
+        {
+			if (LevelChatterController.Instance)
+			{
+				LevelChatterController.Instance.playChatter("nothinghappening");
+			}
+		} else if (numPhotoPoints > 0 && numBalloons + FightersToSpawn == 0)	//Only photos
+        {
+			if (LevelChatterController.Instance)
+			{
+				LevelChatterController.Instance.playChatter("hasphotos");
+			}
+		} else if (numBalloons > 0)
+        {
+			if (LevelChatterController.Instance)
+			{
+				LevelChatterController.Instance.playChatter("hasballoons");
+			}
+		}
+	}
 }

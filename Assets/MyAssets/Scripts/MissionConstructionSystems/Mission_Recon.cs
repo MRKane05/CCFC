@@ -63,12 +63,12 @@ public class Mission_Recon : MissionConstructionBase {
             //A few details to control the setup
             int numPhotos = Random.Range(2, 5);
             int numFighters = 0;
-            if (Random.value > 0.125f)
+            if (Random.value < 0.25f)
             {
                 numFighters = Random.Range(1, 5);
             }
             int numBalloons = 0;
-            if (Random.value > 0.125f)
+            if (Random.value < 0.125f)
             {
                 numBalloons = Random.Range(1, 3);
             }

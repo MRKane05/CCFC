@@ -9,13 +9,16 @@ public class PickupBase : MonoBehaviour {
 	public enPickupType PickupType = enPickupType.HEALTH;
 
 
-
 	public GameObject Instigator;   //What was the thing that dropped us?
 	public float Lifespan = 15f;    //How long will we be alive for? If this is zero we're always present in the scene
 	public float PickupValue = 10f;	//How much of whatever do we add?
 	float DieTime = 0;
 	public bool bIsParachute = true;    //Will this be behaving like something that pops up and then floats down?
-
+	[Space]
+	[Header("Scaling stuff for attention")]
+	public bool bScaleWithDistance = false;
+	public float scaleDistance = 15f;   //This will be the square distance for speed
+	public Transform scaleTransform;
 
 	float gravity = 10f;
 	float fallspeed = 1f;   //What's our maximum falling speed?
@@ -54,6 +57,11 @@ public class PickupBase : MonoBehaviour {
 		if (Time.time > DieTime && Lifespan > 0)
         {
 			Destroy(gameObject);
+        }
+
+		if (bScaleWithDistance && scaleTransform)
+        {
+			scaleTransform.localScale = Vector3.one * (1f- Mathf.Clamp01(Vector3.SqrMagnitude(gameObject.transform.position - Camera.main.transform.position) / scaleDistance));
         }
 	}
 }
