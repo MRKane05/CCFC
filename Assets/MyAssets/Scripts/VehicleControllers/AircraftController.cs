@@ -584,7 +584,7 @@ public class AircraftController : Actor {
 				break;
 			case PickupBase.enPickupType.PHOTO:
 				//we need to send through to the system that we've taken a photo, so happy times :)
-				gameManager.Instance.addKill("Photograph", 0.5f);	//How many points should a photograph be worth?
+				gameManager.Instance.addKill("Photo", 0.5f);	//How many points should a photograph be worth?
 
 				//And now play some sort of effect using some clever system...
 				if (!ourPhotoHandler)

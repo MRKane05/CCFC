@@ -208,7 +208,10 @@ public class Mission_Skirmish : MissionConstructionBase {
         if (enemyRemaining <= 0 && ((LevelController)LevelControllerBase.Instance).enemyList.Count == 0 && !bMissionConcluding)
         {
             bMissionConcluding = true;
-            NGUI_Base.Instance.setPortraitMessage("Commander", "The skies are clear. Well done!", Color.black);
+            if (LevelChatterController.Instance)
+            {
+                LevelChatterController.Instance.playChatter("missioncomplete");
+            }
             DelayFinishMission(true, 5f);
         }
     }

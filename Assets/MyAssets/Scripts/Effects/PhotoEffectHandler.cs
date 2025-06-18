@@ -23,6 +23,7 @@ public class PhotoEffectHandler : MonoBehaviour {
 
 	IEnumerator CameraEffect()
 	{
+		ourAudio.pitch = Random.Range(0.8f, 1.2f);
 		ourAudio.PlayOneShot(cameraNoise);
 		ourLensFlare.enabled = true;
 		float timeStart = Time.time;

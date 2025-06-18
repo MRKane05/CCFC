@@ -24,7 +24,7 @@ public class reconPointActor : Actor {
 	public bool bMissionKeyPoint = false;
 
 	public float stateTriggerDistance = 25f;
-
+	public Range fighterSpawnHeight = new Range(30, 50);
 
 	// Use this for initialization
 	void Start () {
@@ -92,10 +92,19 @@ public class reconPointActor : Actor {
 		//Lets start by spitting out what there is to do at this point!
 		//Debug.LogError("Photos: " + numPhotoPoints + " Balloons: " + numBalloons + " Fighters: " + FightersToSpawn);
 		//We should disable or change our icon for the radar
-		((LevelController)LevelControllerBase.Instance).RemoveReconPoint(gameObject);	//We should remove this so that it's not hanging around, and make sure that our activities happen
+		((LevelController)LevelControllerBase.Instance).RemoveReconPoint(gameObject);   //We should remove this so that it's not hanging around, and make sure that our activities happen
 
 		//Need to play some sort of comment to inform the player of what's happening around here
-		if (numPhotoPoints + numBalloons + FightersToSpawn == 0)	//Empty node
+		if (FightersToSpawn > 0)
+		{
+			//Spawn some fighters in, and play the correct chatter
+			if (LevelChatterController.Instance)
+			{
+				LevelChatterController.Instance.playChatter("hasfighters");
+			}
+			((LevelController)LevelControllerBase.Instance).AddFighterFlight(LevelController.Instance.getTerrainHeightAtPoint(PlayerController.Instance.gameObject.transform.position), fighterSpawnHeight.GetRandom(), 20f, FightersToSpawn, 1);
+		}
+		else if (numPhotoPoints + numBalloons + FightersToSpawn == 0)	//Empty node
         {
 			if (LevelChatterController.Instance)
 			{

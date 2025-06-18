@@ -51,10 +51,21 @@ public class TargetIndicator : MonoBehaviour {
 					//indicator.SetActive(false); //turn this off
 					targetColor = new Color(targetColor[0], targetColor[1], targetColor[2], 0);
 				}
+			} else
+            {
+				targetColor = new Color(targetColor[0], targetColor[1], targetColor[2], 0);	//Fade this off if we've got no target
 			}
 		}
 
 		currentColor = Color.Lerp (currentColor, targetColor, Time.deltaTime*4); //this is working well
 		markerMat.SetColor("_TintColor", currentColor); //this doesn't seem to be taking effect at all
+		if (Mathf.Approximately(currentColor.a, 0f) && Mathf.Approximately(targetColor.a, 0f) && indicator.active)	//Turn our indicator off if we're fading down to zero
+        {
+			indicator.SetActive(false);
+        }
+		if (!Mathf.Approximately(targetColor.a, 0f) && !indicator.active)  //Turn our indicator on assuming it was off
+		{
+			indicator.SetActive(true);
+		}
 	}
 }

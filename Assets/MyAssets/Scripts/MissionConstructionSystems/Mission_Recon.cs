@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 //Basically the player has to go through points to engage with fighters and collect intel
@@ -13,6 +12,8 @@ public class Mission_Recon : MissionConstructionBase {
 
     public List<GameObject> ReconPoints;
 
+    bool bMissionConcluding = false;
+
     public override void DoStart()
     {
         base.DoStart();
@@ -24,6 +25,8 @@ public class Mission_Recon : MissionConstructionBase {
         //In this we'd set the target number of enemy we'd be fighting against, and also the amount of support we're expected to have
         levelStartTime = Time.time;
         int targetRconPoints = Random.Range(3, 7);
+
+        ((LevelController)LevelControllerBase.Instance).AddWingmen();
 
         //List<Vector3> ReconOffsets = AddReconPoints(targetRconPoints);
         /*
@@ -114,5 +117,20 @@ public class Mission_Recon : MissionConstructionBase {
             }
         }
         return newPoints;
+    }
+
+    public override void DoUpdate()
+    {
+        base.DoUpdate();
+
+        if (((LevelController)LevelControllerBase.Instance).enemyList.Count == 0 && (((LevelController)LevelControllerBase.Instance).reconPointList.Count ==0) && !bMissionConcluding)
+        {
+            bMissionConcluding = true;
+            if (LevelChatterController.Instance)
+            {
+                LevelChatterController.Instance.playChatter("missioncomplete");
+            }
+            DelayFinishMission(true, 5f);
+        }
     }
 }
