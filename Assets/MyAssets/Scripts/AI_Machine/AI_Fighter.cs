@@ -8,7 +8,8 @@ public class AI_Fighter : ActorController {
 	
 	[HideInInspector]
 	public AnimationCurve aircraftRollCurve;
-	float aircraftYaw;
+	[HideInInspector]
+	public float aircraftYaw;
 	
 	Vector3 targetLead; //will be set by seek target.
 	
@@ -18,8 +19,10 @@ public class AI_Fighter : ActorController {
 
 	public float shootDistance = 40; //don't shoot at anything father than this.
 
-	Quaternion targetRotation, returnRotation;
-	float targetSpeed=1; //how much throttle should we have?
+	[HideInInspector]
+	public Quaternion targetRotation, returnRotation;
+	[HideInInspector]
+	public float targetSpeed=1; //how much throttle should we have?
 	
 	#region AItimers
 	//we've got some magic numbers here
@@ -45,8 +48,10 @@ public class AI_Fighter : ActorController {
 	GameObject lastDamager; //who hit us last? We're simple like that...
 	
 	//Firing functions
-	bool bIsFiring = false, bWasFiring=false;
-	float fireOngoingTime, fireEndTime, fireDuration=1.2F, triggerHoldTime=0.33F, triggerStartRand=1.2F; //because I think it's cool if fire systems have an overhold
+	[HideInInspector]
+	public bool bIsFiring = false, bWasFiring=false;
+	[HideInInspector]
+	public float fireOngoingTime, fireEndTime, fireDuration=1.2F, triggerHoldTime=0.33F, triggerStartRand=1.2F; //because I think it's cool if fire systems have an overhold
 	
 	
 	string targetMethod="AIM"; //ahead: pick a spot ahead and fire through it, ontarget: fire on the correct spot
@@ -60,34 +65,33 @@ public class AI_Fighter : ActorController {
 
 	public Actor followTarg; //Target that we're following - is either what we're "protecting" or our wing leader
 	public int formationNumber = -1; //assign this dynamically
-	//ATTACK: ATTACK, SETUP
-	//STOP: COLLABORATE AND LISTEN hehehe
+									 //ATTACK: ATTACK, SETUP
+									 //STOP: COLLABORATE AND LISTEN hehehe
+	// FSM
+	public AIStateMachine stateMachine;
 
 	//sent through whenever an AI needs to send out a message to other AI - could also be used for team situations.
-	public override void getNotification(string thisMessage, string thisTag) {
-		//we could do with a small delay here...
-		//Debug.Log (gameObject.name + " Got Message: " + thisMessage);
-
-		//we should have been tag filtered already.
-		if (thisMessage == "PATROLBREAK") { //we've been called to break our patrol pattern (probably by another fighter being attacked
-			if (pattern=="PATROL") { //do the standard patrol escape stuff.
-				//do an escape panic or flat out attack...oh the choices!
+	public override void getNotification(string thisMessage, string thisTag)
+	{
+		if (thisMessage == "PATROLBREAK")
+		{
+			if (pattern == "PATROL")
+			{
 				float randomDraw = Random.value;
-				if (randomDraw < 0.33F) { //full out panic
-					pattern = "DOEVASIVE";
-					patternStage = "PICK";
+				if (randomDraw < 0.33f)
+				{
+					stateMachine.ChangeState("DOEVASIVE");
 				}
-				else if (randomDraw < 0.66F) { 
-					pattern="ATTACK";
-					patternStage="SETUP"; //slight disorientation
+				else if (randomDraw < 0.66f)
+				{
+					stateMachine.ChangeState("ATTACK");
 				}
-				else {
-					pattern="ATTACK";
-					patternStage="ATTACK"; //staight attack
+				else
+				{
+					stateMachine.ChangeState("ATTACK");
 				}
 			}
 		}
-
 	}
 	
 	public Vector3 getTargetLead() { //used by the guns
@@ -98,9 +102,18 @@ public class AI_Fighter : ActorController {
 		target = newTarget;
 		targetController = newController;	
 	}
+
+	string initialState = "PATROL";
+
+	public void setInitialFSMState(string newPattern, float stateTime)
+    {
+		initialState = newPattern;
+		patternTime = Time.time;
+		patternDuration = stateTime;
+	}
 	
 	// Use this for initialization
-	void Start () {
+	void Start() {
 		//Setup our roll curves for this particular aircraft
 		if (aircraftRollCurve==null)
 			aircraftRollCurve = new AnimationCurve(new Keyframe(5, 0), new Keyframe(25, 1F), new Keyframe(335, 1F), new Keyframe(355, 0F)); //this is a touch incomplete?
@@ -110,7 +123,18 @@ public class AI_Fighter : ActorController {
 		foreach(AttachedGun thisGun in ourGuns) {
 			thisGun.ourFighterAI = this;	
 		}
+
+		SetupFSM();
 	}
+
+	public void SetupFSM()
+	{
+		if (stateMachine != null) { return; }
+		// Initialize FSM
+		stateMachine = new AIStateMachine(this);
+		stateMachine.ChangeState(initialState); // Default state
+	}
+
 	//This is returned if we've called for a target.
 	public override void targetCallback(Actor newTargetController, GameObject newTarget, int flightProcess) {
 
@@ -120,6 +144,7 @@ public class AI_Fighter : ActorController {
 
 		//this is causing issues with our Patrol call
 		if (target) {
+			stateMachine.ChangeState("ATTACK");
 			pattern="ATTACK";
 			patternStage="SETUP"; //needs to have the return stuff put in place here
 			//we need to click out of this pattern
@@ -134,7 +159,7 @@ public class AI_Fighter : ActorController {
 				//Might actually be smarter to request it from the Level controller.
 				formationNumber = ((LevelController)LevelControllerBase.Instance).getFormationNumber(team, followTarg.gameObject);
 				pattern="FOLLOW"; //go back to following our group lead.
-
+				stateMachine.ChangeState("FOLLOW");
 			}
 		}
 	}
@@ -169,10 +194,63 @@ public class AI_Fighter : ActorController {
 		float angle = Vector3.Angle(targetDir, transform.forward);
 		return angle;	
 	}
-	
+
 	//Does all the attack script stuff, including handing off behaviours to other functions
-	
-	public virtual void HandleDamage() {
+	public virtual void HandleDamage()
+	{
+		if (pattern == "ATTACK")
+		{
+			if (patternStage == "ATTACK")
+			{
+				targetSpeed = 1;
+				damageTaken = 0;
+			}
+			else if (patternStage == "SETUP")
+			{
+				stateMachine.ChangeState("EVADE");
+				damageTaken = 0;
+			}
+		}
+		else if (pattern == "EVADE")
+		{
+			stateMachine.ChangeState("DOEVASIVE");
+			damageTaken = 0;
+		}
+		else if (pattern == "DOEVASIVE")
+		{
+			if (lastDamager)
+			{
+				target = lastDamager;
+				targetController = lastDamager.GetComponent<Actor>();
+			}
+			stateMachine.ChangeState("ATTACK");
+			damageTaken = 0;
+		}
+
+		// Handle patrol break
+		if (pattern == "PATROL" || pattern == "FOLLOW")
+		{
+			((LevelController)LevelControllerBase.Instance).notifyWithTag(team, "PATROLBREAK", flightGroup);
+
+			float randomDraw = Random.value;
+			if (randomDraw < 0.33f)
+			{
+				stateMachine.ChangeState("DOEVASIVE");
+			}
+			else if (randomDraw < 0.66f)
+			{
+				stateMachine.ChangeState("ATTACK");
+				patternStage = "SETUP";
+			}
+			else
+			{
+				stateMachine.ChangeState("ATTACK");
+				patternStage = "ATTACK";
+			}
+		}
+	}
+
+	public virtual void OldHandleDamage() {
 
 		if (damageTaken > damageThreshold) {
 			if (pattern =="ATTACK") {
@@ -251,10 +329,10 @@ public class AI_Fighter : ActorController {
 	
 	
 	//Used with our timer stuff for the random
-	float varValue(float keyDuration, float keyVariance) {
+	public float varValue(float keyDuration, float keyVariance) {
 		return Mathf.Abs(keyDuration + Random.Range(-keyVariance, keyVariance));
 	}
-	
+	/*
 	public virtual void AttackPattern() {
 		//Our breakers...
 		//This function can cause an issue as it'll prevent a break if the player tails the target
@@ -314,11 +392,17 @@ public class AI_Fighter : ActorController {
 			}
 		}
 	}
+	*/
 	
 	public virtual void EvadePattern() {	//This is in state machines
 		if (pattern=="EVADE") { //Also useful for a mid-fight pattern. Aka scramble patterns before going into a long engage.
 			//Generally do our escape stuff...
 			DoTaticalManuver (out returnRotation, out aircraftYaw);
+			if (target == null)	//A quick check to make sure we don't go after something that just got downed
+            {
+				pattern = "ATTACK";
+				patternStage = "ATTACK";
+			}
 			if (Time.time - patternTime > patternDuration) {
 				//Need to check and see if we're in a state to attack or if we should do an evasive manuver...
 				if ((transform.position-target.transform.position).magnitude < 10) { //do an evasive
@@ -362,44 +446,76 @@ public class AI_Fighter : ActorController {
 			}
 		}	
 	}
-	
+
 	//Really the AI has about two different base states, shooting at, and being shot at.
 	//In both cases we need it to be as interesting and as exciting as possible
 	//When shooting at the player it needs to shoot in timed bursts
 	//Upon getting too close to the player it needs to break away and come around for another attack
-	
+
 	//When being shot at we need to behave similar to xWing with simple turns and attempts to evade
 	//Periodic turns to a new angle (that's within about 90deg of the players aspect). If the dot normal of the directions
 	//hits a suitable threshold, or the aircraft gets to a point where it can about face and attack it does so
-	
+
 	//Headon runs are just like a standard attack run I'd assume
-	
+
 	//AI aircraft needs to avoid except in a few headon cases. Need to think of a method to collide, or alternatively
 	//just turn it off
-	
+
 	//Patterns:
 	//Attack run: AI needs to back away from the target for long enough to make the attack run. Distance will have to be
 	//calculated somehow, then turn to do an attack run
 	//When being tailed the AI will have to do an attack run, followed by a dodge, and another attack run.
-	
+
 	//Self-preservation functions
-	
-	
+
+
 	//So here we need to break this down into the command parts...
 	//SeekTarget (out returnRotation, out aircraftYaw);
 	//DoTaticalManuver (out returnRotation, out aircraftYaw); //Basic twisting and turning stuff
 	//FleeTarget (out returnRotation, out aircraftYaw);
 
-	public override void setPatrol(float awakeTime) { //used to set this AI onto a patrol pattern
-		pattern="PATROL";
-		//Debug.LogError("Set Patrol Routine");
-		//if (Time.time - patternTime > patternDuration)
+
+	public override void setPatrol(float awakeTime)
+	{
+		stateMachine.ChangeState("PATROL");
 		patternTime = Time.time;
-		patternDuration = awakeTime; //this is how long it takes us to "snap out" if you will
+		patternDuration = awakeTime;
 	}
 
 	//this is our main AI switching center
-	void DoFighterAI() {
+	void DoFighterAI()
+	{
+		// Handle damage
+		if (damageTaken > damageThreshold)
+		{
+			HandleDamage();
+		}
+
+		// Handle targets
+		if (pattern != "PATROL")
+		{
+			handleTargets();
+		}
+
+		// Ground avoidance check
+		Ray ray = new Ray(ourAircraft.transform.position, Vector3.Lerp(ourAircraft.transform.forward, -Vector3.up, 0.3f));
+		if (Physics.Raycast(ray, 7f, LevelControllerBase.Instance.GroundMask))
+		{
+			ourAircraft.AIUpdateInput(Quaternion.Euler(Vector3.up), aircraftYaw, targetSpeed, bIsFiring);
+			return;
+		}
+
+		// Update current state
+		stateMachine.Update();
+
+		// Fire control
+		bIsFiring = bFireOnTarget();
+
+		// Update aircraft
+		ourAircraft.AIUpdateInput(returnRotation, aircraftYaw, targetSpeed, bIsFiring);
+	}
+	/*
+	void OldDoFighterAI() {
 				
 		//=====Our damage handling patterns...================
 		//we really need a few different thresholds here
@@ -468,26 +584,14 @@ public class AI_Fighter : ActorController {
 		
 		//maybe not the best place?
 		bIsFiring = bFireOnTarget(); //so this will return if we should be shooting at our target 
-
-
-		/*
-		bool bTempFiring = bFireOnTarget(); //set this which will be used.
-		
-		//Our over fire time should easily cover this over
-		if (bTempFiring && !bIsFiring) { //we've just begun shooting, need to set our burst stuff
-			fireEndTime = Time.time + fireDuration;	
-		}
-		
-		bIsFiring = bTempFiring;
-		*/
 		
 		ourAircraft.AIUpdateInput(returnRotation, aircraftYaw, targetSpeed, bIsFiring); //Turn to face a target
 		//Need one for flying away from a target.
 		
-	}
+	}*/
 
 	//called while we're in a tatical situation, intended for target evaluation stuff
-	void CheckSituation() {
+	public void CheckSituation() {
 		//so our calls will come through when we change state etc.
 		//lets try something simple here
 		//Debug.Log ("Checking Situation");
@@ -495,7 +599,7 @@ public class AI_Fighter : ActorController {
 	}
 
 	//This function will forcibly change state if we're set to break. Prevents huffing while evading and with other things like Patrol
-	void CheckBreak() {
+	public void CheckBreak() {
 
 		//We have a flight check system when we're following
 		if (pattern=="FOLLOW" && (Time.time - patternTime > patternDuration)) {
@@ -519,7 +623,7 @@ public class AI_Fighter : ActorController {
 
 	//====Follow patterns - generally just seeks a location by an aircraft========================================
 	//Presently isn't rolling to the left...?
-	void followTarget() {
+	public void followTarget() {
 		//DoLoop (out returnRotation, out aircraftYaw, 20);
 		//===========Target Seeking Functions...======================
 		//if (false) {
@@ -729,7 +833,7 @@ public class AI_Fighter : ActorController {
 	
 	//This flies away but we stay at the same vertical level as our target...
 	//Almost need to have something in here that'll make us flee up, or down, or something other than horizontal.
-	void FleeTarget(out Quaternion newRotation, out float newYaw) {	//Is in State Machine
+	public void FleeTarget(out Quaternion newRotation, out float newYaw) {	//Is in State Machine
 		//===========Target Seeking Functions...in reverse...======================
 		//PROBLEM: This AI function breaks during tailgunner missions
 		if (target)
