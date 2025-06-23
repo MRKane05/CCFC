@@ -231,7 +231,9 @@ public class LevelController : LevelControllerBase {
 
 		((AI_Fighter)newActor.ourController).formationNumber = formationPosition; // ((LevelController)LevelControllerBase.Instance).getFormationNumber(thisTeam, PlayerController.Instance.ourAircraft.gameObject);
 																				  //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
-		((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
+
+		//((AI_Fighter)newActor.ourController).pattern = "FOLLOW";
+		((AI_Fighter)newActor.ourController).setInitialFSMState("FOLLOW", 0);	//For the new FSM AI system
 
 		((AI_Fighter)newActor.ourController).followTarg = PlayerController.Instance.ourAircraft; //follow this
 		((AI_Fighter)newActor.ourController).flightGroup = groupTag;
@@ -315,7 +317,8 @@ public class LevelController : LevelControllerBase {
 			//Add this actor to our level controller so it'll show up on radar etc.
 			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.enemyPrefabList[0], team, startPoint + patrolOffset, startQuat, groupTag, null);
 			//Assign our AI actions for this fighter
-			((AI_Fighter)newActor.ourController).setPatrol(awakeTime); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			//((AI_Fighter)newActor.ourController).setPatrol(awakeTime); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			((AI_Fighter)newActor.ourController).setInitialFSMState("PATROL", awakeTime);
 			newFlight.addActor(newActor);
 
 		}
@@ -616,8 +619,12 @@ public class LevelController : LevelControllerBase {
 
 
 			newActor.ourController.team = thisTeam;
-			newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
-		}
+            //newActor.ourController.setPatrol(Random.Range(30, 35)); //set everything here on patrol
+            if (newActor.ourController is AI_Fighter)
+            {
+                ((AI_Fighter)newActor.ourController).setInitialFSMState("PATROL", Random.Range(20, 35));
+            }
+        }
 		newActor.actor.setTeam(thisTeam);
 		//Need to assign the variables to the aircraft controller
 

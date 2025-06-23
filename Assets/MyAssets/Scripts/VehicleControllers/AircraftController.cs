@@ -331,11 +331,10 @@ public class AircraftController : Actor {
 			health -= thisDamage;
 			if (health<0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
-				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					gameManager.Instance.addKill(vehicleType, vehicleScore); //rack it up!
+				CheckPlayerKill(instigator);
 
 				//doExplode(); //whack this.
-				bIsDead=true;
+				bIsDead =true;
 				applyShotDown();
 			}
 		}
@@ -512,13 +511,15 @@ public class AircraftController : Actor {
 		return -1f; //no update...
 	}
 
+	public float breakingTurnSpeedMultiplier = 1.125f;
+
 	void PlayerUpdate() {
 		pitch = Mathf.Lerp(pitch, targetPitch, Time.deltaTime * controlResponce);
 		roll = Mathf.Lerp(roll, targetRoll, Time.deltaTime * controlResponce);
 		yaw = Mathf.Lerp(yaw, targetYaw, Time.deltaTime * controlResponce);
 
 		//Put in a little tweak to give our aircraft more agility if we're going slower
-		float turnSpeedBreaking = Mathf.Lerp(turnspeed * 1.25f, turnspeed, Mathf.Clamp01((speed - SlowAirSpeed) / (MaxAirSpeed / SlowAirSpeed)));
+		float turnSpeedBreaking = Mathf.Lerp(turnspeed * breakingTurnSpeedMultiplier, turnspeed, Mathf.Clamp01((speed - SlowAirSpeed) / (MaxAirSpeed / SlowAirSpeed)));
 
 		if (!ourPlayerController.bControlArcade) { //control the pitch, roll, yaw of the vehicle.
 			//roll commands

@@ -95,9 +95,6 @@ public class BalloonController : Actor {
 		if (!isInvincible) {
 			health -= thisDamage;
 			if (health<0 && !bIsDead) {
-				//need to check and see if this is the player, and if it is then add the score up.
-				if (instigator == PlayerController.Instance.ourAircraft.gameObject)
-					gameManager.Instance.addKill(vehicleType, vehicleScore); //rack it up!
 				
 				//doExplode(); //whack this.
 				bIsDead=true;

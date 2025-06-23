@@ -40,13 +40,13 @@ public class Mission_Recon : MissionConstructionBase {
         //For the moment lets just generate in a crooked line...
         Vector3 newPosition = PlayerController.Instance.transform.position;
         float flatAngle = Random.Range(0, 360);
-        Range pointDistance = new Range(20, 50);
+        Range pointDistance = new Range(30, 70);
         List<Vector3> linearReconPoints = new List<Vector3>();
         for (int i = 0; i < targetRconPoints; i++)
         {
             newPosition += Quaternion.AngleAxis(flatAngle, Vector3.up) * Vector3.forward * pointDistance.GetRandom();
             linearReconPoints.Add(newPosition);
-            flatAngle += Random.Range(-45, 45);
+            flatAngle += Random.Range(-90, 90);
         }
 
         GenerateReconPoints(linearReconPoints);
@@ -55,6 +55,9 @@ public class Mission_Recon : MissionConstructionBase {
 
     void GenerateReconPoints(List<Vector3> Offsets)
     {
+        float fightersProbability = 4f;
+        float balloonsProbability = 6f;
+
         for (int i=0; i<Offsets.Count; i++)
         {
             Vector3 FinalPosition = LevelControllerBase.Instance.getTerrainHeightAtPoint(PlayerController.Instance.transform.position + Offsets[i]);
@@ -66,14 +69,24 @@ public class Mission_Recon : MissionConstructionBase {
             //A few details to control the setup
             int numPhotos = Random.Range(2, 5);
             int numFighters = 0;
-            if (Random.value < 0.25f)
+            if (Random.value < 1f/ fightersProbability)
             {
-                numFighters = Random.Range(1, 5);
+                numFighters = Random.Range(1, 3);
+                fightersProbability += 2; //Decrease the odds of getting two lots of fighters in a row
+            } else if (fightersProbability > 3)
+            {
+                fightersProbability -= 1;
             }
+
+
             int numBalloons = 0;
-            if (Random.value < 0.125f)
+            if (Random.value < 1f/balloonsProbability)
             {
                 numBalloons = Random.Range(1, 3);
+                balloonsProbability += 2;
+            } else if (balloonsProbability > 3)
+            {
+                balloonsProbability -= 1;
             }
 
             newReconActor.DoSetup(FinalPosition, this, numBalloons, numFighters, numPhotos, true); //For the moment we'll roll with this and lets the points set themselves up

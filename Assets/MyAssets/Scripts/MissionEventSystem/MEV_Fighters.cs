@@ -66,7 +66,8 @@ public class MEV_Fighters : MissionEventObject {
 			//Add this actor to our level controller so it'll show up on radar etc.
 			actorWrapper newActor = ((LevelController)LevelControllerBase.Instance).addFighterActor(ourMissionEvent.spawnObject[i], ourMissionEvent.eventTeam, patrolStart + patrolOffset, startQuat, groupTag, this);
 			//Assign our AI actions for this fighter
-			((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			//((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			((AI_Fighter)newActor.ourController).setInitialFSMState("PATROL", 10f);
 			groupActors.Add(newActor);
 		}
 	}

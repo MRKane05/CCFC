@@ -124,6 +124,10 @@ public class UIMenuHandler : MonoBehaviour
                 gameManager.Instance.panelTitle = "Skirmish";
                 gameManager.Instance.panelContent = "Vye for air superiority against waves of enemy aircraft.";
                 break;
+            case enMissionType.RECON:
+                gameManager.Instance.panelTitle = "Reconnaissance";
+                gameManager.Instance.panelContent = "Fly reconnaissance through the points marked on your radar. Keep your eyes open for intel photos, balloons, enemy fighters, and also ack ack fire.";
+                break;
         }
     }
 

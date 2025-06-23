@@ -25,6 +25,8 @@ public class zone_AckAck : MonoBehaviour {
 
 	public List<GameObject> EffectPrefabs = new List<GameObject>(); //The idea here is that we'll recycle these to prevent memory issues
 
+	bool bPlayerWarned = false;
+
 	void Start()
     {
 
@@ -107,6 +109,11 @@ public class zone_AckAck : MonoBehaviour {
 		{
 			if (bIsPositionInZone(PlayerController.Instance.transform.position + PlayerController.Instance.transform.forward * EffectZoneSize * 1.5f))
 			{
+				if (!bPlayerWarned)
+                {
+					LevelChatterController.Instance.playChatter("warnackack");
+					bPlayerWarned = true;
+                }
 				//Make a "background" Ack Ack
 				volumeTriggerTime = Time.time;
 				//This is only worthwhile if our player sees it, so lets see about making a pattern that'll put it within a forward zone of the player

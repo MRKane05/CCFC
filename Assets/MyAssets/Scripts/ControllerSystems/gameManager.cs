@@ -159,9 +159,9 @@ public class PlayerGameStats
 public class LevelScoreItem
 {
 	//public string itemName = "";
-	public float itemPoints = 1;
-	public int count = 0;
-	public int totalInLevel = 0;
+	public float itemPoints = 1;	//What's the points value of this item
+	public int count = 0;	//Number of times we've bagged this item
+	public int totalInLevel = 0;	//How many are in the level
 
 	public LevelScoreItem(float newPoints, int newCount, int newInLevel)
 	{
@@ -201,7 +201,7 @@ public class PlayerLevelScore
 		}
 		else
 		{
-			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 1, 1);
+			LevelScoreItem newScoreItem = new LevelScoreItem(itemPoints, 0, 1);
 			playerLevelScore.Add(itemName, newScoreItem);
 		}
 	}
@@ -379,7 +379,7 @@ public class gameManager : MonoBehaviour {
 
 		//load our level
 		UIMusicHandler.Instance.SetMusicTrack(false);   //Set our combat track playing
-		if (missionType == enMissionType.FLIGHT || missionType == enMissionType.BASEDEFENCE || missionType == enMissionType.BASEATTACK || missionType == enMissionType.SKIRMISH)
+		if (missionType == enMissionType.FLIGHT || missionType == enMissionType.BASEDEFENCE || missionType == enMissionType.BASEATTACK || missionType == enMissionType.SKIRMISH || missionType == enMissionType.RECON)
 		{
 			yield return StartCoroutine(loadScene("Level"));
 		} else if (missionType == enMissionType.TURRET)

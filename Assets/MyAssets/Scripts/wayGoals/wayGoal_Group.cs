@@ -63,7 +63,8 @@ public class wayGoal_Group : wayGoal {
 			//((LevelController)LevelControllerBase.Instance).waypointCallbackEnemy(prefabManager.Instance.getEnemyFighter(0F, 1F), patrolStart + patrolOffset, startQuat, groupTag);
 			wayActors[i] = ((LevelController)LevelControllerBase.Instance).addFighterActor(prefabManager.Instance.getEnemyFighter(0F, 1F), 1, patrolStart + patrolOffset, startQuat, groupTag, null);
 
-			((AI_Fighter)wayActors[i].ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			//((AI_Fighter)wayActors[i].ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			((AI_Fighter)wayActors[i].ourController).setInitialFSMState("PATROL", 10f);
 		}
 	}
 
