@@ -362,7 +362,7 @@ public class LevelController : LevelControllerBase {
 			}
 			actorWrapper newActor = addFighterActor(team == 0 ? prefabManager.Instance.friendlyPrefabList[0] : prefabManager.Instance.enemyPrefabList[0], team, patrolStart + patrolOffset, startQuat, groupTag);
 			//Assign our AI actions for this fighter
-			((AI_Fighter)newActor.ourController).setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
+			((AI_Fighter)newActor.ourController).setInitialFSMState("PATROL", 10f);// .setPatrol(10f); //set this fighter to a patrol for however many seconds. //.pattern="PATROL";
 		}
 	}
 
