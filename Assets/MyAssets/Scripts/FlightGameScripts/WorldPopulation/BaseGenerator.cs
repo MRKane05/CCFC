@@ -134,7 +134,7 @@ public class BaseGenerator : MonoBehaviour {
 		BaseCenterPoint /= (float)spawnedBaseObjects.Length;
 	}
 
-
+	public Vector3 baseCenter = Vector3.zero;
 
 	public void setBaseBuildingsPoints(bool bIsPlayerBase, GameObject thisGameObject)
     {
@@ -145,8 +145,10 @@ public class BaseGenerator : MonoBehaviour {
 			foreach (Transform child in thisGameObject.transform)
 			{
 				setBaseBuildingsPoints(bIsPlayerBase, child.gameObject);
+				baseCenter += child.position;
 			}
-		}
+			baseCenter /= thisGameObject.transform.childCount;
+		}		
 
 		foreach (WorldDestructableObject thisBuilding in buildings)
         {

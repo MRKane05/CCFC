@@ -83,6 +83,22 @@ public class Mission_Bombers : MissionConstructionBase
         //Assign points to the buildings to reflect in mission score
         ourBaseGenerator.setBaseBuildingsPoints(BombingTeam == enBombingTeam.ENEMY, ourBaseGenerator.baseParent);
 
+        float photoRadius = 100f;
+        int BasePhotos = Random.Range(0, 15);
+        if (BombingTeam == enBombingTeam.PLAYER)
+        {
+            for (int i = 0; i < BasePhotos; i++)
+            {
+                //Scatter some recon points above the base for the player to collect as little additional extras
+                Vector3 picPoint = new Vector3(Random.Range(-photoRadius, photoRadius), 0, Random.Range(-photoRadius, photoRadius));
+                picPoint += ourBaseGenerator.baseCenter;
+                picPoint = LevelControllerBase.Instance.getTerrainHeightAtPoint(picPoint);
+                picPoint += Vector3.up * Random.Range(10f, 60f);
+                GameObject newPhotoObject = Instantiate(LevelPickupManager.Instance.PhotoPositionPrefab, picPoint, Quaternion.identity) as GameObject;
+
+            }
+        }
+
         //Then we position our player
         //Then we give everything the all-clear to proceed
 
