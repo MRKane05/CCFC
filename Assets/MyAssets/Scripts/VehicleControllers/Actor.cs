@@ -43,13 +43,6 @@ public class Actor : MonoBehaviour {
 	//Actors need to fade in when they begin...
 	protected float inFadeStart, inFadeTime = 2f;
 
-	//And the movement variables :)
-	/*
-	//Depricated
-	public float rollspeed = 1.5F;      //Used by the AI for doing turns
-	public float pitchspeed = 1.5F;
-	public float yawspeed = 1.5F;       //Used by the AI for doing turns
-	*/
 
 	public float turnspeed = 1.5f;
 
@@ -70,7 +63,15 @@ public class Actor : MonoBehaviour {
 	float playerKillTimeThreshold = 1f; //Because we don't care about the AI getting points and if the player is shooting at something we should give the kill to the player
 
 
-	public float inFade {
+	#region Settings
+	public float takenDamage = 0.5f; //So this is handled from the opposite slider to the team
+	public float AI_Aggression = 0.5f; //I wonder if this should be on the AI module itself?
+	public float AI_PlayerFocus = 0.5f;	//Again, might be better on the AI module
+    #endregion
+
+
+
+    public float inFade {
 		get { return Mathf.Clamp01((Time.time-inFadeStart)/inFadeTime); }
 	}
 
@@ -87,8 +88,8 @@ public class Actor : MonoBehaviour {
 		DoStart();
 
 		yield return null;
-		if (bIsPlayerVehicle)
-		{
+		//if (bIsPlayerVehicle)
+		//{
 			while (UISettingsHandler.Instance == null)
 			{
 				yield return null;
@@ -96,7 +97,7 @@ public class Actor : MonoBehaviour {
 			//Debug.LogError("Adding Settings Listner");
 			UISettingsHandler.Instance.OnSettingsChanged.AddListener(UpdateInternalSettings);
 			DoUpdateInternalSettings();	//make sure we get our settings on start
-		}
+		//}
 	}
 
 	public virtual void DoStart()
@@ -252,10 +253,15 @@ public class Actor : MonoBehaviour {
 		}			
 	}
 
+	protected float getDamageMod(float thisDamage)
+    {
+		return thisDamage *= Mathf.Lerp(0.25f, 3.25f, takenDamage * takenDamage);
+	}
+
 	//kind of explains why this isn't getting shot now doesn't it?
 	public virtual void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay) {
 		//Debug.LogError("Getting Shot");
-
+		thisDamage = getDamageMod(thisDamage);
 		//Make this invincible for the moment...
 		if (!isInvincible)
 		{
@@ -366,10 +372,7 @@ public class Actor : MonoBehaviour {
     #region Settings Handlers
     void OnDestroy()
 	{
-		if (bIsPlayerVehicle)
-		{
-			UISettingsHandler.Instance.OnSettingsChanged.RemoveListener(UpdateInternalSettings);
-		}
+		UISettingsHandler.Instance.OnSettingsChanged.RemoveListener(UpdateInternalSettings);
 	}
 
 	void UpdateInternalSettings()
@@ -379,8 +382,18 @@ public class Actor : MonoBehaviour {
 
 	public virtual void DoUpdateInternalSettings()
     {
-		
-    }
+		Debug.Log(gameObject.name + " updating settings");
+		if (team == 0)
+		{
+			takenDamage = UISettingsHandler.Instance.getSettingFloat("flight_enemy_damage");
+		}
+		else if (team == 1)
+		{
+			takenDamage = UISettingsHandler.Instance.getSettingFloat("flight_friendly_damage");
+			AI_Aggression = UISettingsHandler.Instance.getSettingFloat("flight_enemy_agg");
+			AI_PlayerFocus = UISettingsHandler.Instance.getSettingFloat("flight_enemy_focus");
+		}
+	}
 
 	public virtual void DoCollectPickup(GameObject thisPickup)
     {

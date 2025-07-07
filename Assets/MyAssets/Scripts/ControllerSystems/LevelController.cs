@@ -459,7 +459,7 @@ public class LevelController : LevelControllerBase {
 	}
 
 	//The fighters can use this to call for another target
-	public void requestTarget(ActorController ourController, bool bDirectionMatters) {
+	public void requestTarget(ActorController ourController, bool bDirectionMatters, float AI_PlayerFocus = 0.5f) {
 		//For the moment just assign it something.
 		int target=-1;
 		if (ourController.team==0) { //we're friendly, and a small tweak for testing...
@@ -469,8 +469,8 @@ public class LevelController : LevelControllerBase {
 			else
 				ourController.targetCallback(null, null, -1);
 		}
-		else if (ourController.team==1) { //we're friendly
-			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, friendlyList, bDirectionMatters);
+		else if (ourController.team==1) { //we're enemy
+			target = GetBestTarget(ourController.ourAircraft.gameObject.transform.position, ourController.ourAircraft.gameObject.transform.forward, friendlyList, bDirectionMatters, AI_PlayerFocus);
 			if (target!=-1)
 				ourController.targetCallback(friendlyList[target].actor, friendlyList[target].vehicle, 1); //list this target and attack it!
 			else
@@ -497,13 +497,23 @@ public class LevelController : LevelControllerBase {
 	}
 
 	//can also be used by the player I suppose. For now this will work.
-	int GetBestTarget(Vector3 thisPosition, Vector3 thisForward, List<actorWrapper> listTargets, bool bDirectionMatters) {
+	int GetBestTarget(Vector3 thisPosition, Vector3 thisForward, List<actorWrapper> listTargets, bool bDirectionMatters, float AI_PlayerFocus = 0.5f) {
 		int bestTarget = -1;
 		float bestPropensity = float.MaxValue, thisTargetPropensity=0; //we use an inverse system
 
 		if (listTargets.Count != 0) { //This just needs to return an int...cunning...oh no wait...I wrote this of course!
 			for (int i=0; i<listTargets.Count; i++) {
 				thisTargetPropensity = 0; //annul this before recalculating
+				
+				//Handle our target bias to see if AI should be focusing on the player or other targets
+				if (AI_PlayerFocus != 0.5f)
+                {
+					if (listTargets[i].vehicle == playerAircraft)
+                    {
+						thisTargetPropensity += (AI_PlayerFocus - 0.5f) * 15f;	//Similar multiplier for target priority
+                    }
+                }
+
 				//first step: how far away from us is it?
 				thisTargetPropensity += (thisPosition-listTargets[i].actor.gameObject.transform.position).magnitude;
 

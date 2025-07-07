@@ -172,7 +172,7 @@ public class AI_Fighter : ActorController {
 
 	void handleTargets() { //to be used to see what we should be doing target wise.
 		if ((!target || targetController.bIsDead) && pattern!="FOLLOW") {
-			levelLink.requestTarget(this, false);
+			levelLink.requestTarget(this, false, ourAircraft.AI_PlayerFocus);
 		}
 
 		//will need to extend this a little for misbehaving players (killing pilots)
@@ -693,7 +693,23 @@ public class AI_Fighter : ActorController {
 		newYaw = 0;
 		
 	}
-	
+
+	public void DoTighteningTurn(out Quaternion newRotation, out float newYaw, float factor)
+	{
+		transform.rotation = ourAircraft.gameObject.transform.rotation; //reset this sucker.
+		transform.RotateAroundLocal(Vector3.up, Mathf.Clamp(factor*8f, 0, 20)); //Well I'll buy that for a dollar despite it not working
+		newRotation = transform.rotation;
+		newYaw = 0;
+	}
+
+	public void DoScissors(out Quaternion newRotation, out float newYaw)
+	{
+		transform.rotation = ourAircraft.gameObject.transform.rotation; //reset this sucker.
+		transform.RotateAroundLocal(Vector3.up, Mathf.Sign(Mathf.Sin(Time.time/3f)) * 20f); //Well I'll buy that for a dollar despite it not working
+		newRotation = transform.rotation;
+		newYaw = 0;
+	}
+
 	//===========Attack Function==============================
 	bool bFireOnTarget() {
 		if (fireOngoingTime + triggerHoldTime > Time.time) { //we're still firing away happily
@@ -826,7 +842,7 @@ public class AI_Fighter : ActorController {
 
 
 
-		newRotation = Quaternion.Lerp (lastRotation, transform.rotation, Time.deltaTime*targetUpdate);
+		newRotation = Quaternion.Lerp(lastRotation, transform.rotation, Time.deltaTime*targetUpdate);
 		lastRotation = newRotation;
 
 	}

@@ -14,24 +14,39 @@ public class EvasiveState : IAIState
     {
         if (fighter.patternStage == "PICK")
         {
-            float rndVal = Random.Range(0, 2);
+            float rndVal = Random.Range(0, 4);
             if (rndVal < 1)
                 fighter.patternStage = "LOOP";
-            else
+            else if (rndVal < 2)
                 fighter.patternStage = "WEAVE";
+            else if (rndVal < 3)
+                fighter.patternStage = "TIGHTENINGTURN";
+            else 
+                fighter.patternStage = "SCISSOR";
         }
 
-        if (fighter.patternStage == "LOOP")
+        switch (fighter.patternStage)
         {
-            fighter.DoLoop(out fighter.returnRotation, out fighter.aircraftYaw, 20);
-            fighter.targetSpeed = 1;
-            CheckBreak(fighter);
-        }
-        else if (fighter.patternStage == "WEAVE")
-        {
-            fighter.DoWeave(out fighter.returnRotation, out fighter.aircraftYaw, 20);
-            fighter.targetSpeed = 0.75f + Mathf.Sin(Time.time) * 0.25f;
-            CheckBreak(fighter);
+            case "LOOP":
+                fighter.DoLoop(out fighter.returnRotation, out fighter.aircraftYaw, 20);
+                fighter.targetSpeed = 1;
+                CheckBreak(fighter);
+                break;
+            case "WEAVE":
+                fighter.DoWeave(out fighter.returnRotation, out fighter.aircraftYaw, 20);
+                fighter.targetSpeed = 0.75f + Mathf.Sin(Time.time) * 0.25f;
+                CheckBreak(fighter);
+                break;
+            case "TIGHTENINGTURN":
+                fighter.DoTighteningTurn(out fighter.returnRotation, out fighter.aircraftYaw, 20f * ((Time.time - fighter.patternTime) / fighter.patternDuration));
+                fighter.targetSpeed = 1;
+                CheckBreak(fighter);
+                break;
+            case "SCISSOR":
+                fighter.DoScissors(out fighter.returnRotation, out fighter.aircraftYaw);
+                fighter.targetSpeed = 1;
+                CheckBreak(fighter);
+                break;
         }
     }
 
@@ -41,6 +56,13 @@ public class EvasiveState : IAIState
         {
             fighter.stateMachine.ChangeState("ATTACK");
         }
+        //We could also do with something that says "we're in an advantageous position over our enemy" for this break
+        float targetDot = Vector3.Dot((fighter.ourAircraft.transform.position- fighter.target.transform.position).normalized, fighter.target.transform.forward);
+        if (targetDot < -0.25)  //We're behind our target but still doing evasive manuvers. We should switch to attacking
+        {
+            fighter.stateMachine.ChangeState("ATTACK");
+        }
+
     }
 
     public void Exit(AI_Fighter fighter) { }

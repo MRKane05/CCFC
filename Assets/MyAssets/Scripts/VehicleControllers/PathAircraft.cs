@@ -182,6 +182,7 @@ public class PathAircraft : Actor {
 
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay)
 	{
+        thisDamage = getDamageMod(thisDamage);
         //base.takeDamage(thisDamage, damageType, instigator, damagingTeam, delay);
         if (!isInvincible)
         {

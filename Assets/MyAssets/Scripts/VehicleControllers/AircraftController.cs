@@ -323,13 +323,15 @@ public class AircraftController : Actor {
 	
 	//I really need to refactor this class...
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int team, float delay) {
+		thisDamage = getDamageMod(thisDamage);
 		//This needs a super...
 		if (owner)	//Need to figure out why this isn't being set
 			owner.actorTakingDamage(owner, this, health / maxHealth);
 		//Make this invincible for the moment...
+
 		if (!isInvincible) {
 			health -= thisDamage;
-			if (health<0 && !bIsDead) {
+			if (health < 0 && !bIsDead) {
 				//need to check and see if this is the player, and if it is then add the score up.
 				CheckPlayerKill(instigator);
 
@@ -338,6 +340,7 @@ public class AircraftController : Actor {
 				applyShotDown();
 			}
 		}
+		//base.takeDamage(thisDamage, damageType, instigator, team, delay);
 		
 		//Need to tell our controller that we're taking damage...
 		if (ourPlayerController) //well this is a moot statement isn't it?
@@ -553,15 +556,16 @@ public class AircraftController : Actor {
 
 	public override void DoUpdateInternalSettings()
 	{
+		base.DoUpdateInternalSettings();
 		//Mainly because I'll want to override for different vehicles
 		//float controllerSoftnessValue = UISettingsHandler.Instance.getSettingFloat("flight_look_softness");
 		//controllerSoftness = Mathf.Lerp(70f, 10f, controllerSoftnessValue);
-
-		yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? -1 : 1;
-
-		bStickControlRight = UISettingsHandler.Instance.getSettingInt("flight_control_handedness") == 0;
-
-		bTriggerControlRight = UISettingsHandler.Instance.getSettingInt("flight_trigger_handedness") == 0;
+		if (bIsPlayerVehicle)
+		{
+			yAxisBias = UISettingsHandler.Instance.getSettingInt("flight_look_inversion") == 0 ? -1 : 1;
+			bStickControlRight = UISettingsHandler.Instance.getSettingInt("flight_control_handedness") == 0;
+			bTriggerControlRight = UISettingsHandler.Instance.getSettingInt("flight_trigger_handedness") == 0;
+		}
 	}
 
 	public override void DoCollectPickup(GameObject targetPickup)

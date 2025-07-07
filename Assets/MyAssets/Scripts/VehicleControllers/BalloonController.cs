@@ -90,7 +90,7 @@ public class BalloonController : Actor {
 	}
 	public override void takeDamage(float thisDamage, string damageType, GameObject instigator, int damagingTeam, float delay) {
 		
-		
+		thisDamage = getDamageMod(thisDamage);
 		//Make this invincible for the moment...
 		if (!isInvincible) {
 			health -= thisDamage;

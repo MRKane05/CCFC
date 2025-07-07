@@ -128,7 +128,7 @@ public class UISettingsHandler : MonoBehaviour {
             addSettingsFloat(valueName, keyValue);
             return keyValue;
         }
-        return 0f;
+        return 0.5f;    //Return the average value
     }
     #endregion
 }
